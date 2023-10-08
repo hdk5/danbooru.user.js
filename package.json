@@ -1,0 +1,32 @@
+{
+  "name": "danbooru-blacklist2",
+  "version": "1.0.0",
+  "description": "Advanced blacklist rule grammar for Danbooru.",
+  "private": true,
+  "author": "hdk5",
+  "license": "WTFPL",
+  "packageManager": "yarn@3.6.4",
+  "devDependencies": {
+    "@tsconfig/strictest": "^2.0.2",
+    "@types/eslint": "^8",
+    "@types/jquery": "^3.5.22",
+    "@types/node": "^20.8.3",
+    "@types/prettier": "^3",
+    "@types/webpack-dev-server": "^4.7.2",
+    "@typescript-eslint/eslint-plugin": "^6.7.4",
+    "@typescript-eslint/parser": "^6.7.4",
+    "eslint": "^8.51.0",
+    "eslint-config-prettier": "^9.0.0",
+    "eslint-plugin-import": "^2.28.1",
+    "eslint-plugin-prettier": "^5.0.0",
+    "eslint-webpack-plugin": "^4.0.1",
+    "prettier": "^3.0.3",
+    "ts-loader": "^9.4.4",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.2.2",
+    "webpack": "^5.88.2",
+    "webpack-cli": "^5.1.4",
+    "webpack-dev-server": "^4.15.1",
+    "webpack-userscript": "^3.2.2"
+  }
+}

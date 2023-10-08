@@ -1,0 +1,10 @@
+{
+  "extends": "@tsconfig/strictest/tsconfig.json",
+  "compilerOptions": {
+    "outDir": "./dist/",
+    "target": "ESNext",
+    "module": "NodeNext",
+    "sourceMap": true,
+    "resolveJsonModule": true
+  }
+}
