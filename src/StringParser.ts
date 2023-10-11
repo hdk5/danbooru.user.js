@@ -39,7 +39,7 @@ export class StringParser<StateType> {
     }
 
     const savedPos = this.scanner.getPosition();
-    const savedState = window.structuredClone(this.state);
+    const savedState = structuredClone(this.state);
 
     const result = parser();
 

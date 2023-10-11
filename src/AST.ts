@@ -1,87 +1,160 @@
 import { Post } from "./Post";
+import { Range } from "./Range";
 
 export abstract class AST {
   abstract match(post: Post): boolean;
+
+  simplify(): AST {
+    return this;
+  }
 }
 
 export class ASTAll extends AST {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   override match(_post: Post): boolean {
     return true;
   }
 }
 
 export class ASTNone extends AST {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   override match(_post: Post): boolean {
     return false;
   }
 }
 
 export class ASTAnd extends AST {
-  readonly left: AST;
-  readonly right: AST;
-
-  constructor(left: AST, right: AST) {
+  constructor(
+    readonly left: AST,
+    readonly right: AST,
+  ) {
     super();
-    this.left = left;
-    this.right = right;
   }
 
   override match(post: Post): boolean {
     return this.left.match(post) && this.right.match(post);
   }
+
+  override simplify(): AST {
+    const left = this.left.simplify();
+    const right = this.right.simplify();
+
+    if (left instanceof ASTNone || right instanceof ASTNone) {
+      return new ASTNone();
+    }
+
+    if (left instanceof ASTAll) {
+      return right;
+    }
+
+    if (right instanceof ASTAll) {
+      return left;
+    }
+
+    if (left instanceof ASTAnd) {
+      return new ASTAnd(left.left, new ASTAnd(left.right, right).simplify());
+    }
+
+    return new ASTAnd(left, right);
+  }
 }
 
 export class ASTOr extends AST {
-  readonly left: AST;
-  readonly right: AST;
-
-  constructor(left: AST, right: AST) {
+  constructor(
+    readonly left: AST,
+    readonly right: AST,
+  ) {
     super();
-    this.left = left;
-    this.right = right;
   }
 
   override match(post: Post): boolean {
     return this.left.match(post) || this.right.match(post);
   }
+
+  override simplify(): AST {
+    const left = this.left.simplify();
+    const right = this.right.simplify();
+
+    if (left instanceof ASTAll || right instanceof ASTAll) {
+      return new ASTAll();
+    }
+
+    if (left instanceof ASTNone) {
+      return right;
+    }
+
+    if (right instanceof ASTNone) {
+      return left;
+    }
+
+    if (left instanceof ASTOr) {
+      return new ASTOr(left.left, new ASTOr(left.right, right).simplify());
+    }
+
+    return new ASTOr(left, right);
+  }
 }
 
 export class ASTNot extends AST {
-  readonly node: AST;
-
-  constructor(node: AST) {
+  constructor(readonly node: AST) {
     super();
-    this.node = node;
   }
 
   override match(post: Post): boolean {
     return !this.node.match(post);
   }
+
+  override simplify(): AST {
+    const node = this.node.simplify();
+
+    if (node instanceof ASTAll) {
+      return new ASTNone();
+    }
+
+    if (node instanceof ASTNone) {
+      return new ASTAll();
+    }
+
+    if (node instanceof ASTNot) {
+      return node.node;
+    }
+
+    return new ASTNot(node);
+  }
+}
+
+export class ASTOpt extends AST {
+  constructor(readonly node: AST) {
+    super();
+  }
+
+  override match(_post: Post): boolean {
+    throw new Error("not implemented");
+  }
 }
 
 export class ASTTag extends AST {
-  readonly tag: string;
-
-  constructor(tag: string) {
+  constructor(readonly tag: string) {
     super();
-    this.tag = tag;
+    this.tag = this.tag.toLowerCase();
   }
 
   override match(post: Post): boolean {
-    return post.tags.includes(this.tag);
+    return post.tags
+      .map((tag) => tag.toLowerCase())
+      .includes(this.tag.toLowerCase());
   }
 }
 
 export class ASTWildcard extends AST {
-  readonly wildcard: string;
   private regex: RegExp;
 
-  constructor(wildcard: string) {
+  constructor(readonly wildcard: string) {
     super();
-    this.wildcard = wildcard;
-    this.regex = RegExp(`^${wildcard.replaceAll("*", ".*")}$`, "i");
+
+    const pattern = this.wildcard
+      .replace(/[|\\{}()[\]^$+*?.]/g, "\\$&")
+      .replace(/-/g, "\\x2d")
+      .replace(/\\\*/g, "[\\s\\S]*");
+    this.regex = RegExp(`^${pattern}$`, "i");
   }
 
   override match(post: Post): boolean {
@@ -92,13 +165,12 @@ export class ASTWildcard extends AST {
 }
 
 export class ASTMetatag extends AST {
-  readonly name: string;
-  readonly value: string;
-
-  constructor(name: string, value: string) {
+  constructor(
+    readonly name: string,
+    readonly value: string,
+  ) {
     super();
-    this.name = name;
-    this.value = value;
+    this.name = this.name.toLowerCase();
   }
 
   override match(post: Post): boolean {
@@ -107,18 +179,12 @@ export class ASTMetatag extends AST {
     }
 
     if (this.name === "score") {
-      if (this.value.startsWith(">")) {
-        const value = parseInt(this.value.slice(1));
-        return post.score > value;
+      const range: Range | null = Range.parse(this.value);
+      if (range === null) {
+        return false;
       }
 
-      if (this.value.startsWith("<")) {
-        const value = parseInt(this.value.slice(1));
-        return post.score < value;
-      }
-
-      const value = parseInt(this.value);
-      return post.score === value;
+      return range.includes(post.score);
     }
 
     if (this.name === "uploaderid") {

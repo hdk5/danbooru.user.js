@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name Danbooru - Blacklist2
 // @description Advanced blacklist rule grammar for Danbooru.
-// @version 1.0.0
+// @version 1.1.0
 // @author hdk5
 // @supportURL https://github.com/hdk5/danbooru-blacklist2/issues
 // @match *://*.donmai.us/*

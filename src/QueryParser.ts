@@ -8,13 +8,14 @@ import {
   ASTAnd,
   ASTOr,
   ASTNone,
+  ASTOpt,
 } from "./AST";
 import { StringParser } from "./StringParser";
 import { Tag } from "./Tag";
 
 export class QueryParser {
-  parser: StringParser<number>;
-  metatagRegex: RegExp;
+  private parser: StringParser<number>;
+  private metatagRegex: RegExp;
 
   private constructor(input: string, metatags: string[]) {
     this.parser = new StringParser<number>(input, 0);
@@ -40,19 +41,16 @@ export class QueryParser {
       return new ASTNone();
     }
 
-    return ast;
+    return ast.simplify();
   }
 
   private root(): AST | null {
-    // eslint-disable-next-line prefer-const
-    let [a, ...rest] = this.parser.zeroOrMore(this.orClause.bind(this));
+    const factorList = this.parser.zeroOrMore(this.orClause.bind(this));
     this.space();
 
-    if (a === undefined) {
-      return new ASTAll();
-    }
+    let a = new ASTAll();
 
-    for (const b of rest) {
+    for (const b of factorList) {
       a = new ASTAnd(a, b);
     }
 
@@ -98,18 +96,27 @@ export class QueryParser {
   }
 
   private factorList(): AST | null {
-    // eslint-disable-next-line prefer-const
-    let [a, ...rest] = this.parser.zeroOrMore(this.factor.bind(this));
-
-    if (a === undefined) {
+    const factorList = this.parser.zeroOrMore(this.factor.bind(this));
+    if (factorList.length === 0) {
       return null;
     }
 
-    for (const b of rest) {
-      a = new ASTAnd(a, b);
+    let and: AST = new ASTAll();
+    let or: AST = new ASTNone();
+
+    for (const factor of factorList) {
+      if (factor instanceof ASTOpt) {
+        or = new ASTOr(or, factor.node);
+      } else {
+        and = new ASTAnd(and, factor);
+      }
     }
 
-    return a;
+    if (or instanceof ASTOr) {
+      and = new ASTAnd(and, or);
+    }
+
+    return and;
   }
 
   private factor(): AST | null {
@@ -124,7 +131,11 @@ export class QueryParser {
     }
 
     if (this.parser.accept(/~/) !== null) {
-      return null;
+      const expr = this.expr();
+      if (expr === null) {
+        return null;
+      }
+      return new ASTOpt(expr);
     }
 
     return this.expr();
@@ -171,7 +182,7 @@ export class QueryParser {
 
   private quotedString(): string | null {
     if (this.parser.accept(/"/) !== null) {
-      const a = this.parser.accept(/([^"\\]|\\")*/)!.replaceAll(/\\"/, '"');
+      const a = this.parser.accept(/([^"\\]|\\")*/)!.replaceAll(/\\"/g, '"');
       if (this.parser.expect(/"/) === null) {
         return null;
       }
@@ -179,7 +190,7 @@ export class QueryParser {
     }
 
     if (this.parser.accept(/'/) !== null) {
-      const a = this.parser.accept(/([^'\\]|\\')*/)!.replaceAll(/\\'/, '"');
+      const a = this.parser.accept(/([^'\\]|\\')*/)!.replaceAll(/\\'/g, "'");
       if (this.parser.expect(/'/) === null) {
         return null;
       }

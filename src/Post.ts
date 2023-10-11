@@ -1,38 +1,16 @@
 export class Post {
-  readonly tags: string[];
-  readonly score: number;
-  readonly rating: string;
-  readonly uploaderId: number;
-  readonly isPending: boolean;
-  readonly isFlagged: boolean;
-  readonly isDeleted: boolean;
-  readonly isBanned: boolean;
-  readonly hasParent: boolean;
-  readonly hasChildren: boolean;
-
   private constructor(
-    tags: string[],
-    score: number,
-    rating: string,
-    uploaderId: number,
-    isPending: boolean,
-    isFlagged: boolean,
-    isDeleted: boolean,
-    isBanned: boolean,
-    hasParent: boolean,
-    hasChildren: boolean,
-  ) {
-    this.tags = tags;
-    this.score = score;
-    this.rating = rating;
-    this.uploaderId = uploaderId;
-    this.isPending = isPending;
-    this.isFlagged = isFlagged;
-    this.isDeleted = isDeleted;
-    this.isBanned = isBanned;
-    this.hasParent = hasParent;
-    this.hasChildren = hasChildren;
-  }
+    readonly tags: string[],
+    readonly score: number,
+    readonly rating: string,
+    readonly uploaderId: number,
+    readonly isPending: boolean,
+    readonly isFlagged: boolean,
+    readonly isDeleted: boolean,
+    readonly isBanned: boolean,
+    readonly hasParent: boolean,
+    readonly hasChildren: boolean,
+  ) {}
 
   static fromElement(post: HTMLElement): Post {
     const tags = post.dataset["tags"]!.split(" ");

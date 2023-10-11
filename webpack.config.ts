@@ -36,10 +36,11 @@ const config: Configuration = {
         updateURL:
           "https://github.com/hdk5/danbooru-blacklist2/raw/master/dist/danbooru-blacklist2.user.js",
       },
+      proxyScript: {},
     }),
   ],
   resolve: {
-    extensions: [".ts"],
+    extensions: [".wasm", ".ts", ".tsx", ".mjs", ".cjs", ".js", ".json"],
   },
   output: {
     path: path.resolve(__dirname, "dist"),
@@ -47,7 +48,7 @@ const config: Configuration = {
   },
   devtool: "source-map",
   devServer: {
-    static: path.resolve(__dirname, "dist"),
+    hot: false,
     devMiddleware: { writeToDisk: true },
   },
 };

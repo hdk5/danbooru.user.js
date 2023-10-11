@@ -19,6 +19,7 @@ Advanced blacklist rule grammar for Danbooru.
 
 * `or` expressions
     * `blonde_hair or blue_eyes`
+    * `~blonde_hair ~blue_eyes`
 
 * `not` expressions
     * `-blonde_hair`
@@ -37,9 +38,17 @@ Advanced blacklist rule grammar for Danbooru.
     * `rating:e`
 
 * `score` metatag
-    * `score:>50`
-    * `score:50`
-    * `score:<50`
+    * `score:5`
+    * `score:>5`
+    * `score:>=5`
+    * `score:<5`
+    * `score:<=5`
+    * `score:5..`
+    * `score:..5`
+    * `score:5..10`
+    * `score:5...10`
+    * `score:5,6,7`
+    * `score:5,7..9`
 
 * `uploaderid` metatag
     * `uploaderid:748553`
@@ -55,14 +64,6 @@ Advanced blacklist rule grammar for Danbooru.
     * `has:children`
 
 ## Unsupported syntax
-
-* Legacy disjunctive operator
-    * `~blonde_hair ~blue_eyes`
-    * Use `blonde_hair or blue_eyes`
-
-* `>=`, `<=`, `..` for `score` metatag
-    * `score:>=50`, `score:<=50`, `score:50..`, `score:..50`, `score:50..100`
-    * Use `score:>49`, `score:<51`, `score:>49 and score:<101`
 
 * `,` for `rating` metatag
     * `rating:q,e`
