@@ -3,8 +3,8 @@ type ValueType = number;
 export abstract class Range {
   abstract includes(value: ValueType): boolean;
 
-  static parse(expr: string): Range | null {
-    const subclasses = [
+  private static get SUBCLASSES(): { parse(expr: string): Range | null }[] {
+    return [
       RangeUnion,
       RangeExclusive,
       RangeInclusive,
@@ -16,8 +16,10 @@ export abstract class Range {
       RangeNone,
       RangeEq,
     ];
+  }
 
-    for (const subclass of subclasses) {
+  static parse(expr: string): Range | null {
+    for (const subclass of this.SUBCLASSES) {
       const range: Range | null = subclass.parse(expr);
 
       if (range !== null) {

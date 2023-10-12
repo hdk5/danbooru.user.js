@@ -36,6 +36,7 @@ Advanced blacklist rule grammar for Danbooru.
     * `rating:s`
     * `rating:q`
     * `rating:e`
+    * `,` is also supported (i.e. `rating:q,e`)
 
 * `score` metatag
     * `score:5`
@@ -58,13 +59,9 @@ Advanced blacklist rule grammar for Danbooru.
     * `is:flagged`
     * `is:deleted`
     * `is:banned`
+    * `is:parent`
+    * `is:child`
 
 * `has` metatag
     * `has:parent`
     * `has:children`
-
-## Unsupported syntax
-
-* `,` for `rating` metatag
-    * `rating:q,e`
-    * Use `rating:q or rating:e`

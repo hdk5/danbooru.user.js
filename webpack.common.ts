@@ -1,6 +1,5 @@
 import * as path from "path";
 
-import ESLintPlugin from "eslint-webpack-plugin";
 import { Configuration } from "webpack";
 import "webpack-dev-server";
 import { UserscriptPlugin } from "webpack-userscript";
@@ -17,12 +16,6 @@ const config: Configuration = {
     ],
   },
   plugins: [
-    new ESLintPlugin({
-      extensions: ["ts"],
-      cache: true,
-      threads: true,
-      emitWarning: true,
-    }),
     new UserscriptPlugin({
       headers: {
         name: "Danbooru - Blacklist2",
@@ -36,20 +29,15 @@ const config: Configuration = {
         updateURL:
           "https://github.com/hdk5/danbooru-blacklist2/raw/master/dist/danbooru-blacklist2.user.js",
       },
-      proxyScript: {},
     }),
   ],
   resolve: {
     extensions: [".wasm", ".ts", ".tsx", ".mjs", ".cjs", ".js", ".json"],
   },
   output: {
-    path: path.resolve(__dirname, "dist"),
     filename: "danbooru-blacklist2.user.js",
-  },
-  devtool: "source-map",
-  devServer: {
-    hot: false,
-    devMiddleware: { writeToDisk: true },
+    path: path.resolve(__dirname, "dist"),
+    clean: true,
   },
 };
 

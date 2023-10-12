@@ -9,10 +9,6 @@ export class StringParser<StateType> {
     this.scanner = new StringScanner(input);
   }
 
-  rest(): string {
-    return this.scanner.getRemainder();
-  }
-
   eos(): boolean {
     return this.scanner.hasTerminated();
   }
@@ -21,15 +17,7 @@ export class StringParser<StateType> {
     return this.scanner.scan(pattern);
   }
 
-  skip(pattern: RegExp): boolean {
-    return this.accept(pattern) !== null;
-  }
-
-  expect(pattern: RegExp): string | null {
-    return this.accept(pattern);
-  }
-
-  rewind(n: number = 1): void {
+  rewind(n = 1): void {
     this.scanner.setPosition(this.scanner.getPosition() - n);
   }
 

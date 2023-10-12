@@ -1,4 +1,4 @@
-import { Metatag } from "./Blacklist";
+import { Metatag } from "./Metatag";
 import { Post } from "./Post";
 import { QueryParser } from "./QueryParser";
 
@@ -19,7 +19,7 @@ $(() => {
   Danbooru.Blacklist.parse_entry = (str): BlacklistEntry => {
     const entry = super_parse_entry(str);
 
-    entry.ast = QueryParser.parse(str, Object.values(Metatag));
+    entry.ast = QueryParser.parse(str, Metatag.NAMES);
 
     return entry;
   };

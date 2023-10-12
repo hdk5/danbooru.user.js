@@ -1,5 +1,5 @@
+import { Metatag } from "./Metatag";
 import { Post } from "./Post";
-import { Range } from "./Range";
 
 export abstract class AST {
   abstract match(post: Post): boolean;
@@ -174,56 +174,12 @@ export class ASTMetatag extends AST {
   }
 
   override match(post: Post): boolean {
-    if (this.name === "rating") {
-      return post.rating === this.value.slice(0, 1);
-    }
+    const metatag = Metatag.create(this.name, this.value);
 
-    if (this.name === "score") {
-      const range: Range | null = Range.parse(this.value);
-      if (range === null) {
-        return false;
-      }
-
-      return range.includes(post.score);
-    }
-
-    if (this.name === "uploaderid") {
-      const value = parseInt(this.value);
-      return post.uploaderId === value;
-    }
-
-    if (this.name === "is") {
-      if (this.value === "pending") {
-        return post.isPending;
-      }
-
-      if (this.value === "flagged") {
-        return post.isFlagged;
-      }
-
-      if (this.value === "deleted") {
-        return post.isDeleted;
-      }
-
-      if (this.value === "banned") {
-        return post.isBanned;
-      }
-
+    if (metatag === null) {
       return false;
     }
 
-    if (this.name === "has") {
-      if (this.value === "parent") {
-        return post.hasParent;
-      }
-
-      if (this.value === "children") {
-        return post.hasChildren;
-      }
-
-      return false;
-    }
-
-    return false;
+    return metatag.match(post);
   }
 }

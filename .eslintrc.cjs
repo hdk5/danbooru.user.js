@@ -3,13 +3,18 @@
 module.exports = {
   extends: [
     "eslint:recommended",
-    "plugin:@typescript-eslint/recommended",
+    "plugin:@typescript-eslint/recommended-type-checked",
+    "plugin:@typescript-eslint/stylistic-type-checked",
     "plugin:prettier/recommended",
     "plugin:import/recommended",
     "plugin:import/typescript",
   ],
   parser: "@typescript-eslint/parser",
   plugins: ["@typescript-eslint", "prettier", "import"],
+  parserOptions: {
+    project: true,
+    tsconfigRootDir: null,
+  },
   rules: {
     curly: ["error", "all"],
     eqeqeq: ["error", "always"],

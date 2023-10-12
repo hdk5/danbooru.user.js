@@ -10,7 +10,19 @@ declare let Danbooru: {
   Blacklist: {
     entries: BlacklistEntry[];
     parse_entry: (str: string) => BlacklistEntry;
-    post_match: (post: HTMLElement, entry: BlacklistEntry) => boolean;
+    post_match: (post: PostHTMLElement, entry: BlacklistEntry) => boolean;
     initialize_all: () => void;
   };
 };
+
+interface PostHTMLDataset extends DOMStringMap {
+  tags: string;
+  score: string;
+  rating: string;
+  uploaderId: string;
+  flags: string;
+}
+
+interface PostHTMLElement extends HTMLElement {
+  readonly dataset: PostHTMLDataset;
+}

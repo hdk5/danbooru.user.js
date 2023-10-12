@@ -323,7 +323,7 @@ export class StringScanner {
   unscan(): string | null {
     const match = this.match;
 
-    if (match !== undefined) {
+    if (match !== null) {
       this.setState([], { head: this.last, last: 0 });
     }
 

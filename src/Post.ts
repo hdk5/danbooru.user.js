@@ -12,13 +12,13 @@ export class Post {
     readonly hasChildren: boolean,
   ) {}
 
-  static fromElement(post: HTMLElement): Post {
-    const tags = post.dataset["tags"]!.split(" ");
-    const score = parseInt(post.dataset["score"]!)!;
-    const rating = post.dataset["rating"]!;
-    const uploaderId = parseInt(post.dataset["uploaderId"]!)!;
+  static fromElement(post: PostHTMLElement): Post {
+    const tags = post.dataset.tags.split(" ");
+    const score = parseInt(post.dataset.score)!;
+    const rating = post.dataset.rating;
+    const uploaderId = parseInt(post.dataset.uploaderId)!;
 
-    const flags = post.dataset["flags"]!.split(" ");
+    const flags = post.dataset.flags.split(" ");
     const isPending = flags.includes("pending");
     const isFlagged = flags.includes("flagged");
     const isDeleted = flags.includes("deleted");

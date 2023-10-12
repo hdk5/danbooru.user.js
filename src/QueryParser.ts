@@ -11,9 +11,17 @@ import {
   ASTOpt,
 } from "./AST";
 import { StringParser } from "./StringParser";
-import { Tag } from "./Tag";
 
 export class QueryParser {
+  static readonly PERMITTED_UNBALANCED_TAGS: readonly string[] = [
+    ":)",
+    ":(",
+    ";)",
+    ";(",
+    ">:)",
+    ">:(",
+  ];
+
   private parser: StringParser<number>;
   private metatagRegex: RegExp;
 
@@ -147,7 +155,7 @@ export class QueryParser {
     if (this.parser.accept(/\(/)) {
       ++this.parser.state;
       const a = this.orClause();
-      if (a === null || this.parser.expect(/\)/) === null) {
+      if (a === null || this.parser.accept(/\)/) === null) {
         return null;
       }
       --this.parser.state;
@@ -166,7 +174,7 @@ export class QueryParser {
   }
 
   private metatag(): AST | null {
-    let name = this.parser.expect(this.metatagRegex);
+    let name = this.parser.accept(this.metatagRegex);
     if (name === null) {
       return null;
     }
@@ -183,7 +191,7 @@ export class QueryParser {
   private quotedString(): string | null {
     if (this.parser.accept(/"/) !== null) {
       const a = this.parser.accept(/([^"\\]|\\")*/)!.replaceAll(/\\"/g, '"');
-      if (this.parser.expect(/"/) === null) {
+      if (this.parser.accept(/"/) === null) {
         return null;
       }
       return a;
@@ -191,7 +199,7 @@ export class QueryParser {
 
     if (this.parser.accept(/'/) !== null) {
       const a = this.parser.accept(/([^'\\]|\\')*/)!.replaceAll(/\\'/g, "'");
-      if (this.parser.expect(/'/) === null) {
+      if (this.parser.accept(/'/) === null) {
         return null;
       }
       return a;
@@ -223,11 +231,8 @@ export class QueryParser {
     return new ASTTag(t);
   }
 
-  private string(
-    pattern: RegExp,
-    skipBalancedParens: boolean = false,
-  ): string | null {
-    let str = this.parser.expect(pattern);
+  private string(pattern: RegExp, skipBalancedParens = false): string | null {
+    let str = this.parser.accept(pattern);
     if (str === null) {
       return null;
     }
@@ -237,7 +242,7 @@ export class QueryParser {
       if (
         skipBalancedParens &&
         (QueryParser.hasBalancedParens(str) ||
-          Tag.PERMITTED_UNBALANCED_TAGS.includes(str))
+          QueryParser.PERMITTED_UNBALANCED_TAGS.includes(str))
       ) {
         break;
       }
@@ -250,13 +255,13 @@ export class QueryParser {
   }
 
   private space(): string {
-    return this.parser.expect(/ */)!;
+    return this.parser.accept(/ */)!;
   }
 
   private static hasBalancedParens(
     str: string,
-    open: string = "(",
-    close: string = ")",
+    open = "(",
+    close = ")",
   ): boolean {
     let parens = 0;
 
