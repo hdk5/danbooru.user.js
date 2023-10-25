@@ -16,6 +16,7 @@ export abstract class Metatag {
     return {
       rating: MetatagRating,
       score: MetatagScore,
+      tagcount: MetatagTagcount,
       uploaderid: MetatagUploaderid,
       is: MetatagIs,
       has: MetatagHas,
@@ -46,6 +47,15 @@ class MetatagScore extends Metatag {
     if (range === null) return false;
 
     return range.includes(post.score);
+  }
+}
+
+class MetatagTagcount extends Metatag {
+  override match(post: Post): boolean {
+    const range = Range.parse(this.value);
+    if (range === null) return false;
+
+    return range.includes(post.tags.length);
   }
 }
 

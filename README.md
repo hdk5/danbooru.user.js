@@ -51,8 +51,12 @@ Advanced blacklist rule grammar for Danbooru.
     * `score:5,6,7`
     * `score:5,7..9`
 
+* `tagcount` metagag
+    * ranges are also supported (see `score`)
+
 * `uploaderid` metatag
     * `uploaderid:748553`
+    * ranges are also supported (see `score`)
 
 * `is` metatag
     * `is:pending`
