@@ -37,21 +37,15 @@ export class ASTAnd extends AST {
     const left = this.left.simplify();
     const right = this.right.simplify();
 
-    if (left instanceof ASTNone || right instanceof ASTNone) {
+    if (left instanceof ASTNone || right instanceof ASTNone)
       return new ASTNone();
-    }
 
-    if (left instanceof ASTAll) {
-      return right;
-    }
+    if (left instanceof ASTAll) return right;
 
-    if (right instanceof ASTAll) {
-      return left;
-    }
+    if (right instanceof ASTAll) return left;
 
-    if (left instanceof ASTAnd) {
+    if (left instanceof ASTAnd)
       return new ASTAnd(left.left, new ASTAnd(left.right, right).simplify());
-    }
 
     return new ASTAnd(left, right);
   }
@@ -73,21 +67,14 @@ export class ASTOr extends AST {
     const left = this.left.simplify();
     const right = this.right.simplify();
 
-    if (left instanceof ASTAll || right instanceof ASTAll) {
-      return new ASTAll();
-    }
+    if (left instanceof ASTAll || right instanceof ASTAll) return new ASTAll();
 
-    if (left instanceof ASTNone) {
-      return right;
-    }
+    if (left instanceof ASTNone) return right;
 
-    if (right instanceof ASTNone) {
-      return left;
-    }
+    if (right instanceof ASTNone) return left;
 
-    if (left instanceof ASTOr) {
+    if (left instanceof ASTOr)
       return new ASTOr(left.left, new ASTOr(left.right, right).simplify());
-    }
 
     return new ASTOr(left, right);
   }
@@ -105,29 +92,13 @@ export class ASTNot extends AST {
   override simplify(): AST {
     const node = this.node.simplify();
 
-    if (node instanceof ASTAll) {
-      return new ASTNone();
-    }
+    if (node instanceof ASTAll) return new ASTNone();
 
-    if (node instanceof ASTNone) {
-      return new ASTAll();
-    }
+    if (node instanceof ASTNone) return new ASTAll();
 
-    if (node instanceof ASTNot) {
-      return node.node;
-    }
+    if (node instanceof ASTNot) return node.node;
 
     return new ASTNot(node);
-  }
-}
-
-export class ASTOpt extends AST {
-  constructor(readonly node: AST) {
-    super();
-  }
-
-  override match(_post: Post): boolean {
-    throw new Error("not implemented");
   }
 }
 
@@ -176,9 +147,7 @@ export class ASTMetatag extends AST {
   override match(post: Post): boolean {
     const metatag = Metatag.create(this.name, this.value);
 
-    if (metatag === null) {
-      return false;
-    }
+    if (metatag === null) return false;
 
     return metatag.match(post);
   }

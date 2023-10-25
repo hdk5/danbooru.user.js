@@ -3,14 +3,10 @@ import { Post } from "./Post";
 import { QueryParser } from "./QueryParser";
 
 $(() => {
-  if ($("#blacklist-box").length === 0) {
-    return;
-  }
+  if ($("#blacklist-box").length === 0) return;
 
   Danbooru.Blacklist.post_match = (post, entry): boolean => {
-    if (entry.disabled) {
-      return false;
-    }
+    if (entry.disabled) return false;
 
     return entry.ast.match(Post.fromElement(post));
   };

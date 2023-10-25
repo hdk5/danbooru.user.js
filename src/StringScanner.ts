@@ -102,9 +102,7 @@ export class StringScanner {
    * @category Scanning and Skipping
    */
   skip(regexp: RegExp): number | null {
-    if (this.scan(regexp) === null) {
-      return null;
-    }
+    if (this.scan(regexp) === null) return null;
 
     return this.match!.length;
   }
@@ -118,9 +116,7 @@ export class StringScanner {
    * @category Scanning and Skipping
    */
   skipUntil(regexp: RegExp): number | null {
-    if (this.scanUntil(regexp) === null) {
-      return null;
-    }
+    if (this.scanUntil(regexp) === null) return null;
 
     return this.head - this.last;
   }
@@ -137,9 +133,7 @@ export class StringScanner {
    */
   check(regexp: RegExp): string | null {
     const matches = regexp.exec(this.getRemainder());
-    if (matches === null || matches.index !== 0) {
-      return this.setState([]);
-    }
+    if (matches === null || matches.index !== 0) return this.setState([]);
 
     return this.setState(matches);
   }
@@ -154,9 +148,7 @@ export class StringScanner {
    */
   checkUntil(regexp: RegExp): string | null {
     const matches = regexp.exec(this.getRemainder());
-    if (matches === null) {
-      return this.setState([]);
-    }
+    if (matches === null) return this.setState([]);
 
     this.setState(matches);
     return this.source.slice(
@@ -234,9 +226,7 @@ export class StringScanner {
    * @category Accessing Match Data
    */
   getPreMatch(): string | null {
-    if (this.match === null) {
-      return null;
-    }
+    if (this.match === null) return null;
 
     return this.source.slice(0, this.head - this.match.length);
   }
@@ -258,9 +248,7 @@ export class StringScanner {
    * @category Accessing Match Data
    */
   getPostMatch(): string | null {
-    if (this.match === null) {
-      return null;
-    }
+    if (this.match === null) return null;
 
     return this.source.slice(this.head);
   }
@@ -273,9 +261,7 @@ export class StringScanner {
    */
   getCapture(index: number): string | null {
     const capture = this.captures[index];
-    if (capture === undefined) {
-      return null;
-    }
+    if (capture === undefined) return null;
 
     return capture;
   }
@@ -323,9 +309,7 @@ export class StringScanner {
   unscan(): string | null {
     const match = this.match;
 
-    if (match !== null) {
-      this.setState([], { head: this.last, last: 0 });
-    }
+    if (match !== null) this.setState([], { head: this.last, last: 0 });
 
     return match;
   }
@@ -350,23 +334,17 @@ export class StringScanner {
     { head, last }: { head?: number; last?: number } = {},
   ): string | null {
     if (head !== undefined) {
-      if (head < 0) {
-        head = 0;
-      }
+      if (head < 0) head = 0;
 
       this.head = head;
     }
-    if (last !== undefined) {
-      this.last = last;
-    }
+    if (last !== undefined) this.last = last;
 
     this.captures = matches.slice(1);
 
     this.match = ((): string | null => {
       const match = matches[0];
-      if (match === undefined) {
-        return null;
-      }
+      if (match === undefined) return null;
 
       return match;
     })();

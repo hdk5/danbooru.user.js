@@ -22,9 +22,7 @@ export abstract class Range {
     for (const subclass of this.SUBCLASSES) {
       const range: Range | null = subclass.parse(expr);
 
-      if (range !== null) {
-        return range;
-      }
+      if (range !== null) return range;
     }
 
     return null;
@@ -41,16 +39,13 @@ class RangeUnion extends Range {
   }
 
   static override parse(expr: string): Range | null {
-    if (/[, ]/.exec(expr) === null) {
-      return null;
-    }
+    if (/[, ]/.exec(expr) === null) return null;
 
     const ranges: Range[] = [];
     for (const innerExpr of expr.split(/[, ]+/)) {
       const innerRange: Range | null = Range.parse(innerExpr);
-      if (innerRange === null) {
-        return null;
-      }
+      if (innerRange === null) return null;
+
       ranges.push(innerRange);
     }
 
@@ -74,9 +69,8 @@ class RangeExclusive extends Range {
 
   static override parse(expr: string): Range | null {
     const match = this.REGEX.exec(expr);
-    if (match === null) {
-      return null;
-    }
+    if (match === null) return null;
+
     const start = this.parseValue(match[1]!);
     const end = this.parseValue(match[2]!);
     return new this(start, end);
@@ -104,9 +98,7 @@ class RangeGt extends Range {
 
   static override parse(expr: string): Range | null {
     const match = this.REGEX.exec(expr);
-    if (match === null) {
-      return null;
-    }
+    if (match === null) return null;
 
     const value = this.parseValue(match.filter(Boolean)[1]!);
     return new this(value);
@@ -145,9 +137,8 @@ class RangeNone extends Range {
   protected static readonly VALUE: string = "none";
 
   static override parse(expr: string): Range | null {
-    if (expr !== this.VALUE) {
-      return null;
-    }
+    if (expr !== this.VALUE) return null;
+
     return new this();
   }
 

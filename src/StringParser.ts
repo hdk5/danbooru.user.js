@@ -22,9 +22,7 @@ export class StringParser<StateType> {
   }
 
   backtrack<T>(parser: () => T | null): T | null {
-    if (this.eos()) {
-      return null;
-    }
+    if (this.eos()) return null;
 
     const savedPos = this.scanner.getPosition();
     const savedState = structuredClone(this.state);
@@ -44,9 +42,7 @@ export class StringParser<StateType> {
 
     for (;;) {
       const match = this.backtrack(parser);
-      if (match === null) {
-        break;
-      }
+      if (match === null) break;
 
       matches.push(match);
     }
@@ -57,9 +53,7 @@ export class StringParser<StateType> {
   oneOf<T>(parsers: (() => T | null)[]): T | null {
     for (const parser of parsers) {
       const result = this.backtrack(parser);
-      if (result === null) {
-        continue;
-      }
+      if (result === null) continue;
 
       return result;
     }

@@ -25,9 +25,7 @@ export abstract class Metatag {
   static create(name: string, value: string): Metatag | null {
     const cls = this.SUBCLASSES[name];
 
-    if (cls === undefined) {
-      return null;
-    }
+    if (cls === undefined) return null;
 
     return new cls(value);
   }
@@ -45,9 +43,7 @@ class MetatagRating extends Metatag {
 class MetatagScore extends Metatag {
   override match(post: Post): boolean {
     const range = Range.parse(this.value);
-    if (range === null) {
-      return false;
-    }
+    if (range === null) return false;
 
     return range.includes(post.score);
   }
@@ -56,9 +52,7 @@ class MetatagScore extends Metatag {
 class MetatagUploaderid extends Metatag {
   override match(post: Post): boolean {
     const range = Range.parse(this.value);
-    if (range === null) {
-      return false;
-    }
+    if (range === null) return false;
 
     return range.includes(post.uploaderId);
   }
@@ -66,44 +60,34 @@ class MetatagUploaderid extends Metatag {
 
 class MetatagIs extends Metatag {
   override match(post: Post): boolean {
-    if (this.value === "pending") {
-      return post.isPending;
+    switch (this.value) {
+      case "pending":
+        return post.isPending;
+      case "flagged":
+        return post.isFlagged;
+      case "deleted":
+        return post.isDeleted;
+      case "banned":
+        return post.isBanned;
+      case "child":
+        return post.hasParent;
+      case "parent":
+        return post.hasChildren;
+      default:
+        return false;
     }
-
-    if (this.value === "flagged") {
-      return post.isFlagged;
-    }
-
-    if (this.value === "deleted") {
-      return post.isDeleted;
-    }
-
-    if (this.value === "banned") {
-      return post.isBanned;
-    }
-
-    if (this.value === "child") {
-      return post.hasParent;
-    }
-
-    if (this.value === "parent") {
-      return post.hasChildren;
-    }
-
-    return false;
   }
 }
 
 class MetatagHas extends Metatag {
   override match(post: Post): boolean {
-    if (this.value === "parent") {
-      return post.hasParent;
+    switch (this.value) {
+      case "parent":
+        return post.hasParent;
+      case "children":
+        return post.hasChildren;
+      default:
+        return false;
     }
-
-    if (this.value === "children") {
-      return post.hasChildren;
-    }
-
-    return false;
   }
 }

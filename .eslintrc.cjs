@@ -13,10 +13,9 @@ module.exports = {
   plugins: ["@typescript-eslint", "prettier", "import"],
   parserOptions: {
     project: true,
-    tsconfigRootDir: null,
   },
   rules: {
-    curly: ["error", "all"],
+    curly: ["error", "multi-or-nest", "consistent"],
     eqeqeq: ["error", "always"],
     "@typescript-eslint/explicit-function-return-type": "error",
     "import/order": [

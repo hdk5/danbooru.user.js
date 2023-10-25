@@ -8,9 +8,16 @@ import {
   ASTAnd,
   ASTOr,
   ASTNone,
-  ASTOpt,
 } from "./AST";
 import { StringParser } from "./StringParser";
+
+class Factor {
+  constructor(readonly ast: AST) {}
+}
+
+class FactorTag extends Factor {}
+class FactorNot extends Factor {}
+class FactorOpt extends Factor {}
 
 export class QueryParser {
   static readonly PERMITTED_UNBALANCED_TAGS: readonly string[] = [
@@ -37,17 +44,11 @@ export class QueryParser {
   private parse(): AST {
     let ast: AST | null = this.root();
 
-    if (!this.parser.eos()) {
-      ast = null;
-    }
+    if (!this.parser.eos()) ast = null;
 
-    if (this.parser.state !== 0) {
-      ast = null;
-    }
+    if (this.parser.state !== 0) ast = null;
 
-    if (ast === null) {
-      return new ASTNone();
-    }
+    if (ast === null) return new ASTNone();
 
     return ast.simplify();
   }
@@ -58,26 +59,21 @@ export class QueryParser {
 
     let a = new ASTAll();
 
-    for (const b of factorList) {
-      a = new ASTAnd(a, b);
-    }
+    for (const b of factorList) a = new ASTAnd(a, b);
 
     return a;
   }
 
   private orClause(): AST | null {
     const a = this.andClause();
-    if (a === null) {
-      return null;
-    }
+    if (a === null) return null;
 
     this.space();
 
     if (this.parser.accept(/or +/i) !== null) {
       const b = this.orClause();
-      if (b === null) {
-        return null;
-      }
+      if (b === null) return null;
+
       return new ASTOr(a, b);
     }
 
@@ -86,17 +82,14 @@ export class QueryParser {
 
   private andClause(): AST | null {
     const a = this.factorList();
-    if (a === null) {
-      return null;
-    }
+    if (a === null) return null;
 
     this.space();
 
     if (this.parser.accept(/and +/i) !== null) {
       const b = this.andClause();
-      if (b === null) {
-        return null;
-      }
+      if (b === null) return null;
+
       return new ASTAnd(a, b);
     }
 
@@ -105,48 +98,37 @@ export class QueryParser {
 
   private factorList(): AST | null {
     const factorList = this.parser.zeroOrMore(this.factor.bind(this));
-    if (factorList.length === 0) {
-      return null;
-    }
+    if (factorList.length === 0) return null;
 
     let and: AST = new ASTAll();
     let or: AST = new ASTNone();
 
     for (const factor of factorList) {
-      if (factor instanceof ASTOpt) {
-        or = new ASTOr(or, factor.node);
-      } else {
-        and = new ASTAnd(and, factor);
-      }
+      let ast = factor.ast;
+
+      if (factor instanceof FactorNot) ast = new ASTNot(ast);
+
+      if (factor instanceof FactorOpt) or = new ASTOr(or, ast);
+      else and = new ASTAnd(and, ast);
     }
 
-    if (or instanceof ASTOr) {
-      and = new ASTAnd(and, or);
-    }
+    if (or instanceof ASTOr) and = new ASTAnd(and, or);
 
     return and;
   }
 
-  private factor(): AST | null {
+  private factor(): Factor | null {
     this.space();
 
-    if (this.parser.accept(/-/) !== null) {
-      const expr = this.expr();
-      if (expr === null) {
-        return null;
-      }
-      return new ASTNot(expr);
-    }
+    let FactorCtor: new (ast: AST) => Factor;
+    if (this.parser.accept(/-/) !== null) FactorCtor = FactorNot;
+    else if (this.parser.accept(/~/) !== null) FactorCtor = FactorOpt;
+    else FactorCtor = FactorTag;
 
-    if (this.parser.accept(/~/) !== null) {
-      const expr = this.expr();
-      if (expr === null) {
-        return null;
-      }
-      return new ASTOpt(expr);
-    }
+    const expr = this.expr();
+    if (expr === null) return null;
 
-    return this.expr();
+    return new FactorCtor(expr);
   }
 
   private expr(): AST | null {
@@ -155,9 +137,8 @@ export class QueryParser {
     if (this.parser.accept(/\(/)) {
       ++this.parser.state;
       const a = this.orClause();
-      if (a === null || this.parser.accept(/\)/) === null) {
-        return null;
-      }
+      if (a === null || this.parser.accept(/\)/) === null) return null;
+
       --this.parser.state;
       return a;
     }
@@ -175,15 +156,12 @@ export class QueryParser {
 
   private metatag(): AST | null {
     let name = this.parser.accept(this.metatagRegex);
-    if (name === null) {
-      return null;
-    }
+    if (name === null) return null;
+
     name = name.slice(0, -1);
 
     const value = this.quotedString();
-    if (value === null) {
-      return null;
-    }
+    if (value === null) return null;
 
     return new ASTMetatag(name, value);
   }
@@ -191,17 +169,15 @@ export class QueryParser {
   private quotedString(): string | null {
     if (this.parser.accept(/"/) !== null) {
       const a = this.parser.accept(/([^"\\]|\\")*/)!.replaceAll(/\\"/g, '"');
-      if (this.parser.accept(/"/) === null) {
-        return null;
-      }
+      if (this.parser.accept(/"/) === null) return null;
+
       return a;
     }
 
     if (this.parser.accept(/'/) !== null) {
       const a = this.parser.accept(/([^'\\]|\\')*/)!.replaceAll(/\\'/g, "'");
-      if (this.parser.accept(/'/) === null) {
-        return null;
-      }
+      if (this.parser.accept(/'/) === null) return null;
+
       return a;
     }
 
@@ -210,9 +186,8 @@ export class QueryParser {
 
   private wildcard(): AST | null {
     const t = this.string(/(?=[^ ]*\*)[^ )~-][^ ]*/, true);
-    if (t === null || this.metatagRegex.exec(t)?.index === 0) {
-      return null;
-    }
+    if (t === null || this.metatagRegex.exec(t)?.index === 0) return null;
+
     this.space();
     return new ASTWildcard(t);
   }
@@ -224,18 +199,16 @@ export class QueryParser {
       ["and", "or"].includes(t.toLowerCase()) ||
       t.includes("*") ||
       this.metatagRegex.exec(t)?.index === 0
-    ) {
+    )
       return null;
-    }
+
     this.space();
     return new ASTTag(t);
   }
 
   private string(pattern: RegExp, skipBalancedParens = false): string | null {
     let str = this.parser.accept(pattern);
-    if (str === null) {
-      return null;
-    }
+    if (str === null) return null;
 
     let n = this.parser.state;
     while (n-- > 0 && str.endsWith(")")) {
@@ -243,9 +216,8 @@ export class QueryParser {
         skipBalancedParens &&
         (QueryParser.hasBalancedParens(str) ||
           QueryParser.PERMITTED_UNBALANCED_TAGS.includes(str))
-      ) {
+      )
         break;
-      }
 
       str = str.slice(0, -1);
       this.parser.rewind();
@@ -266,13 +238,8 @@ export class QueryParser {
     let parens = 0;
 
     for (const char of str) {
-      if (char === open) {
-        ++parens;
-      } else if (char === close) {
-        if (--parens < 0) {
-          return false;
-        }
-      }
+      if (char === open) ++parens;
+      else if (char === close) if (--parens < 0) return false;
     }
 
     return parens === 0;
