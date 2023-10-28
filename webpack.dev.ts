@@ -1,6 +1,7 @@
+import { merge } from "webpack-merge";
+
 import ESLintPlugin from "eslint-webpack-plugin";
 import { Configuration } from "webpack";
-import { merge } from "webpack-merge";
 
 import common from "./webpack.common";
 
