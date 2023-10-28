@@ -24,11 +24,9 @@ const config: Configuration = {
         grant: "none",
         homepageURL: "https://github.com/hdk5/danbooru-blacklist2",
         supportURL: "https://github.com/hdk5/danbooru-blacklist2/issues",
-        installURL:
-          "https://github.com/hdk5/danbooru-blacklist2/raw/master/dist/danbooru-blacklist2.user.js",
-        updateURL:
-          "https://github.com/hdk5/danbooru-blacklist2/raw/master/dist/danbooru-blacklist2.user.js",
       },
+      downloadBaseURL:
+        "https://github.com/hdk5/danbooru-blacklist2/raw/master/dist/",
     }),
   ],
   resolve: {
