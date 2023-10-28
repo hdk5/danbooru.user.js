@@ -12,6 +12,10 @@ export class Post {
     readonly hasChildren: boolean,
   ) {}
 
+  get isActive(): boolean {
+    return !(this.isPending || this.isDeleted || this.isFlagged);
+  }
+
   static fromElement(post: PostHTMLElement): Post {
     const tags = post.dataset.tags.split(" ");
     const score = parseInt(post.dataset.score)!;

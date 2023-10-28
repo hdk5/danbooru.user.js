@@ -20,6 +20,7 @@ export abstract class Metatag {
       uploaderid: MetatagUploaderid,
       is: MetatagIs,
       has: MetatagHas,
+      status: MetatagStatus,
     };
   }
 
@@ -68,7 +69,7 @@ class MetatagUploaderid extends Metatag {
   }
 }
 
-class MetatagIs extends Metatag {
+class MetatagStatus extends Metatag {
   override match(post: Post): boolean {
     switch (this.value) {
       case "pending":
@@ -79,10 +80,8 @@ class MetatagIs extends Metatag {
         return post.isDeleted;
       case "banned":
         return post.isBanned;
-      case "child":
-        return post.hasParent;
-      case "parent":
-        return post.hasChildren;
+      case "active":
+        return post.isActive;
       default:
         return false;
     }
@@ -94,8 +93,39 @@ class MetatagHas extends Metatag {
     switch (this.value) {
       case "parent":
         return post.hasParent;
+      case "child":
       case "children":
         return post.hasChildren;
+      default:
+        return false;
+    }
+  }
+}
+
+class MetatagIs extends Metatag {
+  override match(post: Post): boolean {
+    switch (this.value) {
+      case "parent":
+        return new MetatagHas("children").match(post);
+      case "child":
+        return new MetatagHas("parent").match(post);
+      case "pending":
+      case "flagged":
+      case "deleted":
+      case "banned":
+      case "active":
+        return new MetatagStatus(this.value).match(post);
+      case "general":
+      case "sensitive":
+      case "questionable":
+      case "explicit":
+        return new MetatagRating(this.value).match(post);
+      case "safe":
+        return new MetatagRating("s").match(post);
+      case "nsfw":
+        return new MetatagRating("q,e").match(post);
+      case "sfw":
+        return new MetatagRating("g,s").match(post);
       default:
         return false;
     }
