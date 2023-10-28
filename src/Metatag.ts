@@ -14,13 +14,13 @@ export abstract class Metatag {
     new (value: string) => Metatag
   > {
     return {
-      rating: MetatagRating,
       score: MetatagScore,
       tagcount: MetatagTagcount,
       uploaderid: MetatagUploaderid,
-      is: MetatagIs,
-      has: MetatagHas,
+      rating: MetatagRating,
       status: MetatagStatus,
+      has: MetatagHas,
+      is: MetatagIs,
     };
   }
 
@@ -30,15 +30,6 @@ export abstract class Metatag {
     if (cls === undefined) return null;
 
     return new cls(value);
-  }
-}
-
-class MetatagRating extends Metatag {
-  override match(post: Post): boolean {
-    return this.value
-      .split(",")
-      .map((s) => s.slice(0, 1))
-      .includes(post.rating);
   }
 }
 
@@ -66,6 +57,15 @@ class MetatagUploaderid extends Metatag {
     if (range === null) return false;
 
     return range.includes(post.uploaderId);
+  }
+}
+
+class MetatagRating extends Metatag {
+  override match(post: Post): boolean {
+    return this.value
+      .split(",")
+      .map((s) => s.slice(0, 1))
+      .includes(post.rating);
   }
 }
 
