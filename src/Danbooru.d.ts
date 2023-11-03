@@ -12,6 +12,8 @@ declare let Danbooru: {
     parse_entry: (str: string) => BlacklistEntry;
     post_match: (post: PostHTMLElement, entry: BlacklistEntry) => boolean;
     initialize_all: () => void;
+    apply: () => number;
+    update_sidebar: () => void;
   };
 };
 

@@ -1,11 +1,14 @@
 {
   "name": "danbooru-blacklist2",
-  "version": "1.4.1",
+  "version": "1.5.0",
   "description": "Advanced blacklist rule grammar for Danbooru.",
   "private": true,
   "author": "hdk5",
   "license": "WTFPL",
   "packageManager": "yarn@4.0.0",
+  "scripts": {
+    "build": "webpack --config ./webpack.prod.ts"
+  },
   "devDependencies": {
     "@tsconfig/strictest": "^2.0.2",
     "@types/eslint": "^8.44.6",

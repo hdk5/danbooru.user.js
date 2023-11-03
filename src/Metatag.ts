@@ -21,6 +21,7 @@ export abstract class Metatag {
       status: MetatagStatus,
       has: MetatagHas,
       is: MetatagIs,
+      vote: MetatagVote,
     };
   }
 
@@ -129,5 +130,16 @@ class MetatagIs extends Metatag {
       default:
         return false;
     }
+  }
+}
+
+class MetatagVote extends Metatag {
+  override match(post: Post): boolean {
+    if (post.vote === null) return false;
+
+    const range = Range.parse(this.value);
+    if (range === null) return false;
+
+    return range.includes(post.vote);
   }
 }

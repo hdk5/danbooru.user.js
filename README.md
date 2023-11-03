@@ -8,6 +8,13 @@ Advanced blacklist rule grammar for Danbooru.
 - Download the script: https://github.com/hdk5/danbooru-blacklist2/raw/master/dist/danbooru-blacklist2.user.js
 - An installation prompt will appear. Accept the installation.
 
+## Build
+
+```sh
+$ yarn install
+$ yarn build
+```
+
 ## Supported syntax
 
 - simple tags
@@ -96,3 +103,9 @@ Advanced blacklist rule grammar for Danbooru.
   - `is:safe` (`rating:s` alias)
   - `is:nsfw` (`rating:q,e` alias)
   - `is:sfw` (`rating:g,s` alias)
+
+- `vote` metatag (non-standard)
+  - `vote:1`
+  - `vote:0`
+  - `vote:-1`
+  - ranges are also supported (see `score`)
