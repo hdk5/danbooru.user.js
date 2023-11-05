@@ -1,111 +1,45 @@
-# danbooru-blacklist2
+# danbooru.user.js
 
-Advanced blacklist rule grammar for Danbooru.
+A collection of userscripts for Danbooru.
 
 ## Installation
 
-- Install [Tampermonkey](https://tampermonkey.net/) extension, it's available for Chrome, Microsoft Edge, Safari, Opera Next, and Firefox.
-- Download the script: https://github.com/hdk5/danbooru-blacklist2/raw/master/dist/danbooru-blacklist2.user.js
+- Install [Tampermonkey](https://tampermonkey.net/) extension.
+- Download the script.
 - An installation prompt will appear. Accept the installation.
 
-## Build
+_All userscripts are confirmed to work only on latest Firefox + latest Tampermonkey. Other browsers and userscript managers are not tested._
 
-```sh
-$ yarn install
-$ yarn build
-```
+## Scripts
 
-## Supported syntax
+### Upload to Danbooru
 
-- simple tags
+Adds button for uploading to Danbooru onto various websites.
 
-  - `blonde_hair`
+[Details](readme/upload-to-danbooru.md) | [Install](/dist/upload-to-danbooru.user.js?raw=1)
 
-- `and` expressions
+### Blacklist2
 
-  - `blonde_hair blue_eyes`
-  - `blonde_hair and blue_eyes`
+Extended blacklist rule syntax, with logical operators, metatags, and other stuff.
 
-- `or` expressions
+[Details](readme/blacklist2.md) | [Install](/dist/blacklist2.user.js?raw=1)
 
-  - `blonde_hair or blue_eyes`
-  - `~blonde_hair ~blue_eyes`
+### Mediaasset Panzoom
 
-- `not` expressions
+Pan & zoom for media assets and uploads.
 
-  - `-blonde_hair`
+[Install](/dist/mediaasset-panzoom.user.js?raw=1)
 
-- wildcard expressions
+### Editform Dock
 
-  - `*_(cosplay)`
+Replaces floating post edit window (shift+e) with the docked sidebar, similar to one on the new post page.<br>
+Works well with Mediaasset Panzoom.
 
-- parentheses
+[Install](/dist/editform-dock.user.js?raw=1)
 
-  - `-(blonde_hair blue_eyes)`
-  - `(blonde_hair blue_eyes) or (red_hair green_eyes)`
+## Old scripts
 
-- `rating` metatag
+These scripts were not moved into this repository yet
 
-  - `rating:g`
-  - `rating:s`
-  - `rating:q`
-  - `rating:e`
-  - `,` is also supported (i.e. `rating:q,e`)
-
-- `score` metatag
-
-  - `score:5`
-  - `score:>5`
-  - `score:>=5`
-  - `score:<5`
-  - `score:<=5`
-  - `score:5..`
-  - `score:..5`
-  - `score:5..10`
-  - `score:5...10`
-  - `score:5,6,7`
-  - `score:5,7..9`
-
-- `tagcount` metagag
-
-  - ranges are also supported (see `score`)
-
-- `uploaderid` metatag
-
-  - `uploaderid:748553`
-  - ranges are also supported (see `score`)
-
-- `status` metatag
-
-  - `is:pending`
-  - `is:flagged`
-  - `is:deleted`
-  - `is:banned`
-  - `is:active`
-
-- `has` metatag
-
-  - `has:parent`
-  - `has:children`/`has:child`
-
-- `is` metatag
-  - `is:parent` (`has:children` alias)
-  - `is:child` (`has:parent` alias)
-  - `is:pending` (`rating:pending` alias)
-  - `is:flagged` (`rating:flagged` alias)
-  - `is:deleted` (`rating:deleted` alias)
-  - `is:banned` (`rating:banned` alias)
-  - `is:active` (`rating:active` alias)
-  - `is:general` (`rating:general` alias)
-  - `is:sensitive` (`rating:sensitive` alias)
-  - `is:questionable` (`rating:questionable` alias)
-  - `is:explicit` (`rating:explicit` alias)
-  - `is:safe` (`rating:s` alias)
-  - `is:nsfw` (`rating:q,e` alias)
-  - `is:sfw` (`rating:g,s` alias)
-
-- `vote` metatag (non-standard)
-  - `vote:1`
-  - `vote:0`
-  - `vote:-1`
-  - ranges are also supported (see `score`)
+- [Upload to Gelbooru](https://gist.github.com/hdk5/d5e896431de6253d67beeb7ef7f9f8fb/raw/danbooru_upload_to_gelbooru.user.js)
+- [Tag Preview](https://gist.github.com/hdk5/be69f7e9e57c643fec130a3f3a46f0a0/raw/danbooru_tag_preview.user.js)

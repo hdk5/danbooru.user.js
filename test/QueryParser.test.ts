@@ -7,1359 +7,1574 @@ import {
   ASTOr,
   ASTTag,
   ASTWildcard,
-} from "../src/AST";
-import { QueryParser } from "../src/QueryParser";
-
-function expectParsed(query: string, expected: AST): void {
-  // expected = expected.simplify();
-  const parsed = QueryParser.parse(query, ["meta"]);
-  expect(parsed).toStrictEqual(expected);
-}
-
-test("QueryParser: ``", () => {
-  expectParsed(String.raw``, new ASTAll());
-});
-
-test("QueryParser: ` `", () => {
-  expectParsed(String.raw` `, new ASTAll());
-});
-
-test("QueryParser: `a`", () => {
-  expectParsed(String.raw`a`, new ASTTag("a"));
-});
-
-test("QueryParser: `A`", () => {
-  expectParsed(String.raw`A`, new ASTTag("a"));
-});
-
-test("QueryParser: `;)`", () => {
-  expectParsed(String.raw`;)`, new ASTTag(";)"));
-});
-
-test("QueryParser: `(9)`", () => {
-  expectParsed(String.raw`(9)`, new ASTTag("9"));
-});
-
-test("QueryParser: `foo_(bar)`", () => {
-  expectParsed(String.raw`foo_(bar)`, new ASTTag("foo_(bar)"));
-});
-
-test("QueryParser: `(foo_(bar))`", () => {
-  expectParsed(String.raw`(foo_(bar))`, new ASTTag("foo_(bar)"));
-});
-
-test("QueryParser: `((foo_(bar)))`", () => {
-  expectParsed(String.raw`((foo_(bar)))`, new ASTTag("foo_(bar)"));
-});
-
-test("QueryParser: `foo_(bar_(baz))`", () => {
-  expectParsed(String.raw`foo_(bar_(baz))`, new ASTTag("foo_(bar_(baz))"));
-});
-
-test("QueryParser: `(foo_(bar_(baz)))`", () => {
-  expectParsed(String.raw`(foo_(bar_(baz)))`, new ASTTag("foo_(bar_(baz))"));
-});
-
-test("QueryParser: `(foo_(bar_baz))`", () => {
-  expectParsed(String.raw`(foo_(bar_baz))`, new ASTTag("foo_(bar_baz)"));
-});
-
-test("QueryParser: `abc_(def) ghi`", () => {
-  expectParsed(
-    String.raw`abc_(def) ghi`,
-    new ASTAnd(new ASTTag("abc_(def)"), new ASTTag("ghi")),
-  );
-});
-
-test("QueryParser: `(abc_(def) ghi)`", () => {
-  expectParsed(
-    String.raw`(abc_(def) ghi)`,
-    new ASTAnd(new ASTTag("abc_(def)"), new ASTTag("ghi")),
-  );
-});
-
-test("QueryParser: `((abc_(def)) ghi)`", () => {
-  expectParsed(
-    String.raw`((abc_(def)) ghi)`,
-    new ASTAnd(new ASTTag("abc_(def)"), new ASTTag("ghi")),
-  );
-});
-
-test("QueryParser: `abc def_(ghi)`", () => {
-  expectParsed(
-    String.raw`abc def_(ghi)`,
-    new ASTAnd(new ASTTag("abc"), new ASTTag("def_(ghi)")),
-  );
-});
-
-test("QueryParser: `(abc def_(ghi))`", () => {
-  expectParsed(
-    String.raw`(abc def_(ghi))`,
-    new ASTAnd(new ASTTag("abc"), new ASTTag("def_(ghi)")),
-  );
-});
-
-test("QueryParser: `(abc (def_(ghi)))`", () => {
-  expectParsed(
-    String.raw`(abc (def_(ghi)))`,
-    new ASTAnd(new ASTTag("abc"), new ASTTag("def_(ghi)")),
-  );
-});
-
-test("QueryParser: `abc_(def) ghi_(jkl)`", () => {
-  expectParsed(
-    String.raw`abc_(def) ghi_(jkl)`,
-    new ASTAnd(new ASTTag("abc_(def)"), new ASTTag("ghi_(jkl)")),
-  );
-});
-
-test("QueryParser: `(abc_(def) ghi_(jkl))`", () => {
-  expectParsed(
-    String.raw`(abc_(def) ghi_(jkl))`,
-    new ASTAnd(new ASTTag("abc_(def)"), new ASTTag("ghi_(jkl)")),
-  );
-});
-
-test("QueryParser: `:)`", () => {
-  expectParsed(String.raw`:)`, new ASTTag(":)"));
-});
-
-test("QueryParser: `(:))`", () => {
-  expectParsed(String.raw`(:))`, new ASTTag(":)"));
-});
-
-test("QueryParser: `(:)`", () => {
-  expectParsed(String.raw`(:)`, new ASTNone());
-});
-
-test("QueryParser: `(:) >:))`", () => {
-  expectParsed(
-    String.raw`(:) >:))`,
-    new ASTAnd(new ASTTag(":)"), new ASTTag(">:)")),
-  );
-});
-
-test("QueryParser: `(:) >:)`", () => {
-  expectParsed(String.raw`(:) >:)`, new ASTNone());
-});
-
-test("QueryParser: `*)`", () => {
-  expectParsed(String.raw`*)`, new ASTWildcard("*)"));
-});
-
-test("QueryParser: `(*)`", () => {
-  expectParsed(String.raw`(*)`, new ASTWildcard("*"));
-});
-
-test("QueryParser: `(foo*)`", () => {
-  expectParsed(String.raw`(foo*)`, new ASTWildcard("foo*"));
-});
-
-test("QueryParser: `foo*)`", () => {
-  expectParsed(String.raw`foo*)`, new ASTWildcard("foo*)"));
-});
-
-test("QueryParser: `foo*) bar`", () => {
-  expectParsed(
-    String.raw`foo*) bar`,
-    new ASTAnd(new ASTWildcard("foo*)"), new ASTTag("bar")),
-  );
-});
-
-test("QueryParser: `(foo*) bar`", () => {
-  expectParsed(
-    String.raw`(foo*) bar`,
-    new ASTAnd(new ASTWildcard("foo*"), new ASTTag("bar")),
-  );
-});
-
-test("QueryParser: `(foo*) bar)`", () => {
-  expectParsed(
-    String.raw`(foo*) bar)`,
-    new ASTAnd(new ASTWildcard("foo*"), new ASTTag("bar)")),
-  );
-});
-
-test("QueryParser: `*_(foo)`", () => {
-  expectParsed(String.raw`*_(foo)`, new ASTWildcard("*_(foo)"));
-});
-
-test("QueryParser: `(*_(foo))`", () => {
-  expectParsed(String.raw`(*_(foo))`, new ASTWildcard("*_(foo)"));
-});
-
-test("QueryParser: `(*_(foo) bar)`", () => {
-  expectParsed(
-    String.raw`(*_(foo) bar)`,
-    new ASTAnd(new ASTWildcard("*_(foo)"), new ASTTag("bar")),
-  );
-});
-
-test("QueryParser: `((*_(foo)) bar)`", () => {
-  expectParsed(
-    String.raw`((*_(foo)) bar)`,
-    new ASTAnd(new ASTWildcard("*_(foo)"), new ASTTag("bar")),
-  );
-});
-
-test("QueryParser: `(bar *_(foo))`", () => {
-  expectParsed(
-    String.raw`(bar *_(foo))`,
-    new ASTAnd(new ASTTag("bar"), new ASTWildcard("*_(foo)")),
-  );
-});
-
-test("QueryParser: `(bar (*_(foo)))`", () => {
-  expectParsed(
-    String.raw`(bar (*_(foo)))`,
-    new ASTAnd(new ASTTag("bar"), new ASTWildcard("*_(foo)")),
-  );
-});
-
-test("QueryParser: `(meta:a)`", () => {
-  expectParsed(String.raw`(meta:a)`, new ASTMetatag("meta", "a"));
-});
-
-test("QueryParser: `(meta:(a)`", () => {
-  expectParsed(String.raw`(meta:(a)`, new ASTMetatag("meta", "(a"));
-});
-
-test("QueryParser: `(meta:(a))`", () => {
-  expectParsed(String.raw`(meta:(a))`, new ASTMetatag("meta", "(a)"));
-});
-
-test("QueryParser: `(meta:a meta:b)`", () => {
-  expectParsed(
-    String.raw`(meta:a meta:b)`,
-    new ASTAnd(new ASTMetatag("meta", "a"), new ASTMetatag("meta", "b")),
-  );
-});
-
-test("QueryParser: `(meta:a) meta:b)`", () => {
-  expectParsed(
-    String.raw`(meta:a) meta:b)`,
-    new ASTAnd(new ASTMetatag("meta", "a"), new ASTMetatag("meta", "b)")),
-  );
-});
-
-test('QueryParser: `(meta:"a)" meta:b)`', () => {
-  expectParsed(
-    String.raw`(meta:"a)" meta:b)`,
-    new ASTAnd(new ASTMetatag("meta", "a)"), new ASTMetatag("meta", "b")),
-  );
-});
-
-test("QueryParser: `a b`", () => {
-  expectParsed(String.raw`a b`, new ASTAnd(new ASTTag("a"), new ASTTag("b")));
-});
-
-test("QueryParser: `a or b`", () => {
-  expectParsed(String.raw`a or b`, new ASTOr(new ASTTag("a"), new ASTTag("b")));
-});
-
-test("QueryParser: `~a ~b`", () => {
-  expectParsed(String.raw`~a ~b`, new ASTOr(new ASTTag("a"), new ASTTag("b")));
-});
-
-test("QueryParser: `-a`", () => {
-  expectParsed(String.raw`-a`, new ASTNot(new ASTTag("a")));
-});
-
-test("QueryParser: `a -b`", () => {
-  expectParsed(
-    String.raw`a -b`,
-    new ASTAnd(new ASTTag("a"), new ASTNot(new ASTTag("b"))),
-  );
-});
-
-test("QueryParser: `meta:a`", () => {
-  expectParsed(String.raw`meta:a`, new ASTMetatag("meta", "a"));
-});
-
-test("QueryParser: `-meta:a`", () => {
-  expectParsed(String.raw`-meta:a`, new ASTNot(new ASTMetatag("meta", "a")));
-});
-
-test("QueryParser: `meta:a meta:b`", () => {
-  expectParsed(
-    String.raw`meta:a meta:b`,
-    new ASTAnd(new ASTMetatag("meta", "a"), new ASTMetatag("meta", "b")),
-  );
-});
-
-test("QueryParser: `meta:a`", () => {
-  expectParsed(String.raw`meta:a`, new ASTMetatag("meta", "a"));
-});
-
-test("QueryParser: `META:a`", () => {
-  expectParsed(String.raw`META:a`, new ASTMetatag("meta", "a"));
-});
-
-test("QueryParser: `meta:A`", () => {
-  expectParsed(String.raw`meta:A`, new ASTMetatag("meta", "A"));
-});
-
-test("QueryParser: `~meta:a`", () => {
-  expectParsed(String.raw`~meta:a`, new ASTMetatag("meta", "a"));
-});
-
-test("QueryParser: `-meta:a`", () => {
-  expectParsed(String.raw`-meta:a`, new ASTNot(new ASTMetatag("meta", "a")));
-});
-
-test("QueryParser: `meta:a meta:b`", () => {
-  expectParsed(
-    String.raw`meta:a meta:b`,
-    new ASTAnd(new ASTMetatag("meta", "a"), new ASTMetatag("meta", "b")),
-  );
-});
-
-test("QueryParser: `~meta:a ~meta:b`", () => {
-  expectParsed(
-    String.raw`~meta:a ~meta:b`,
-    new ASTOr(new ASTMetatag("meta", "a"), new ASTMetatag("meta", "b")),
-  );
-});
-
-test("QueryParser: `meta:a or meta:b`", () => {
-  expectParsed(
-    String.raw`meta:a or meta:b`,
-    new ASTOr(new ASTMetatag("meta", "a"), new ASTMetatag("meta", "b")),
-  );
-});
-
-test("QueryParser: `(meta:a)`", () => {
-  expectParsed(String.raw`(meta:a)`, new ASTMetatag("meta", "a"));
-});
-
-test("QueryParser: `meta:(a)`", () => {
-  expectParsed(String.raw`meta:(a)`, new ASTMetatag("meta", "(a)"));
-});
-
-test("QueryParser: `(meta:(a)`", () => {
-  expectParsed(String.raw`(meta:(a)`, new ASTMetatag("meta", "(a"));
-});
-
-test('QueryParser: `meta:"foo bar"`', () => {
-  expectParsed(String.raw`meta:"foo bar"`, new ASTMetatag("meta", "foo bar"));
-});
-
-test('QueryParser: `meta:foobar"(`', () => {
-  expectParsed(String.raw`meta:foobar"(`, new ASTMetatag("meta", 'foobar"('));
-});
-
-test("QueryParser: `meta:`", () => {
-  expectParsed(String.raw`meta:`, new ASTMetatag("meta", ""));
-});
-
-test('QueryParser: `meta:""`', () => {
-  expectParsed(String.raw`meta:""`, new ASTMetatag("meta", ""));
-});
-
-test('QueryParser: `meta:"\\""`', () => {
-  expectParsed(String.raw`meta:"\""`, new ASTMetatag("meta", '"'));
-});
-
-test('QueryParser: `meta:"don\'t say \\"lazy\\" okay"`', () => {
-  expectParsed(
-    String.raw`meta:"don't say \"lazy\" okay"`,
-    new ASTMetatag("meta", 'don\'t say "lazy" okay'),
-  );
-});
-
-test('QueryParser: `(a (meta:"foo)bar"))`', () => {
-  expectParsed(
-    String.raw`(a (meta:"foo)bar"))`,
-    new ASTAnd(new ASTTag("a"), new ASTMetatag("meta", "foo)bar")),
-  );
-});
-
-test("QueryParser: `meta:'foo bar'`", () => {
-  expectParsed(String.raw`meta:'foo bar'`, new ASTMetatag("meta", "foo bar"));
-});
-
-test("QueryParser: `meta:foobar'(`", () => {
-  expectParsed(String.raw`meta:foobar'(`, new ASTMetatag("meta", "foobar'("));
-});
-
-test("QueryParser: `meta:''`", () => {
-  expectParsed(String.raw`meta:''`, new ASTMetatag("meta", ""));
-});
-
-test("QueryParser: `meta:'\\''`", () => {
-  expectParsed(String.raw`meta:'\''`, new ASTMetatag("meta", "'"));
-});
-
-test("QueryParser: `meta:'don\\'t say \"lazy\" okay'`", () => {
-  expectParsed(
-    String.raw`meta:'don\'t say "lazy" okay'`,
-    new ASTMetatag("meta", 'don\'t say "lazy" okay'),
-  );
-});
-
-test("QueryParser: `(a (meta:'foo)bar'))`", () => {
-  expectParsed(
-    String.raw`(a (source:'foo)bar'))`,
-    new ASTAnd(new ASTTag("a"), new ASTTag("source:'foo)bar'")),
-  );
-});
-
-test("QueryParser: `*`", () => {
-  expectParsed(String.raw`*`, new ASTWildcard("*"));
-});
-
-test("QueryParser: `*a`", () => {
-  expectParsed(String.raw`*a`, new ASTWildcard("*a"));
-});
-
-test("QueryParser: `a*`", () => {
-  expectParsed(String.raw`a*`, new ASTWildcard("a*"));
-});
-
-test("QueryParser: `*a*`", () => {
-  expectParsed(String.raw`*a*`, new ASTWildcard("*a*"));
-});
-
-test("QueryParser: `a*b`", () => {
-  expectParsed(String.raw`a*b`, new ASTWildcard("a*b"));
-});
-
-test("QueryParser: `* b`", () => {
-  expectParsed(
-    String.raw`* b`,
-    new ASTAnd(new ASTWildcard("*"), new ASTTag("b")),
-  );
-});
-
-test("QueryParser: `*a b`", () => {
-  expectParsed(
-    String.raw`*a b`,
-    new ASTAnd(new ASTWildcard("*a"), new ASTTag("b")),
-  );
-});
-
-test("QueryParser: `a* b`", () => {
-  expectParsed(
-    String.raw`a* b`,
-    new ASTAnd(new ASTWildcard("a*"), new ASTTag("b")),
-  );
-});
-
-test("QueryParser: `*a* b`", () => {
-  expectParsed(
-    String.raw`*a* b`,
-    new ASTAnd(new ASTWildcard("*a*"), new ASTTag("b")),
-  );
-});
-
-test("QueryParser: `a *`", () => {
-  expectParsed(
-    String.raw`a *`,
-    new ASTAnd(new ASTTag("a"), new ASTWildcard("*")),
-  );
-});
-
-test("QueryParser: `a *b`", () => {
-  expectParsed(
-    String.raw`a *b`,
-    new ASTAnd(new ASTTag("a"), new ASTWildcard("*b")),
-  );
-});
-
-test("QueryParser: `a b*`", () => {
-  expectParsed(
-    String.raw`a b*`,
-    new ASTAnd(new ASTTag("a"), new ASTWildcard("b*")),
-  );
-});
-
-test("QueryParser: `a *b*`", () => {
-  expectParsed(
-    String.raw`a *b*`,
-    new ASTAnd(new ASTTag("a"), new ASTWildcard("*b*")),
-  );
-});
-
-test("QueryParser: `a -*`", () => {
-  expectParsed(
-    String.raw`a -*`,
-    new ASTAnd(new ASTTag("a"), new ASTNot(new ASTWildcard("*"))),
-  );
-});
-
-test("QueryParser: `a -b*`", () => {
-  expectParsed(
-    String.raw`a -b*`,
-    new ASTAnd(new ASTTag("a"), new ASTNot(new ASTWildcard("b*"))),
-  );
-});
-
-test("QueryParser: `a -*b`", () => {
-  expectParsed(
-    String.raw`a -*b`,
-    new ASTAnd(new ASTTag("a"), new ASTNot(new ASTWildcard("*b"))),
-  );
-});
-
-test("QueryParser: `a -*b*`", () => {
-  expectParsed(
-    String.raw`a -*b*`,
-    new ASTAnd(new ASTTag("a"), new ASTNot(new ASTWildcard("*b*"))),
-  );
-});
-
-test("QueryParser: `~a ~*`", () => {
-  expectParsed(
-    String.raw`~a ~*`,
-    new ASTOr(new ASTTag("a"), new ASTWildcard("*")),
-  );
-});
-
-test("QueryParser: `~* ~a`", () => {
-  expectParsed(
-    String.raw`~* ~a`,
-    new ASTOr(new ASTWildcard("*"), new ASTTag("a")),
-  );
-});
-
-test("QueryParser: `~a ~*a`", () => {
-  expectParsed(
-    String.raw`~a ~*a`,
-    new ASTOr(new ASTTag("a"), new ASTWildcard("*a")),
-  );
-});
-
-test("QueryParser: `~*a ~a`", () => {
-  expectParsed(
-    String.raw`~*a ~a`,
-    new ASTOr(new ASTWildcard("*a"), new ASTTag("a")),
-  );
-});
-
-test("QueryParser: `a or a*`", () => {
-  expectParsed(
-    String.raw`a or a*`,
-    new ASTOr(new ASTTag("a"), new ASTWildcard("a*")),
-  );
-});
-
-test("QueryParser: `a and a*`", () => {
-  expectParsed(
-    String.raw`a and a*`,
-    new ASTAnd(new ASTTag("a"), new ASTWildcard("a*")),
-  );
-});
-
-test("QueryParser: `a* b*`", () => {
-  expectParsed(
-    String.raw`a* b*`,
-    new ASTAnd(new ASTWildcard("a*"), new ASTWildcard("b*")),
-  );
-});
-
-test("QueryParser: `a* or b*`", () => {
-  expectParsed(
-    String.raw`a* or b*`,
-    new ASTOr(new ASTWildcard("a*"), new ASTWildcard("b*")),
-  );
-});
-
-test("QueryParser: `a b* c`", () => {
-  expectParsed(
-    String.raw`a b* c`,
-    new ASTAnd(
-      new ASTTag("a"),
-      new ASTAnd(new ASTWildcard("b*"), new ASTTag("c")),
+} from '../src/AST'
+import { QueryParser } from '../src/QueryParser'
+
+it.each([
+  {
+    query: String.raw``,
+    ast: new ASTAll(),
+  },
+  {
+    query: String.raw` `,
+    ast: new ASTAll(),
+  },
+  {
+    query: String.raw`a`,
+    ast: new ASTTag('a'),
+  },
+  {
+    query: String.raw`A`,
+    ast: new ASTTag('a'),
+  },
+  {
+    query: String.raw`;)`,
+    ast: new ASTTag(';)'),
+  },
+  {
+    query: String.raw`(9)`,
+    ast: new ASTTag('9'),
+  },
+  {
+    query: String.raw`foo_(bar)`,
+    ast: new ASTTag('foo_(bar)'),
+  },
+  {
+    query: String.raw`(foo_(bar))`,
+    ast: new ASTTag('foo_(bar)'),
+  },
+  {
+    query: String.raw`((foo_(bar)))`,
+    ast: new ASTTag('foo_(bar)'),
+  },
+  {
+    query: String.raw`foo_(bar_(baz))`,
+    ast: new ASTTag('foo_(bar_(baz))'),
+  },
+  {
+    query: String.raw`(foo_(bar_(baz)))`,
+    ast: new ASTTag('foo_(bar_(baz))'),
+  },
+  {
+    query: String.raw`(foo_(bar_baz))`,
+    ast: new ASTTag('foo_(bar_baz)'),
+  },
+  {
+    query: String.raw`abc_(def) ghi`,
+    ast: new ASTAnd(
+      new ASTTag('abc_(def)'),
+      new ASTTag('ghi'),
     ),
-  );
-});
-
-test("QueryParser: `a -* c`", () => {
-  expectParsed(
-    String.raw`a -* c`,
-    new ASTAnd(
-      new ASTTag("a"),
-      new ASTAnd(new ASTNot(new ASTWildcard("*")), new ASTTag("c")),
+  },
+  {
+    query: String.raw`(abc_(def) ghi)`,
+    ast: new ASTAnd(
+      new ASTTag('abc_(def)'),
+      new ASTTag('ghi'),
     ),
-  );
-});
-
-test("QueryParser: `a`", () => {
-  expectParsed(String.raw`a`, new ASTTag("a"));
-});
-
-test("QueryParser: `a `", () => {
-  expectParsed(String.raw`a `, new ASTTag("a"));
-});
-
-test("QueryParser: ` a`", () => {
-  expectParsed(String.raw` a`, new ASTTag("a"));
-});
-
-test("QueryParser: ` a `", () => {
-  expectParsed(String.raw` a `, new ASTTag("a"));
-});
-
-test("QueryParser: `(a)`", () => {
-  expectParsed(String.raw`(a)`, new ASTTag("a"));
-});
-
-test("QueryParser: `( a)`", () => {
-  expectParsed(String.raw`( a)`, new ASTTag("a"));
-});
-
-test("QueryParser: `(a )`", () => {
-  expectParsed(String.raw`(a )`, new ASTTag("a"));
-});
-
-test("QueryParser: ` ( a ) `", () => {
-  expectParsed(String.raw` ( a ) `, new ASTTag("a"));
-});
-
-test("QueryParser: `((a))`", () => {
-  expectParsed(String.raw`((a))`, new ASTTag("a"));
-});
-
-test("QueryParser: `( ( a ) )`", () => {
-  expectParsed(String.raw`( ( a ) )`, new ASTTag("a"));
-});
-
-test("QueryParser: ` ( ( a ) ) `", () => {
-  expectParsed(String.raw` ( ( a ) ) `, new ASTTag("a"));
-});
-
-test("QueryParser: `a b`", () => {
-  expectParsed(String.raw`a b`, new ASTAnd(new ASTTag("a"), new ASTTag("b")));
-});
-
-test("QueryParser: `(a b)`", () => {
-  expectParsed(String.raw`(a b)`, new ASTAnd(new ASTTag("a"), new ASTTag("b")));
-});
-
-test("QueryParser: `a (b)`", () => {
-  expectParsed(String.raw`a (b)`, new ASTAnd(new ASTTag("a"), new ASTTag("b")));
-});
-
-test("QueryParser: `(a) b`", () => {
-  expectParsed(String.raw`(a) b`, new ASTAnd(new ASTTag("a"), new ASTTag("b")));
-});
-
-test("QueryParser: `(a) (b)`", () => {
-  expectParsed(
-    String.raw`(a) (b)`,
-    new ASTAnd(new ASTTag("a"), new ASTTag("b")),
-  );
-});
-
-test("QueryParser: `((a) (b))`", () => {
-  expectParsed(
-    String.raw`((a) (b))`,
-    new ASTAnd(new ASTTag("a"), new ASTTag("b")),
-  );
-});
-
-test("QueryParser: `a b c`", () => {
-  expectParsed(
-    String.raw`a b c`,
-    new ASTAnd(new ASTTag("a"), new ASTAnd(new ASTTag("b"), new ASTTag("c"))),
-  );
-});
-
-test("QueryParser: `(a b) c`", () => {
-  expectParsed(
-    String.raw`(a b) c`,
-    new ASTAnd(new ASTTag("a"), new ASTAnd(new ASTTag("b"), new ASTTag("c"))),
-  );
-});
-
-test("QueryParser: `((a) b) c`", () => {
-  expectParsed(
-    String.raw`((a) b) c`,
-    new ASTAnd(new ASTTag("a"), new ASTAnd(new ASTTag("b"), new ASTTag("c"))),
-  );
-});
-
-test("QueryParser: `(((a) b) c)`", () => {
-  expectParsed(
-    String.raw`(((a) b) c)`,
-    new ASTAnd(new ASTTag("a"), new ASTAnd(new ASTTag("b"), new ASTTag("c"))),
-  );
-});
-
-test("QueryParser: `((a b) c)`", () => {
-  expectParsed(
-    String.raw`((a b) c)`,
-    new ASTAnd(new ASTTag("a"), new ASTAnd(new ASTTag("b"), new ASTTag("c"))),
-  );
-});
-
-test("QueryParser: `((a) (b) (c))`", () => {
-  expectParsed(
-    String.raw`((a) (b) (c))`,
-    new ASTAnd(new ASTTag("a"), new ASTAnd(new ASTTag("b"), new ASTTag("c"))),
-  );
-});
-
-test("QueryParser: `a (b c)`", () => {
-  expectParsed(
-    String.raw`a (b c)`,
-    new ASTAnd(new ASTTag("a"), new ASTAnd(new ASTTag("b"), new ASTTag("c"))),
-  );
-});
-
-test("QueryParser: `a (b (c))`", () => {
-  expectParsed(
-    String.raw`a (b (c))`,
-    new ASTAnd(new ASTTag("a"), new ASTAnd(new ASTTag("b"), new ASTTag("c"))),
-  );
-});
-
-test("QueryParser: `(a (b (c)))`", () => {
-  expectParsed(
-    String.raw`(a (b (c)))`,
-    new ASTAnd(new ASTTag("a"), new ASTAnd(new ASTTag("b"), new ASTTag("c"))),
-  );
-});
-
-test("QueryParser: `(a (b c))`", () => {
-  expectParsed(
-    String.raw`(a (b c))`,
-    new ASTAnd(new ASTTag("a"), new ASTAnd(new ASTTag("b"), new ASTTag("c"))),
-  );
-});
-
-test("QueryParser: `(a b c)`", () => {
-  expectParsed(
-    String.raw`(a b c)`,
-    new ASTAnd(new ASTTag("a"), new ASTAnd(new ASTTag("b"), new ASTTag("c"))),
-  );
-});
-
-test("QueryParser: `a and b`", () => {
-  expectParsed(
-    String.raw`a and b`,
-    new ASTAnd(new ASTTag("a"), new ASTTag("b")),
-  );
-});
-
-test("QueryParser: `a AND b`", () => {
-  expectParsed(
-    String.raw`a AND b`,
-    new ASTAnd(new ASTTag("a"), new ASTTag("b")),
-  );
-});
-
-test("QueryParser: `(a and b)`", () => {
-  expectParsed(
-    String.raw`(a and b)`,
-    new ASTAnd(new ASTTag("a"), new ASTTag("b")),
-  );
-});
-
-test("QueryParser: `a and b and c`", () => {
-  expectParsed(
-    String.raw`a and b and c`,
-    new ASTAnd(new ASTTag("a"), new ASTAnd(new ASTTag("b"), new ASTTag("c"))),
-  );
-});
-
-test("QueryParser: `(a and b) and c`", () => {
-  expectParsed(
-    String.raw`(a and b) and c`,
-    new ASTAnd(new ASTTag("a"), new ASTAnd(new ASTTag("b"), new ASTTag("c"))),
-  );
-});
-
-test("QueryParser: `a and (b and c)`", () => {
-  expectParsed(
-    String.raw`a and (b and c)`,
-    new ASTAnd(new ASTTag("a"), new ASTAnd(new ASTTag("b"), new ASTTag("c"))),
-  );
-});
-
-test("QueryParser: `(a and b and c)`", () => {
-  expectParsed(
-    String.raw`(a and b and c)`,
-    new ASTAnd(new ASTTag("a"), new ASTAnd(new ASTTag("b"), new ASTTag("c"))),
-  );
-});
-
-test("QueryParser: `a or b`", () => {
-  expectParsed(String.raw`a or b`, new ASTOr(new ASTTag("a"), new ASTTag("b")));
-});
-
-test("QueryParser: `a OR b`", () => {
-  expectParsed(String.raw`a OR b`, new ASTOr(new ASTTag("a"), new ASTTag("b")));
-});
-
-test("QueryParser: `(a or b)`", () => {
-  expectParsed(
-    String.raw`(a or b)`,
-    new ASTOr(new ASTTag("a"), new ASTTag("b")),
-  );
-});
-
-test("QueryParser: `(a) or (b)`", () => {
-  expectParsed(
-    String.raw`(a) or (b)`,
-    new ASTOr(new ASTTag("a"), new ASTTag("b")),
-  );
-});
-
-test("QueryParser: `a or b or c`", () => {
-  expectParsed(
-    String.raw`a or b or c`,
-    new ASTOr(new ASTTag("a"), new ASTOr(new ASTTag("b"), new ASTTag("c"))),
-  );
-});
-
-test("QueryParser: `(a or b) or c`", () => {
-  expectParsed(
-    String.raw`(a or b) or c`,
-    new ASTOr(new ASTTag("a"), new ASTOr(new ASTTag("b"), new ASTTag("c"))),
-  );
-});
-
-test("QueryParser: `a or (b or c)`", () => {
-  expectParsed(
-    String.raw`a or (b or c)`,
-    new ASTOr(new ASTTag("a"), new ASTOr(new ASTTag("b"), new ASTTag("c"))),
-  );
-});
-
-test("QueryParser: `(a or b or c)`", () => {
-  expectParsed(
-    String.raw`(a or b or c)`,
-    new ASTOr(new ASTTag("a"), new ASTOr(new ASTTag("b"), new ASTTag("c"))),
-  );
-});
-
-test("QueryParser: `a or (b or (c or d))`", () => {
-  expectParsed(
-    String.raw`a or (b or (c or d))`,
-    new ASTOr(
-      new ASTTag("a"),
-      new ASTOr(new ASTTag("b"), new ASTOr(new ASTTag("c"), new ASTTag("d"))),
+  },
+  {
+    query: String.raw`((abc_(def)) ghi)`,
+    ast: new ASTAnd(
+      new ASTTag('abc_(def)'),
+      new ASTTag('ghi'),
     ),
-  );
-});
-
-test("QueryParser: `((a or b) or c) or d`", () => {
-  expectParsed(
-    String.raw`((a or b) or c) or d`,
-    new ASTOr(
-      new ASTTag("a"),
-      new ASTOr(new ASTTag("b"), new ASTOr(new ASTTag("c"), new ASTTag("d"))),
+  },
+  {
+    query: String.raw`abc def_(ghi)`,
+    ast: new ASTAnd(
+      new ASTTag('abc'),
+      new ASTTag('def_(ghi)'),
     ),
-  );
-});
-
-test("QueryParser: `(a or b) or (c or d)`", () => {
-  expectParsed(
-    String.raw`(a or b) or (c or d)`,
-    new ASTOr(
-      new ASTTag("a"),
-      new ASTOr(new ASTTag("b"), new ASTOr(new ASTTag("c"), new ASTTag("d"))),
+  },
+  {
+    query: String.raw`(abc def_(ghi))`,
+    ast: new ASTAnd(
+      new ASTTag('abc'),
+      new ASTTag('def_(ghi)'),
     ),
-  );
-});
-
-test("QueryParser: `~a ~b`", () => {
-  expectParsed(String.raw`~a ~b`, new ASTOr(new ASTTag("a"), new ASTTag("b")));
-});
-
-test("QueryParser: `~a ~b ~c`", () => {
-  expectParsed(
-    String.raw`~a ~b ~c`,
-    new ASTOr(new ASTTag("a"), new ASTOr(new ASTTag("b"), new ASTTag("c"))),
-  );
-});
-
-test("QueryParser: `~a ~b ~c ~d`", () => {
-  expectParsed(
-    String.raw`~a ~b ~c ~d`,
-    new ASTOr(
-      new ASTTag("a"),
-      new ASTOr(new ASTTag("b"), new ASTOr(new ASTTag("c"), new ASTTag("d"))),
+  },
+  {
+    query: String.raw`(abc (def_(ghi)))`,
+    ast: new ASTAnd(
+      new ASTTag('abc'),
+      new ASTTag('def_(ghi)'),
     ),
-  );
-});
-
-test("QueryParser: `~a`", () => {
-  expectParsed(String.raw`~a`, new ASTTag("a"));
-});
-
-test("QueryParser: `(~a)`", () => {
-  expectParsed(String.raw`(~a)`, new ASTTag("a"));
-});
-
-test("QueryParser: `~(a)`", () => {
-  expectParsed(String.raw`~(a)`, new ASTTag("a"));
-});
-
-test("QueryParser: `~(~a)`", () => {
-  expectParsed(String.raw`~(~a)`, new ASTTag("a"));
-});
-
-test("QueryParser: `~(~(~a))`", () => {
-  expectParsed(String.raw`~(~(~a))`, new ASTTag("a"));
-});
-
-test("QueryParser: `~(-a)`", () => {
-  expectParsed(String.raw`~(-a)`, new ASTNot(new ASTTag("a")));
-});
-
-test("QueryParser: `-(~a)`", () => {
-  expectParsed(String.raw`-(~a)`, new ASTNot(new ASTTag("a")));
-});
-
-test("QueryParser: `-(~(-(~a)))`", () => {
-  expectParsed(String.raw`-(~(-(~a)))`, new ASTTag("a"));
-});
-
-test("QueryParser: `~(-(~(-a)))`", () => {
-  expectParsed(String.raw`~(-(~(-a)))`, new ASTTag("a"));
-});
-
-test("QueryParser: `a ~b`", () => {
-  expectParsed(String.raw`a ~b`, new ASTAnd(new ASTTag("a"), new ASTTag("b")));
-});
-
-test("QueryParser: `~a b`", () => {
-  expectParsed(String.raw`~a b`, new ASTAnd(new ASTTag("b"), new ASTTag("a")));
-});
-
-test("QueryParser: `((a) ~b)`", () => {
-  expectParsed(
-    String.raw`((a) ~b)`,
-    new ASTAnd(new ASTTag("a"), new ASTTag("b")),
-  );
-});
-
-test("QueryParser: `~(a b)`", () => {
-  expectParsed(
-    String.raw`~(a b)`,
-    new ASTAnd(new ASTTag("a"), new ASTTag("b")),
-  );
-});
-
-test("QueryParser: `~a and ~b`", () => {
-  expectParsed(
-    String.raw`~a and ~b`,
-    new ASTAnd(new ASTTag("a"), new ASTTag("b")),
-  );
-});
-
-test("QueryParser: `~a or ~b`", () => {
-  expectParsed(
-    String.raw`~a or ~b`,
-    new ASTOr(new ASTTag("a"), new ASTTag("b")),
-  );
-});
-
-test("QueryParser: `~(-a) or ~(-b)`", () => {
-  expectParsed(
-    String.raw`~(-a) or ~(-b)`,
-    new ASTOr(new ASTNot(new ASTTag("a")), new ASTNot(new ASTTag("b"))),
-  );
-});
-
-test("QueryParser: `~(a) ~(b)`", () => {
-  expectParsed(
-    String.raw`~(a) ~(b)`,
-    new ASTOr(new ASTTag("a"), new ASTTag("b")),
-  );
-});
-
-test("QueryParser: `(~a) (~b)`", () => {
-  expectParsed(
-    String.raw`(~a) (~b)`,
-    new ASTAnd(new ASTTag("a"), new ASTTag("b")),
-  );
-});
-
-test("QueryParser: `(~a) ~b ~c`", () => {
-  expectParsed(
-    String.raw`(~a) ~b ~c`,
-    new ASTAnd(new ASTTag("a"), new ASTOr(new ASTTag("b"), new ASTTag("c"))),
-  );
-});
-
-test("QueryParser: `~a (~b ~c)`", () => {
-  expectParsed(
-    String.raw`~a (~b ~c)`,
-    new ASTAnd(new ASTOr(new ASTTag("b"), new ASTTag("c")), new ASTTag("a")),
-  );
-});
-
-test("QueryParser: `~a ~b or ~c ~d`", () => {
-  expectParsed(
-    String.raw`~a ~b or ~c ~d`,
-    new ASTOr(
-      new ASTTag("a"),
-      new ASTOr(new ASTTag("b"), new ASTOr(new ASTTag("c"), new ASTTag("d"))),
+  },
+  {
+    query: String.raw`abc_(def) ghi_(jkl)`,
+    ast: new ASTAnd(
+      new ASTTag('abc_(def)'),
+      new ASTTag('ghi_(jkl)'),
     ),
-  );
-});
-
-test("QueryParser: `~a ~b and ~c ~d`", () => {
-  expectParsed(
-    String.raw`~a ~b and ~c ~d`,
-    new ASTAnd(
-      new ASTOr(new ASTTag("a"), new ASTTag("b")),
-      new ASTOr(new ASTTag("c"), new ASTTag("d")),
+  },
+  {
+    query: String.raw`(abc_(def) ghi_(jkl))`,
+    ast: new ASTAnd(
+      new ASTTag('abc_(def)'),
+      new ASTTag('ghi_(jkl)'),
     ),
-  );
-});
-
-test("QueryParser: `(~a ~b) (~c ~d)`", () => {
-  expectParsed(
-    String.raw`(~a ~b) (~c ~d)`,
-    new ASTAnd(
-      new ASTOr(new ASTTag("a"), new ASTTag("b")),
-      new ASTOr(new ASTTag("c"), new ASTTag("d")),
+  },
+  {
+    query: String.raw`:)`,
+    ast: new ASTTag(':)'),
+  },
+  {
+    query: String.raw`(:))`,
+    ast: new ASTTag(':)'),
+  },
+  {
+    query: String.raw`(:)`,
+    ast: new ASTNone(),
+  },
+  {
+    query: String.raw`(:) >:))`,
+    ast: new ASTAnd(
+      new ASTTag(':)'),
+      new ASTTag('>:)'),
     ),
-  );
-});
-
-test("QueryParser: `~(a b) ~(c d)`", () => {
-  expectParsed(
-    String.raw`~(a b) ~(c d)`,
-    new ASTOr(
-      new ASTAnd(new ASTTag("a"), new ASTTag("b")),
-      new ASTAnd(new ASTTag("c"), new ASTTag("d")),
+  },
+  {
+    query: String.raw`(:) >:)`,
+    ast: new ASTNone(),
+  },
+  {
+    query: String.raw`*)`,
+    ast: new ASTWildcard('*)'),
+  },
+  {
+    query: String.raw`(*)`,
+    ast: new ASTWildcard('*'),
+  },
+  {
+    query: String.raw`(foo*)`,
+    ast: new ASTWildcard('foo*'),
+  },
+  {
+    query: String.raw`foo*)`,
+    ast: new ASTWildcard('foo*)'),
+  },
+  {
+    query: String.raw`foo*) bar`,
+    ast: new ASTAnd(
+      new ASTWildcard('foo*)'),
+      new ASTTag('bar'),
     ),
-  );
-});
-
-test("QueryParser: `(a b) or (c d)`", () => {
-  expectParsed(
-    String.raw`(a b) or (c d)`,
-    new ASTOr(
-      new ASTAnd(new ASTTag("a"), new ASTTag("b")),
-      new ASTAnd(new ASTTag("c"), new ASTTag("d")),
+  },
+  {
+    query: String.raw`(foo*) bar`,
+    ast: new ASTAnd(
+      new ASTWildcard('foo*'),
+      new ASTTag('bar'),
     ),
-  );
-});
-
-test("QueryParser: ` a  b  c  d`", () => {
-  expectParsed(
-    String.raw` a  b  c  d`,
-    new ASTAnd(
-      new ASTTag("a"),
-      new ASTAnd(new ASTTag("b"), new ASTAnd(new ASTTag("c"), new ASTTag("d"))),
+  },
+  {
+    query: String.raw`(foo*) bar)`,
+    ast: new ASTAnd(
+      new ASTWildcard('foo*'),
+      new ASTTag('bar)'),
     ),
-  );
-});
-
-test("QueryParser: ` a  b  c ~d`", () => {
-  expectParsed(
-    String.raw` a  b  c ~d`,
-    new ASTAnd(
-      new ASTTag("a"),
-      new ASTAnd(new ASTTag("b"), new ASTAnd(new ASTTag("c"), new ASTTag("d"))),
+  },
+  {
+    query: String.raw`*_(foo)`,
+    ast: new ASTWildcard('*_(foo)'),
+  },
+  {
+    query: String.raw`(*_(foo))`,
+    ast: new ASTWildcard('*_(foo)'),
+  },
+  {
+    query: String.raw`(*_(foo) bar)`,
+    ast: new ASTAnd(
+      new ASTWildcard('*_(foo)'),
+      new ASTTag('bar'),
     ),
-  );
-});
-
-test("QueryParser: ` a  b ~c  d`", () => {
-  expectParsed(
-    String.raw` a  b ~c  d`,
-    new ASTAnd(
-      new ASTTag("a"),
-      new ASTAnd(new ASTTag("b"), new ASTAnd(new ASTTag("d"), new ASTTag("c"))),
+  },
+  {
+    query: String.raw`((*_(foo)) bar)`,
+    ast: new ASTAnd(
+      new ASTWildcard('*_(foo)'),
+      new ASTTag('bar'),
     ),
-  );
-});
-
-test("QueryParser: ` a  b ~c ~d`", () => {
-  expectParsed(
-    String.raw` a  b ~c ~d`,
-    new ASTAnd(
-      new ASTTag("a"),
-      new ASTAnd(new ASTTag("b"), new ASTOr(new ASTTag("c"), new ASTTag("d"))),
+  },
+  {
+    query: String.raw`(bar *_(foo))`,
+    ast: new ASTAnd(
+      new ASTTag('bar'),
+      new ASTWildcard('*_(foo)'),
     ),
-  );
-});
-
-test("QueryParser: ` a ~b  c  d`", () => {
-  expectParsed(
-    String.raw` a ~b  c  d`,
-    new ASTAnd(
-      new ASTTag("a"),
-      new ASTAnd(new ASTTag("c"), new ASTAnd(new ASTTag("d"), new ASTTag("b"))),
+  },
+  {
+    query: String.raw`(bar (*_(foo)))`,
+    ast: new ASTAnd(
+      new ASTTag('bar'),
+      new ASTWildcard('*_(foo)'),
     ),
-  );
-});
-
-test("QueryParser: ` a ~b  c ~d`", () => {
-  expectParsed(
-    String.raw` a ~b  c ~d`,
-    new ASTAnd(
-      new ASTTag("a"),
-      new ASTAnd(new ASTTag("c"), new ASTOr(new ASTTag("b"), new ASTTag("d"))),
+  },
+  {
+    query: String.raw`(meta:a)`,
+    ast: new ASTMetatag('meta', 'a'),
+  },
+  {
+    query: String.raw`(meta:(a)`,
+    ast: new ASTMetatag('meta', '(a'),
+  },
+  {
+    query: String.raw`(meta:(a))`,
+    ast: new ASTMetatag('meta', '(a)'),
+  },
+  {
+    query: String.raw`(meta:a meta:b)`,
+    ast: new ASTAnd(
+      new ASTMetatag('meta', 'a'),
+      new ASTMetatag('meta', 'b'),
     ),
-  );
-});
-
-test("QueryParser: ` a ~b ~c  d`", () => {
-  expectParsed(
-    String.raw` a ~b ~c  d`,
-    new ASTAnd(
-      new ASTTag("a"),
-      new ASTAnd(new ASTTag("d"), new ASTOr(new ASTTag("b"), new ASTTag("c"))),
+  },
+  {
+    query: String.raw`(meta:a) meta:b)`,
+    ast: new ASTAnd(
+      new ASTMetatag('meta', 'a'),
+      new ASTMetatag('meta', 'b)'),
     ),
-  );
-});
-
-test("QueryParser: ` a ~b ~c ~d`", () => {
-  expectParsed(
-    String.raw` a ~b ~c ~d`,
-    new ASTAnd(
-      new ASTTag("a"),
-      new ASTOr(new ASTTag("b"), new ASTOr(new ASTTag("c"), new ASTTag("d"))),
+  },
+  {
+    query: String.raw`(meta:"a)" meta:b)`,
+    ast: new ASTAnd(
+      new ASTMetatag('meta', 'a)'),
+      new ASTMetatag('meta', 'b'),
     ),
-  );
-});
-
-test("QueryParser: `~a  b  c  d`", () => {
-  expectParsed(
-    String.raw`~a  b  c  d`,
-    new ASTAnd(
-      new ASTTag("b"),
-      new ASTAnd(new ASTTag("c"), new ASTAnd(new ASTTag("d"), new ASTTag("a"))),
+  },
+  {
+    query: String.raw`a b`,
+    ast: new ASTAnd(
+      new ASTTag('a'),
+      new ASTTag('b'),
     ),
-  );
-});
-
-test("QueryParser: `~a  b  c ~d`", () => {
-  expectParsed(
-    String.raw`~a  b  c ~d`,
-    new ASTAnd(
-      new ASTTag("b"),
-      new ASTAnd(new ASTTag("c"), new ASTOr(new ASTTag("a"), new ASTTag("d"))),
+  },
+  {
+    query: String.raw`a or b`,
+    ast: new ASTOr(
+      new ASTTag('a'),
+      new ASTTag('b'),
     ),
-  );
-});
-
-test("QueryParser: `~a  b ~c  d`", () => {
-  expectParsed(
-    String.raw`~a  b ~c  d`,
-    new ASTAnd(
-      new ASTTag("b"),
-      new ASTAnd(new ASTTag("d"), new ASTOr(new ASTTag("a"), new ASTTag("c"))),
+  },
+  {
+    query: String.raw`~a ~b`,
+    ast: new ASTOr(
+      new ASTTag('a'),
+      new ASTTag('b'),
     ),
-  );
-});
-
-test("QueryParser: `~a  b ~c ~d`", () => {
-  expectParsed(
-    String.raw`~a  b ~c ~d`,
-    new ASTAnd(
-      new ASTTag("b"),
-      new ASTOr(new ASTTag("a"), new ASTOr(new ASTTag("c"), new ASTTag("d"))),
+  },
+  {
+    query: String.raw`-a`,
+    ast: new ASTNot(
+      new ASTTag('a'),
     ),
-  );
-});
-
-test("QueryParser: `~a ~b  c  d`", () => {
-  expectParsed(
-    String.raw`~a ~b  c  d`,
-    new ASTAnd(
-      new ASTTag("c"),
-      new ASTAnd(new ASTTag("d"), new ASTOr(new ASTTag("a"), new ASTTag("b"))),
+  },
+  {
+    query: String.raw`a -b`,
+    ast: new ASTAnd(
+      new ASTTag('a'),
+      new ASTNot(
+        new ASTTag('b'),
+      ),
     ),
-  );
-});
-
-test("QueryParser: `~a ~b  c ~d`", () => {
-  expectParsed(
-    String.raw`~a ~b  c ~d`,
-    new ASTAnd(
-      new ASTTag("c"),
-      new ASTOr(new ASTTag("a"), new ASTOr(new ASTTag("b"), new ASTTag("d"))),
+  },
+  {
+    query: String.raw`meta:a`,
+    ast: new ASTMetatag('meta', 'a'),
+  },
+  {
+    query: String.raw`-meta:a`,
+    ast: new ASTNot(
+      new ASTMetatag('meta', 'a'),
     ),
-  );
-});
-
-test("QueryParser: `~a ~b ~c  d`", () => {
-  expectParsed(
-    String.raw`~a ~b ~c  d`,
-    new ASTAnd(
-      new ASTTag("d"),
-      new ASTOr(new ASTTag("a"), new ASTOr(new ASTTag("b"), new ASTTag("c"))),
+  },
+  {
+    query: String.raw`meta:a meta:b`,
+    ast: new ASTAnd(
+      new ASTMetatag('meta', 'a'),
+      new ASTMetatag('meta', 'b'),
     ),
-  );
-});
-
-test("QueryParser: `~a ~b ~c ~d`", () => {
-  expectParsed(
-    String.raw`~a ~b ~c ~d`,
-    new ASTOr(
-      new ASTTag("a"),
-      new ASTOr(new ASTTag("b"), new ASTOr(new ASTTag("c"), new ASTTag("d"))),
+  },
+  {
+    query: String.raw`meta:a`,
+    ast: new ASTMetatag('meta', 'a'),
+  },
+  {
+    query: String.raw`META:a`,
+    ast: new ASTMetatag('meta', 'a'),
+  },
+  {
+    query: String.raw`meta:A`,
+    ast: new ASTMetatag('meta', 'A'),
+  },
+  {
+    query: String.raw`~meta:a`,
+    ast: new ASTMetatag('meta', 'a'),
+  },
+  {
+    query: String.raw`-meta:a`,
+    ast: new ASTNot(
+      new ASTMetatag('meta', 'a'),
     ),
-  );
-});
-
-test("QueryParser: `-a`", () => {
-  expectParsed(String.raw`-a`, new ASTNot(new ASTTag("a")));
-});
-
-test("QueryParser: `(a -b)`", () => {
-  expectParsed(
-    String.raw`(a -b)`,
-    new ASTAnd(new ASTTag("a"), new ASTNot(new ASTTag("b"))),
-  );
-});
-
-test("QueryParser: `a (-b)`", () => {
-  expectParsed(
-    String.raw`a (-b)`,
-    new ASTAnd(new ASTTag("a"), new ASTNot(new ASTTag("b"))),
-  );
-});
-
-test("QueryParser: `((a) -b)`", () => {
-  expectParsed(
-    String.raw`((a) -b)`,
-    new ASTAnd(new ASTTag("a"), new ASTNot(new ASTTag("b"))),
-  );
-});
-
-test("QueryParser: `-a`", () => {
-  expectParsed(String.raw`-a`, new ASTNot(new ASTTag("a")));
-});
-
-test("QueryParser: `-(-(-a))`", () => {
-  expectParsed(String.raw`-(-(-a))`, new ASTNot(new ASTTag("a")));
-});
-
-test("QueryParser: `-(-a)`", () => {
-  expectParsed(String.raw`-(-a)`, new ASTTag("a"));
-});
-
-test("QueryParser: `-(-(-(-a)))`", () => {
-  expectParsed(String.raw`-(-(-(-a)))`, new ASTTag("a"));
-});
-
-test("QueryParser: `a -(-(b)) c`", () => {
-  expectParsed(
-    String.raw`a -(-(b)) c`,
-    new ASTAnd(new ASTTag("a"), new ASTAnd(new ASTTag("b"), new ASTTag("c"))),
-  );
-});
-
-test("QueryParser: `a -(-(b -(-c))) d`", () => {
-  expectParsed(
-    String.raw`a -(-(b -(-c))) d`,
-    new ASTAnd(
-      new ASTTag("a"),
-      new ASTAnd(new ASTTag("b"), new ASTAnd(new ASTTag("c"), new ASTTag("d"))),
+  },
+  {
+    query: String.raw`meta:a meta:b`,
+    ast: new ASTAnd(
+      new ASTMetatag('meta', 'a'),
+      new ASTMetatag('meta', 'b'),
     ),
-  );
-});
-
-test("QueryParser: `(`", () => {
-  expectParsed(String.raw`(`, new ASTNone());
-});
-
-test("QueryParser: `)`", () => {
-  expectParsed(String.raw`)`, new ASTNone());
-});
-
-test("QueryParser: `-`", () => {
-  expectParsed(String.raw`-`, new ASTNone());
-});
-
-test("QueryParser: `~`", () => {
-  expectParsed(String.raw`~`, new ASTNone());
-});
-
-test("QueryParser: `(a`", () => {
-  expectParsed(String.raw`(a`, new ASTNone());
-});
-
-test("QueryParser: `)a`", () => {
-  expectParsed(String.raw`)a`, new ASTNone());
-});
-
-test("QueryParser: `-~a`", () => {
-  expectParsed(String.raw`-~a`, new ASTNone());
-});
-
-test("QueryParser: `~-a`", () => {
-  expectParsed(String.raw`~-a`, new ASTNone());
-});
-
-test("QueryParser: `~~a`", () => {
-  expectParsed(String.raw`~~a`, new ASTNone());
-});
-
-test("QueryParser: `--a`", () => {
-  expectParsed(String.raw`--a`, new ASTNone());
-});
-
-test("QueryParser: `and`", () => {
-  expectParsed(String.raw`and`, new ASTNone());
-});
-
-test("QueryParser: `-and`", () => {
-  expectParsed(String.raw`-and`, new ASTNone());
-});
-
-test("QueryParser: `~and`", () => {
-  expectParsed(String.raw`~and`, new ASTNone());
-});
-
-test("QueryParser: `or`", () => {
-  expectParsed(String.raw`or`, new ASTNone());
-});
-
-test("QueryParser: `-or`", () => {
-  expectParsed(String.raw`-or`, new ASTNone());
-});
-
-test("QueryParser: `~or`", () => {
-  expectParsed(String.raw`~or`, new ASTNone());
-});
-
-test("QueryParser: `a and`", () => {
-  expectParsed(String.raw`a and`, new ASTNone());
-});
-
-test("QueryParser: `a or`", () => {
-  expectParsed(String.raw`a or`, new ASTNone());
-});
-
-test("QueryParser: `and a`", () => {
-  expectParsed(String.raw`and a`, new ASTNone());
-});
-
-test("QueryParser: `or a`", () => {
-  expectParsed(String.raw`or a`, new ASTNone());
-});
-
-test("QueryParser: `a -`", () => {
-  expectParsed(String.raw`a -`, new ASTNone());
-});
-
-test("QueryParser: `a ~`", () => {
-  expectParsed(String.raw`a ~`, new ASTNone());
-});
-
-test("QueryParser: `(a b`", () => {
-  expectParsed(String.raw`(a b`, new ASTNone());
-});
-
-test("QueryParser: `(a (b)`", () => {
-  expectParsed(String.raw`(a (b)`, new ASTNone());
-});
-
-test('QueryParser: `meta:"foo`', () => {
-  expectParsed(String.raw`meta:"foo`, new ASTNone());
-});
-
-test('QueryParser: `meta:"foo bar`', () => {
-  expectParsed(String.raw`meta:"foo bar`, new ASTNone());
-});
+  },
+  {
+    query: String.raw`~meta:a ~meta:b`,
+    ast: new ASTOr(
+      new ASTMetatag('meta', 'a'),
+      new ASTMetatag('meta', 'b'),
+    ),
+  },
+  {
+    query: String.raw`meta:a or meta:b`,
+    ast: new ASTOr(
+      new ASTMetatag('meta', 'a'),
+      new ASTMetatag('meta', 'b'),
+    ),
+  },
+  {
+    query: String.raw`(meta:a)`,
+    ast: new ASTMetatag('meta', 'a'),
+  },
+  {
+    query: String.raw`meta:(a)`,
+    ast: new ASTMetatag('meta', '(a)'),
+  },
+  {
+    query: String.raw`(meta:(a)`,
+    ast: new ASTMetatag('meta', '(a'),
+  },
+  {
+    query: String.raw`meta:"foo bar"`,
+    ast: new ASTMetatag('meta', 'foo bar'),
+  },
+  {
+    query: String.raw`meta:foobar"(`,
+    ast: new ASTMetatag('meta', 'foobar"('),
+  },
+  {
+    query: String.raw`meta:`,
+    ast: new ASTMetatag('meta', ''),
+  },
+  {
+    query: String.raw`meta:""`,
+    ast: new ASTMetatag('meta', ''),
+  },
+  {
+    query: String.raw`meta:"\""`,
+    ast: new ASTMetatag('meta', '"'),
+  },
+  {
+    query: String.raw`meta:"don't say \"lazy\" okay"`,
+    ast: new ASTMetatag('meta', 'don\'t say "lazy" okay'),
+  },
+  {
+    query: String.raw`(a (meta:"foo)bar"))`,
+    ast: new ASTAnd(
+      new ASTTag('a'),
+      new ASTMetatag('meta', 'foo)bar'),
+    ),
+  },
+  {
+    query: String.raw`meta:'foo bar'`,
+    ast: new ASTMetatag('meta', 'foo bar'),
+  },
+  {
+    query: String.raw`meta:foobar'(`,
+    ast: new ASTMetatag('meta', 'foobar\'('),
+  },
+  {
+    query: String.raw`meta:''`,
+    ast: new ASTMetatag('meta', ''),
+  },
+  {
+    query: String.raw`meta:'\''`,
+    ast: new ASTMetatag('meta', '\''),
+  },
+  {
+    query: String.raw`meta:'don\'t say "lazy" okay'`,
+    ast: new ASTMetatag('meta', 'don\'t say "lazy" okay'),
+  },
+  {
+    query: String.raw`(a (source:'foo)bar'))`,
+    ast: new ASTAnd(
+      new ASTTag('a'),
+      new ASTTag('source:\'foo)bar\''),
+    ),
+  },
+  {
+    query: String.raw`*`,
+    ast: new ASTWildcard('*'),
+  },
+  {
+    query: String.raw`*a`,
+    ast: new ASTWildcard('*a'),
+  },
+  {
+    query: String.raw`a*`,
+    ast: new ASTWildcard('a*'),
+  },
+  {
+    query: String.raw`*a*`,
+    ast: new ASTWildcard('*a*'),
+  },
+  {
+    query: String.raw`a*b`,
+    ast: new ASTWildcard('a*b'),
+  },
+  {
+    query: String.raw`* b`,
+    ast: new ASTAnd(
+      new ASTWildcard('*'),
+      new ASTTag('b'),
+    ),
+  },
+  {
+    query: String.raw`*a b`,
+    ast: new ASTAnd(
+      new ASTWildcard('*a'),
+      new ASTTag('b'),
+    ),
+  },
+  {
+    query: String.raw`a* b`,
+    ast: new ASTAnd(
+      new ASTWildcard('a*'),
+      new ASTTag('b'),
+    ),
+  },
+  {
+    query: String.raw`*a* b`,
+    ast: new ASTAnd(
+      new ASTWildcard('*a*'),
+      new ASTTag('b'),
+    ),
+  },
+  {
+    query: String.raw`a *`,
+    ast: new ASTAnd(
+      new ASTTag('a'),
+      new ASTWildcard('*'),
+    ),
+  },
+  {
+    query: String.raw`a *b`,
+    ast: new ASTAnd(
+      new ASTTag('a'),
+      new ASTWildcard('*b'),
+    ),
+  },
+  {
+    query: String.raw`a b*`,
+    ast: new ASTAnd(
+      new ASTTag('a'),
+      new ASTWildcard('b*'),
+    ),
+  },
+  {
+    query: String.raw`a *b*`,
+    ast: new ASTAnd(
+      new ASTTag('a'),
+      new ASTWildcard('*b*'),
+    ),
+  },
+  {
+    query: String.raw`a -*`,
+    ast: new ASTAnd(
+      new ASTTag('a'),
+      new ASTNot(
+        new ASTWildcard('*'),
+      ),
+    ),
+  },
+  {
+    query: String.raw`a -b*`,
+    ast: new ASTAnd(
+      new ASTTag('a'),
+      new ASTNot(
+        new ASTWildcard('b*'),
+      ),
+    ),
+  },
+  {
+    query: String.raw`a -*b`,
+    ast: new ASTAnd(
+      new ASTTag('a'),
+      new ASTNot(
+        new ASTWildcard('*b'),
+      ),
+    ),
+  },
+  {
+    query: String.raw`a -*b*`,
+    ast: new ASTAnd(
+      new ASTTag('a'),
+      new ASTNot(
+        new ASTWildcard('*b*'),
+      ),
+    ),
+  },
+  {
+    query: String.raw`~a ~*`,
+    ast: new ASTOr(
+      new ASTTag('a'),
+      new ASTWildcard('*'),
+    ),
+  },
+  {
+    query: String.raw`~* ~a`,
+    ast: new ASTOr(
+      new ASTWildcard('*'),
+      new ASTTag('a'),
+    ),
+  },
+  {
+    query: String.raw`~a ~*a`,
+    ast: new ASTOr(
+      new ASTTag('a'),
+      new ASTWildcard('*a'),
+    ),
+  },
+  {
+    query: String.raw`~*a ~a`,
+    ast: new ASTOr(
+      new ASTWildcard('*a'),
+      new ASTTag('a'),
+    ),
+  },
+  {
+    query: String.raw`a or a*`,
+    ast: new ASTOr(
+      new ASTTag('a'),
+      new ASTWildcard('a*'),
+    ),
+  },
+  {
+    query: String.raw`a and a*`,
+    ast: new ASTAnd(
+      new ASTTag('a'),
+      new ASTWildcard('a*'),
+    ),
+  },
+  {
+    query: String.raw`a* b*`,
+    ast: new ASTAnd(
+      new ASTWildcard('a*'),
+      new ASTWildcard('b*'),
+    ),
+  },
+  {
+    query: String.raw`a* or b*`,
+    ast: new ASTOr(
+      new ASTWildcard('a*'),
+      new ASTWildcard('b*'),
+    ),
+  },
+  {
+    query: String.raw`a b* c`,
+    ast: new ASTAnd(
+      new ASTTag('a'),
+      new ASTAnd(
+        new ASTWildcard('b*'),
+        new ASTTag('c'),
+      ),
+    ),
+  },
+  {
+    query: String.raw`a -* c`,
+    ast: new ASTAnd(
+      new ASTTag('a'),
+      new ASTAnd(
+        new ASTNot(
+          new ASTWildcard('*'),
+        ),
+        new ASTTag('c'),
+      ),
+    ),
+  },
+  {
+    query: String.raw`a`,
+    ast: new ASTTag('a'),
+  },
+  {
+    query: String.raw`a `,
+    ast: new ASTTag('a'),
+  },
+  {
+    query: String.raw` a`,
+    ast: new ASTTag('a'),
+  },
+  {
+    query: String.raw` a `,
+    ast: new ASTTag('a'),
+  },
+  {
+    query: String.raw`(a)`,
+    ast: new ASTTag('a'),
+  },
+  {
+    query: String.raw`( a)`,
+    ast: new ASTTag('a'),
+  },
+  {
+    query: String.raw`(a )`,
+    ast: new ASTTag('a'),
+  },
+  {
+    query: String.raw` ( a ) `,
+    ast: new ASTTag('a'),
+  },
+  {
+    query: String.raw`((a))`,
+    ast: new ASTTag('a'),
+  },
+  {
+    query: String.raw`( ( a ) )`,
+    ast: new ASTTag('a'),
+  },
+  {
+    query: String.raw` ( ( a ) ) `,
+    ast: new ASTTag('a'),
+  },
+  {
+    query: String.raw`a b`,
+    ast: new ASTAnd(
+      new ASTTag('a'),
+      new ASTTag('b'),
+    ),
+  },
+  {
+    query: String.raw`(a b)`,
+    ast: new ASTAnd(
+      new ASTTag('a'),
+      new ASTTag('b'),
+    ),
+  },
+  {
+    query: String.raw`a (b)`,
+    ast: new ASTAnd(
+      new ASTTag('a'),
+      new ASTTag('b'),
+    ),
+  },
+  {
+    query: String.raw`(a) b`,
+    ast: new ASTAnd(
+      new ASTTag('a'),
+      new ASTTag('b'),
+    ),
+  },
+  {
+    query: String.raw`(a) (b)`,
+    ast: new ASTAnd(
+      new ASTTag('a'),
+      new ASTTag('b'),
+    ),
+  },
+  {
+    query: String.raw`((a) (b))`,
+    ast: new ASTAnd(
+      new ASTTag('a'),
+      new ASTTag('b'),
+    ),
+  },
+  {
+    query: String.raw`a b c`,
+    ast: new ASTAnd(
+      new ASTTag('a'),
+      new ASTAnd(
+        new ASTTag('b'),
+        new ASTTag('c'),
+      ),
+    ),
+  },
+  {
+    query: String.raw`(a b) c`,
+    ast: new ASTAnd(
+      new ASTTag('a'),
+      new ASTAnd(
+        new ASTTag('b'),
+        new ASTTag('c'),
+      ),
+    ),
+  },
+  {
+    query: String.raw`((a) b) c`,
+    ast: new ASTAnd(
+      new ASTTag('a'),
+      new ASTAnd(
+        new ASTTag('b'),
+        new ASTTag('c'),
+      ),
+    ),
+  },
+  {
+    query: String.raw`(((a) b) c)`,
+    ast: new ASTAnd(
+      new ASTTag('a'),
+      new ASTAnd(
+        new ASTTag('b'),
+        new ASTTag('c'),
+      ),
+    ),
+  },
+  {
+    query: String.raw`((a b) c)`,
+    ast: new ASTAnd(
+      new ASTTag('a'),
+      new ASTAnd(
+        new ASTTag('b'),
+        new ASTTag('c'),
+      ),
+    ),
+  },
+  {
+    query: String.raw`((a) (b) (c))`,
+    ast: new ASTAnd(
+      new ASTTag('a'),
+      new ASTAnd(
+        new ASTTag('b'),
+        new ASTTag('c'),
+      ),
+    ),
+  },
+  {
+    query: String.raw`a (b c)`,
+    ast: new ASTAnd(
+      new ASTTag('a'),
+      new ASTAnd(
+        new ASTTag('b'),
+        new ASTTag('c'),
+      ),
+    ),
+  },
+  {
+    query: String.raw`a (b (c))`,
+    ast: new ASTAnd(
+      new ASTTag('a'),
+      new ASTAnd(
+        new ASTTag('b'),
+        new ASTTag('c'),
+      ),
+    ),
+  },
+  {
+    query: String.raw`(a (b (c)))`,
+    ast: new ASTAnd(
+      new ASTTag('a'),
+      new ASTAnd(
+        new ASTTag('b'),
+        new ASTTag('c'),
+      ),
+    ),
+  },
+  {
+    query: String.raw`(a (b c))`,
+    ast: new ASTAnd(
+      new ASTTag('a'),
+      new ASTAnd(
+        new ASTTag('b'),
+        new ASTTag('c'),
+      ),
+    ),
+  },
+  {
+    query: String.raw`(a b c)`,
+    ast: new ASTAnd(
+      new ASTTag('a'),
+      new ASTAnd(
+        new ASTTag('b'),
+        new ASTTag('c'),
+      ),
+    ),
+  },
+  {
+    query: String.raw`a and b`,
+    ast: new ASTAnd(
+      new ASTTag('a'),
+      new ASTTag('b'),
+    ),
+  },
+  {
+    query: String.raw`a AND b`,
+    ast: new ASTAnd(
+      new ASTTag('a'),
+      new ASTTag('b'),
+    ),
+  },
+  {
+    query: String.raw`(a and b)`,
+    ast: new ASTAnd(
+      new ASTTag('a'),
+      new ASTTag('b'),
+    ),
+  },
+  {
+    query: String.raw`a and b and c`,
+    ast: new ASTAnd(
+      new ASTTag('a'),
+      new ASTAnd(
+        new ASTTag('b'),
+        new ASTTag('c'),
+      ),
+    ),
+  },
+  {
+    query: String.raw`(a and b) and c`,
+    ast: new ASTAnd(
+      new ASTTag('a'),
+      new ASTAnd(
+        new ASTTag('b'),
+        new ASTTag('c'),
+      ),
+    ),
+  },
+  {
+    query: String.raw`a and (b and c)`,
+    ast: new ASTAnd(
+      new ASTTag('a'),
+      new ASTAnd(
+        new ASTTag('b'),
+        new ASTTag('c'),
+      ),
+    ),
+  },
+  {
+    query: String.raw`(a and b and c)`,
+    ast: new ASTAnd(
+      new ASTTag('a'),
+      new ASTAnd(
+        new ASTTag('b'),
+        new ASTTag('c'),
+      ),
+    ),
+  },
+  {
+    query: String.raw`a or b`,
+    ast: new ASTOr(
+      new ASTTag('a'),
+      new ASTTag('b'),
+    ),
+  },
+  {
+    query: String.raw`a OR b`,
+    ast: new ASTOr(
+      new ASTTag('a'),
+      new ASTTag('b'),
+    ),
+  },
+  {
+    query: String.raw`(a or b)`,
+    ast: new ASTOr(
+      new ASTTag('a'),
+      new ASTTag('b'),
+    ),
+  },
+  {
+    query: String.raw`(a) or (b)`,
+    ast: new ASTOr(
+      new ASTTag('a'),
+      new ASTTag('b'),
+    ),
+  },
+  {
+    query: String.raw`a or b or c`,
+    ast: new ASTOr(
+      new ASTTag('a'),
+      new ASTOr(
+        new ASTTag('b'),
+        new ASTTag('c'),
+      ),
+    ),
+  },
+  {
+    query: String.raw`(a or b) or c`,
+    ast: new ASTOr(
+      new ASTTag('a'),
+      new ASTOr(
+        new ASTTag('b'),
+        new ASTTag('c'),
+      ),
+    ),
+  },
+  {
+    query: String.raw`a or (b or c)`,
+    ast: new ASTOr(
+      new ASTTag('a'),
+      new ASTOr(
+        new ASTTag('b'),
+        new ASTTag('c'),
+      ),
+    ),
+  },
+  {
+    query: String.raw`(a or b or c)`,
+    ast: new ASTOr(
+      new ASTTag('a'),
+      new ASTOr(
+        new ASTTag('b'),
+        new ASTTag('c'),
+      ),
+    ),
+  },
+  {
+    query: String.raw`a or (b or (c or d))`,
+    ast: new ASTOr(
+      new ASTTag('a'),
+      new ASTOr(
+        new ASTTag('b'),
+        new ASTOr(
+          new ASTTag('c'),
+          new ASTTag('d'),
+        ),
+      ),
+    ),
+  },
+  {
+    query: String.raw`((a or b) or c) or d`,
+    ast: new ASTOr(
+      new ASTTag('a'),
+      new ASTOr(
+        new ASTTag('b'),
+        new ASTOr(
+          new ASTTag('c'),
+          new ASTTag('d'),
+        ),
+      ),
+    ),
+  },
+  {
+    query: String.raw`(a or b) or (c or d)`,
+    ast: new ASTOr(
+      new ASTTag('a'),
+      new ASTOr(
+        new ASTTag('b'),
+        new ASTOr(
+          new ASTTag('c'),
+          new ASTTag('d'),
+        ),
+      ),
+    ),
+  },
+  {
+    query: String.raw`~a ~b`,
+    ast: new ASTOr(
+      new ASTTag('a'),
+      new ASTTag('b'),
+    ),
+  },
+  {
+    query: String.raw`~a ~b ~c`,
+    ast: new ASTOr(
+      new ASTTag('a'),
+      new ASTOr(
+        new ASTTag('b'),
+        new ASTTag('c'),
+      ),
+    ),
+  },
+  {
+    query: String.raw`~a ~b ~c ~d`,
+    ast: new ASTOr(
+      new ASTTag('a'),
+      new ASTOr(
+        new ASTTag('b'),
+        new ASTOr(
+          new ASTTag('c'),
+          new ASTTag('d'),
+        ),
+      ),
+    ),
+  },
+  {
+    query: String.raw`~a`,
+    ast: new ASTTag('a'),
+  },
+  {
+    query: String.raw`(~a)`,
+    ast: new ASTTag('a'),
+  },
+  {
+    query: String.raw`~(a)`,
+    ast: new ASTTag('a'),
+  },
+  {
+    query: String.raw`~(~a)`,
+    ast: new ASTTag('a'),
+  },
+  {
+    query: String.raw`~(~(~a))`,
+    ast: new ASTTag('a'),
+  },
+  {
+    query: String.raw`~(-a)`,
+    ast: new ASTNot(
+      new ASTTag('a'),
+    ),
+  },
+  {
+    query: String.raw`-(~a)`,
+    ast: new ASTNot(
+      new ASTTag('a'),
+    ),
+  },
+  {
+    query: String.raw`-(~(-(~a)))`,
+    ast: new ASTTag('a'),
+  },
+  {
+    query: String.raw`~(-(~(-a)))`,
+    ast: new ASTTag('a'),
+  },
+  {
+    query: String.raw`a ~b`,
+    ast: new ASTAnd(
+      new ASTTag('a'),
+      new ASTTag('b'),
+    ),
+  },
+  {
+    query: String.raw`~a b`,
+    ast: new ASTAnd(
+      new ASTTag('b'),
+      new ASTTag('a'),
+    ),
+  },
+  {
+    query: String.raw`((a) ~b)`,
+    ast: new ASTAnd(
+      new ASTTag('a'),
+      new ASTTag('b'),
+    ),
+  },
+  {
+    query: String.raw`~(a b)`,
+    ast: new ASTAnd(
+      new ASTTag('a'),
+      new ASTTag('b'),
+    ),
+  },
+  {
+    query: String.raw`~a and ~b`,
+    ast: new ASTAnd(
+      new ASTTag('a'),
+      new ASTTag('b'),
+    ),
+  },
+  {
+    query: String.raw`~a or ~b`,
+    ast: new ASTOr(
+      new ASTTag('a'),
+      new ASTTag('b'),
+    ),
+  },
+  {
+    query: String.raw`~(-a) or ~(-b)`,
+    ast: new ASTOr(
+      new ASTNot(
+        new ASTTag('a'),
+      ),
+      new ASTNot(
+        new ASTTag('b'),
+      ),
+    ),
+  },
+  {
+    query: String.raw`~(a) ~(b)`,
+    ast: new ASTOr(
+      new ASTTag('a'),
+      new ASTTag('b'),
+    ),
+  },
+  {
+    query: String.raw`(~a) (~b)`,
+    ast: new ASTAnd(
+      new ASTTag('a'),
+      new ASTTag('b'),
+    ),
+  },
+  {
+    query: String.raw`(~a) ~b ~c`,
+    ast: new ASTAnd(
+      new ASTTag('a'),
+      new ASTOr(
+        new ASTTag('b'),
+        new ASTTag('c'),
+      ),
+    ),
+  },
+  {
+    query: String.raw`~a (~b ~c)`,
+    ast: new ASTAnd(
+      new ASTOr(
+        new ASTTag('b'),
+        new ASTTag('c'),
+      ),
+      new ASTTag('a'),
+    ),
+  },
+  {
+    query: String.raw`~a ~b or ~c ~d`,
+    ast: new ASTOr(
+      new ASTTag('a'),
+      new ASTOr(
+        new ASTTag('b'),
+        new ASTOr(
+          new ASTTag('c'),
+          new ASTTag('d'),
+        ),
+      ),
+    ),
+  },
+  {
+    query: String.raw`~a ~b and ~c ~d`,
+    ast: new ASTAnd(
+      new ASTOr(
+        new ASTTag('a'),
+        new ASTTag('b'),
+      ),
+      new ASTOr(
+        new ASTTag('c'),
+        new ASTTag('d'),
+      ),
+    ),
+  },
+  {
+    query: String.raw`(~a ~b) (~c ~d)`,
+    ast: new ASTAnd(
+      new ASTOr(
+        new ASTTag('a'),
+        new ASTTag('b'),
+      ),
+      new ASTOr(
+        new ASTTag('c'),
+        new ASTTag('d'),
+      ),
+    ),
+  },
+  {
+    query: String.raw`~(a b) ~(c d)`,
+    ast: new ASTOr(
+      new ASTAnd(
+        new ASTTag('a'),
+        new ASTTag('b'),
+      ),
+      new ASTAnd(
+        new ASTTag('c'),
+        new ASTTag('d'),
+      ),
+    ),
+  },
+  {
+    query: String.raw`(a b) or (c d)`,
+    ast: new ASTOr(
+      new ASTAnd(
+        new ASTTag('a'),
+        new ASTTag('b'),
+      ),
+      new ASTAnd(
+        new ASTTag('c'),
+        new ASTTag('d'),
+      ),
+    ),
+  },
+  {
+    query: String.raw` a  b  c  d`,
+    ast: new ASTAnd(
+      new ASTTag('a'),
+      new ASTAnd(
+        new ASTTag('b'),
+        new ASTAnd(
+          new ASTTag('c'),
+          new ASTTag('d'),
+        ),
+      ),
+    ),
+  },
+  {
+    query: String.raw` a  b  c ~d`,
+    ast: new ASTAnd(
+      new ASTTag('a'),
+      new ASTAnd(
+        new ASTTag('b'),
+        new ASTAnd(
+          new ASTTag('c'),
+          new ASTTag('d'),
+        ),
+      ),
+    ),
+  },
+  {
+    query: String.raw` a  b ~c  d`,
+    ast: new ASTAnd(
+      new ASTTag('a'),
+      new ASTAnd(
+        new ASTTag('b'),
+        new ASTAnd(
+          new ASTTag('d'),
+          new ASTTag('c'),
+        ),
+      ),
+    ),
+  },
+  {
+    query: String.raw` a  b ~c ~d`,
+    ast: new ASTAnd(
+      new ASTTag('a'),
+      new ASTAnd(
+        new ASTTag('b'),
+        new ASTOr(
+          new ASTTag('c'),
+          new ASTTag('d'),
+        ),
+      ),
+    ),
+  },
+  {
+    query: String.raw` a ~b  c  d`,
+    ast: new ASTAnd(
+      new ASTTag('a'),
+      new ASTAnd(
+        new ASTTag('c'),
+        new ASTAnd(
+          new ASTTag('d'),
+          new ASTTag('b'),
+        ),
+      ),
+    ),
+  },
+  {
+    query: String.raw` a ~b  c ~d`,
+    ast: new ASTAnd(
+      new ASTTag('a'),
+      new ASTAnd(
+        new ASTTag('c'),
+        new ASTOr(
+          new ASTTag('b'),
+          new ASTTag('d'),
+        ),
+      ),
+    ),
+  },
+  {
+    query: String.raw` a ~b ~c  d`,
+    ast: new ASTAnd(
+      new ASTTag('a'),
+      new ASTAnd(
+        new ASTTag('d'),
+        new ASTOr(
+          new ASTTag('b'),
+          new ASTTag('c'),
+        ),
+      ),
+    ),
+  },
+  {
+    query: String.raw` a ~b ~c ~d`,
+    ast: new ASTAnd(
+      new ASTTag('a'),
+      new ASTOr(
+        new ASTTag('b'),
+        new ASTOr(
+          new ASTTag('c'),
+          new ASTTag('d'),
+        ),
+      ),
+    ),
+  },
+  {
+    query: String.raw`~a  b  c  d`,
+    ast: new ASTAnd(
+      new ASTTag('b'),
+      new ASTAnd(
+        new ASTTag('c'),
+        new ASTAnd(
+          new ASTTag('d'),
+          new ASTTag('a'),
+        ),
+      ),
+    ),
+  },
+  {
+    query: String.raw`~a  b  c ~d`,
+    ast: new ASTAnd(
+      new ASTTag('b'),
+      new ASTAnd(
+        new ASTTag('c'),
+        new ASTOr(
+          new ASTTag('a'),
+          new ASTTag('d'),
+        ),
+      ),
+    ),
+  },
+  {
+    query: String.raw`~a  b ~c  d`,
+    ast: new ASTAnd(
+      new ASTTag('b'),
+      new ASTAnd(
+        new ASTTag('d'),
+        new ASTOr(
+          new ASTTag('a'),
+          new ASTTag('c'),
+        ),
+      ),
+    ),
+  },
+  {
+    query: String.raw`~a  b ~c ~d`,
+    ast: new ASTAnd(
+      new ASTTag('b'),
+      new ASTOr(
+        new ASTTag('a'),
+        new ASTOr(
+          new ASTTag('c'),
+          new ASTTag('d'),
+        ),
+      ),
+    ),
+  },
+  {
+    query: String.raw`~a ~b  c  d`,
+    ast: new ASTAnd(
+      new ASTTag('c'),
+      new ASTAnd(
+        new ASTTag('d'),
+        new ASTOr(
+          new ASTTag('a'),
+          new ASTTag('b'),
+        ),
+      ),
+    ),
+  },
+  {
+    query: String.raw`~a ~b  c ~d`,
+    ast: new ASTAnd(
+      new ASTTag('c'),
+      new ASTOr(
+        new ASTTag('a'),
+        new ASTOr(
+          new ASTTag('b'),
+          new ASTTag('d'),
+        ),
+      ),
+    ),
+  },
+  {
+    query: String.raw`~a ~b ~c  d`,
+    ast: new ASTAnd(
+      new ASTTag('d'),
+      new ASTOr(
+        new ASTTag('a'),
+        new ASTOr(
+          new ASTTag('b'),
+          new ASTTag('c'),
+        ),
+      ),
+    ),
+  },
+  {
+    query: String.raw`~a ~b ~c ~d`,
+    ast: new ASTOr(
+      new ASTTag('a'),
+      new ASTOr(
+        new ASTTag('b'),
+        new ASTOr(
+          new ASTTag('c'),
+          new ASTTag('d'),
+        ),
+      ),
+    ),
+  },
+  {
+    query: String.raw`-a`,
+    ast: new ASTNot(
+      new ASTTag('a'),
+    ),
+  },
+  {
+    query: String.raw`(a -b)`,
+    ast: new ASTAnd(
+      new ASTTag('a'),
+      new ASTNot(
+        new ASTTag('b'),
+      ),
+    ),
+  },
+  {
+    query: String.raw`a (-b)`,
+    ast: new ASTAnd(
+      new ASTTag('a'),
+      new ASTNot(
+        new ASTTag('b'),
+      ),
+    ),
+  },
+  {
+    query: String.raw`((a) -b)`,
+    ast: new ASTAnd(
+      new ASTTag('a'),
+      new ASTNot(
+        new ASTTag('b'),
+      ),
+    ),
+  },
+  {
+    query: String.raw`-a`,
+    ast: new ASTNot(
+      new ASTTag('a'),
+    ),
+  },
+  {
+    query: String.raw`-(-(-a))`,
+    ast: new ASTNot(
+      new ASTTag('a'),
+    ),
+  },
+  {
+    query: String.raw`-(-a)`,
+    ast: new ASTTag('a'),
+  },
+  {
+    query: String.raw`-(-(-(-a)))`,
+    ast: new ASTTag('a'),
+  },
+  {
+    query: String.raw`a -(-(b)) c`,
+    ast: new ASTAnd(
+      new ASTTag('a'),
+      new ASTAnd(
+        new ASTTag('b'),
+        new ASTTag('c'),
+      ),
+    ),
+  },
+  {
+    query: String.raw`a -(-(b -(-c))) d`,
+    ast: new ASTAnd(
+      new ASTTag('a'),
+      new ASTAnd(
+        new ASTTag('b'),
+        new ASTAnd(
+          new ASTTag('c'),
+          new ASTTag('d'),
+        ),
+      ),
+    ),
+  },
+  {
+    query: String.raw`(`,
+    ast: new ASTNone(),
+  },
+  {
+    query: String.raw`)`,
+    ast: new ASTNone(),
+  },
+  {
+    query: String.raw`-`,
+    ast: new ASTNone(),
+  },
+  {
+    query: String.raw`~`,
+    ast: new ASTNone(),
+  },
+  {
+    query: String.raw`(a`,
+    ast: new ASTNone(),
+  },
+  {
+    query: String.raw`)a`,
+    ast: new ASTNone(),
+  },
+  {
+    query: String.raw`-~a`,
+    ast: new ASTNone(),
+  },
+  {
+    query: String.raw`~-a`,
+    ast: new ASTNone(),
+  },
+  {
+    query: String.raw`~~a`,
+    ast: new ASTNone(),
+  },
+  {
+    query: String.raw`--a`,
+    ast: new ASTNone(),
+  },
+  {
+    query: String.raw`and`,
+    ast: new ASTNone(),
+  },
+  {
+    query: String.raw`-and`,
+    ast: new ASTNone(),
+  },
+  {
+    query: String.raw`~and`,
+    ast: new ASTNone(),
+  },
+  {
+    query: String.raw`or`,
+    ast: new ASTNone(),
+  },
+  {
+    query: String.raw`-or`,
+    ast: new ASTNone(),
+  },
+  {
+    query: String.raw`~or`,
+    ast: new ASTNone(),
+  },
+  {
+    query: String.raw`a and`,
+    ast: new ASTNone(),
+  },
+  {
+    query: String.raw`a or`,
+    ast: new ASTNone(),
+  },
+  {
+    query: String.raw`and a`,
+    ast: new ASTNone(),
+  },
+  {
+    query: String.raw`or a`,
+    ast: new ASTNone(),
+  },
+  {
+    query: String.raw`a -`,
+    ast: new ASTNone(),
+  },
+  {
+    query: String.raw`a ~`,
+    ast: new ASTNone(),
+  },
+  {
+    query: String.raw`(a b`,
+    ast: new ASTNone(),
+  },
+  {
+    query: String.raw`(a (b)`,
+    ast: new ASTNone(),
+  },
+  {
+    query: String.raw`meta:"foo`,
+    ast: new ASTNone(),
+  },
+  {
+    query: String.raw`meta:"foo bar`,
+    ast: new ASTNone(),
+  },
+])('.parse(`$query`)', ({ query, ast }) => {
+  const parsed = QueryParser.parse(query, ['meta'])
+  expect(parsed).toStrictEqual(ast)
+})

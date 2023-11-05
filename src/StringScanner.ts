@@ -23,21 +23,21 @@ SOFTWARE.
 */
 
 export class StringScanner {
-  private source: string;
-  private match!: string | null;
-  private captures!: string[];
-  private head!: number;
-  private last!: number;
+  private source: string
+  private match!: string | null
+  private captures!: string[]
+  private head!: number
+  private last!: number
 
   /**
    * Create a new StringScanner containing the given string.
    *
    * @param source The string to be scanned. If not a string,
-   * it will be converted using `toSAtring()`
+   * it will be converted using `toString()`
    */
   constructor(source: { toString(): string }) {
-    this.source = source.toString();
-    this.reset();
+    this.source = source.toString()
+    this.reset()
   }
 
   /**
@@ -53,14 +53,15 @@ export class StringScanner {
    * @category Scanning and Skipping
    */
   scan(regexp: RegExp): string | null {
-    const matches = regexp.exec(this.getRemainder());
+    const matches = regexp.exec(this.getRemainder())
     if (matches?.index === 0) {
       return this.setState(matches, {
         head: this.head + matches[0].length,
         last: this.head,
-      });
-    } else {
-      return this.setState([]);
+      })
+    }
+    else {
+      return this.setState([])
     }
   }
 
@@ -73,15 +74,16 @@ export class StringScanner {
    * @category Scanning and Skipping
    */
   scanUntil(regexp: RegExp): string | null {
-    const matches = regexp.exec(this.getRemainder());
+    const matches = regexp.exec(this.getRemainder())
     if (matches) {
       this.setState(matches, {
         head: this.head + matches.index + matches[0].length,
         last: this.head,
-      });
-      return this.source.slice(this.last, this.head);
-    } else {
-      return this.setState([]);
+      })
+      return this.source.slice(this.last, this.head)
+    }
+    else {
+      return this.setState([])
     }
   }
 
@@ -91,7 +93,7 @@ export class StringScanner {
    * @category Scanning and Skipping
    */
   scanChar(): string | null {
-    return this.scan(/[\s\S]/);
+    return this.scan(/[\s\S]/)
   }
 
   /**
@@ -102,9 +104,10 @@ export class StringScanner {
    * @category Scanning and Skipping
    */
   skip(regexp: RegExp): number | null {
-    if (this.scan(regexp) === null) return null;
+    if (this.scan(regexp) === null)
+      return null
 
-    return this.match!.length;
+    return this.match!.length
   }
 
   /**
@@ -116,9 +119,10 @@ export class StringScanner {
    * @category Scanning and Skipping
    */
   skipUntil(regexp: RegExp): number | null {
-    if (this.scanUntil(regexp) === null) return null;
+    if (this.scanUntil(regexp) === null)
+      return null
 
-    return this.head - this.last;
+    return this.head - this.last
   }
 
   /**
@@ -132,10 +136,11 @@ export class StringScanner {
    *
    */
   check(regexp: RegExp): string | null {
-    const matches = regexp.exec(this.getRemainder());
-    if (matches === null || matches.index !== 0) return this.setState([]);
+    const matches = regexp.exec(this.getRemainder())
+    if (matches === null || matches.index !== 0)
+      return this.setState([])
 
-    return this.setState(matches);
+    return this.setState(matches)
   }
 
   /**
@@ -147,14 +152,15 @@ export class StringScanner {
    *
    */
   checkUntil(regexp: RegExp): string | null {
-    const matches = regexp.exec(this.getRemainder());
-    if (matches === null) return this.setState([]);
+    const matches = regexp.exec(this.getRemainder())
+    if (matches === null)
+      return this.setState([])
 
-    this.setState(matches);
+    this.setState(matches)
     return this.source.slice(
       this.head,
       this.head + matches.index + matches[0].length,
-    );
+    )
   }
 
   /**
@@ -166,7 +172,7 @@ export class StringScanner {
    *
    */
   peek(length = 1): string {
-    return this.source.substring(this.head, this.head + length);
+    return this.source.substring(this.head, this.head + length)
   }
 
   /**
@@ -180,7 +186,7 @@ export class StringScanner {
    *
    */
   getSource(): string {
-    return this.source;
+    return this.source
   }
 
   /**
@@ -191,7 +197,7 @@ export class StringScanner {
    *
    */
   getRemainder(): string {
-    return this.source.slice(this.head);
+    return this.source.slice(this.head)
   }
 
   /**
@@ -202,7 +208,7 @@ export class StringScanner {
    *
    */
   getPosition(): number {
-    return this.head;
+    return this.head
   }
 
   /**
@@ -212,7 +218,7 @@ export class StringScanner {
    *
    */
   hasTerminated(): boolean {
-    return this.head === this.source.length;
+    return this.head === this.source.length
   }
 
   /**
@@ -226,9 +232,10 @@ export class StringScanner {
    * @category Accessing Match Data
    */
   getPreMatch(): string | null {
-    if (this.match === null) return null;
+    if (this.match === null)
+      return null
 
-    return this.source.slice(0, this.head - this.match.length);
+    return this.source.slice(0, this.head - this.match.length)
   }
 
   /**
@@ -238,7 +245,7 @@ export class StringScanner {
    * @category Accessing Match Data
    */
   getMatch(): string | null {
-    return this.match;
+    return this.match
   }
 
   /**
@@ -248,9 +255,10 @@ export class StringScanner {
    * @category Accessing Match Data
    */
   getPostMatch(): string | null {
-    if (this.match === null) return null;
+    if (this.match === null)
+      return null
 
-    return this.source.slice(this.head);
+    return this.source.slice(this.head)
   }
 
   /**
@@ -260,10 +268,11 @@ export class StringScanner {
    * @category Accessing Match Data
    */
   getCapture(index: number): string | null {
-    const capture = this.captures[index];
-    if (capture === undefined) return null;
+    const capture = this.captures[index]
+    if (capture === undefined)
+      return null
 
-    return capture;
+    return capture
   }
 
   /**
@@ -276,7 +285,7 @@ export class StringScanner {
    * @category Modifying Scanner State
    */
   reset(): void {
-    this.setState([], { head: 0, last: 0 });
+    this.setState([], { head: 0, last: 0 })
   }
 
   /**
@@ -286,7 +295,7 @@ export class StringScanner {
    * @category Modifying Scanner State
    */
   terminate(): void {
-    this.setState([], { head: this.source.length, last: this.head });
+    this.setState([], { head: this.source.length, last: this.head })
   }
 
   /**
@@ -296,7 +305,7 @@ export class StringScanner {
    * @category Modifying Scanner State
    */
   concat(string: string): void {
-    this.source += string;
+    this.source += string
   }
 
   /**
@@ -307,11 +316,12 @@ export class StringScanner {
    * @category Modifying Scanner State
    */
   unscan(): string | null {
-    const match = this.match;
+    const match = this.match
 
-    if (match !== null) this.setState([], { head: this.last, last: 0 });
+    if (match !== null)
+      this.setState([], { head: this.last, last: 0 })
 
-    return match;
+    return match
   }
 
   /**
@@ -320,10 +330,10 @@ export class StringScanner {
    * @category Modifying Scanner State
    */
   setPosition(pos: number): void {
-    this.setState([], { head: pos, last: this.head });
+    this.setState([], { head: pos, last: this.head })
   }
 
-  //#### Private methods
+  // #### Private methods
 
   /**
    *  Sets the state of the scanner
@@ -334,20 +344,23 @@ export class StringScanner {
     { head, last }: { head?: number; last?: number } = {},
   ): string | null {
     if (head !== undefined) {
-      if (head < 0) head = 0;
+      if (head < 0)
+        head = 0
 
-      this.head = head;
+      this.head = head
     }
-    if (last !== undefined) this.last = last;
+    if (last !== undefined)
+      this.last = last
 
-    this.captures = matches.slice(1);
+    this.captures = matches.slice(1)
 
     this.match = ((): string | null => {
-      const match = matches[0];
-      if (match === undefined) return null;
+      const match = matches[0]
+      if (match === undefined)
+        return null
 
-      return match;
-    })();
-    return this.match;
+      return match
+    })()
+    return this.match
   }
 }

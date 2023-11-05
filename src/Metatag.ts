@@ -1,12 +1,12 @@
-import { Post } from "./Post";
-import { Range } from "./Range";
+import type { Post } from './Post'
+import { Range } from './Range'
 
 export abstract class Metatag {
-  abstract match(post: Post): boolean;
+  abstract match(post: Post): boolean
   constructor(readonly value: string) {}
 
   public static get NAMES(): string[] {
-    return Object.keys(this.SUBCLASSES);
+    return Object.keys(this.SUBCLASSES)
   }
 
   private static get SUBCLASSES(): Record<
@@ -22,69 +22,73 @@ export abstract class Metatag {
       has: MetatagHas,
       is: MetatagIs,
       vote: MetatagVote,
-    };
+    }
   }
 
   static create(name: string, value: string): Metatag | null {
-    const cls = this.SUBCLASSES[name];
+    const Ctor = this.SUBCLASSES[name]
 
-    if (cls === undefined) return null;
+    if (Ctor === undefined)
+      return null
 
-    return new cls(value);
+    return new Ctor(value)
   }
 }
 
 class MetatagScore extends Metatag {
   override match(post: Post): boolean {
-    const range = Range.parse(this.value);
-    if (range === null) return false;
+    const range = Range.parse(this.value)
+    if (range === null)
+      return false
 
-    return range.includes(post.score);
+    return range.includes(post.score)
   }
 }
 
 class MetatagTagcount extends Metatag {
   override match(post: Post): boolean {
-    const range = Range.parse(this.value);
-    if (range === null) return false;
+    const range = Range.parse(this.value)
+    if (range === null)
+      return false
 
-    return range.includes(post.tags.length);
+    return range.includes(post.tags.length)
   }
 }
 
 class MetatagUploaderid extends Metatag {
   override match(post: Post): boolean {
-    const range = Range.parse(this.value);
-    if (range === null) return false;
+    const range = Range.parse(this.value)
+    if (range === null)
+      return false
 
-    return range.includes(post.uploaderId);
+    return range.includes(post.uploaderId)
   }
 }
 
 class MetatagRating extends Metatag {
   override match(post: Post): boolean {
     return this.value
-      .split(",")
-      .map((s) => s.slice(0, 1))
-      .includes(post.rating);
+      .split(',')
+      .map(s => s.slice(0, 1))
+      .includes(post.rating)
   }
 }
 
 class MetatagStatus extends Metatag {
   override match(post: Post): boolean {
     switch (this.value) {
-      case "pending":
-        return post.isPending;
-      case "flagged":
-        return post.isFlagged;
-      case "deleted":
-        return post.isDeleted;
-      case "banned":
-        return post.isBanned;
-      case "active":
-        return post.isActive;
+      case 'pending':
+        return post.isPending
+      case 'flagged':
+        return post.isFlagged
+      case 'deleted':
+        return post.isDeleted
+      case 'banned':
+        return post.isBanned
+      case 'active':
+        return post.isActive
       default:
-        return false;
+        return false
     }
   }
 }
@@ -92,13 +96,13 @@ class MetatagStatus extends Metatag {
 class MetatagHas extends Metatag {
   override match(post: Post): boolean {
     switch (this.value) {
-      case "parent":
-        return post.hasParent;
-      case "child":
-      case "children":
-        return post.hasChildren;
+      case 'parent':
+        return post.hasParent
+      case 'child':
+      case 'children':
+        return post.hasChildren
       default:
-        return false;
+        return false
     }
   }
 }
@@ -106,40 +110,42 @@ class MetatagHas extends Metatag {
 class MetatagIs extends Metatag {
   override match(post: Post): boolean {
     switch (this.value) {
-      case "parent":
-        return new MetatagHas("children").match(post);
-      case "child":
-        return new MetatagHas("parent").match(post);
-      case "pending":
-      case "flagged":
-      case "deleted":
-      case "banned":
-      case "active":
-        return new MetatagStatus(this.value).match(post);
-      case "general":
-      case "sensitive":
-      case "questionable":
-      case "explicit":
-        return new MetatagRating(this.value).match(post);
-      case "safe":
-        return new MetatagRating("s").match(post);
-      case "nsfw":
-        return new MetatagRating("q,e").match(post);
-      case "sfw":
-        return new MetatagRating("g,s").match(post);
+      case 'parent':
+        return new MetatagHas('children').match(post)
+      case 'child':
+        return new MetatagHas('parent').match(post)
+      case 'pending':
+      case 'flagged':
+      case 'deleted':
+      case 'banned':
+      case 'active':
+        return new MetatagStatus(this.value).match(post)
+      case 'general':
+      case 'sensitive':
+      case 'questionable':
+      case 'explicit':
+        return new MetatagRating(this.value).match(post)
+      case 'safe':
+        return new MetatagRating('s').match(post)
+      case 'nsfw':
+        return new MetatagRating('q,e').match(post)
+      case 'sfw':
+        return new MetatagRating('g,s').match(post)
       default:
-        return false;
+        return false
     }
   }
 }
 
 class MetatagVote extends Metatag {
   override match(post: Post): boolean {
-    if (post.vote === null) return false;
+    if (post.vote === null)
+      return false
 
-    const range = Range.parse(this.value);
-    if (range === null) return false;
+    const range = Range.parse(this.value)
+    if (range === null)
+      return false
 
-    return range.includes(post.vote);
+    return range.includes(post.vote)
   }
 }
