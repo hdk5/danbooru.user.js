@@ -43,3 +43,4 @@ These scripts were not moved into this repository yet
 
 - [Upload to Gelbooru](https://gist.github.com/hdk5/d5e896431de6253d67beeb7ef7f9f8fb/raw/danbooru_upload_to_gelbooru.user.js)
 - [Tag Preview](https://gist.github.com/hdk5/be69f7e9e57c643fec130a3f3a46f0a0/raw/danbooru_tag_preview.user.js)
+- [Frontpage](https://github.com/hdk5/danbooru-frontpage.user.js/raw/master/danbooru-frontpage.user.js)
