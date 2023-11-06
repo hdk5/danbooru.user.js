@@ -24,6 +24,10 @@ Unlike the extension, which aims to be lightweight and universal, this one does 
     * Extension's context menu action uploads only the first image in the set
     * Works with the extension's address bar action, but each post has to be opened in new tab
 
+* NicoSeiga
+    * Adds the upload button on post thumbnails
+    * At the moment danbooru can fetch the commentary, but not the images
+
 * Fantia
     * `post_content_photo` type
         * Adds the upload button to full-size image page and post thumbnails

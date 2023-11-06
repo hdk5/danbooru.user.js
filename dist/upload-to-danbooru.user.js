@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Upload To Danbooru
 // @author       hdk5
-// @version      20231106011256
+// @version      20231106130639
 // @description  another userscript for uploading to danbooru
 // @namespace    https://github.com/hdk5/danbooru.user.js
 // @homepageURL  https://github.com/hdk5/danbooru.user.js
@@ -15,12 +15,15 @@
 // @match        *://twitter.com/*
 // @match        *://x.com/*
 // @match        *://ci-en.dlsite.com/*
+// @match        *://seiga.nicovideo.jp/*
 // @grant        GM_addStyle
 // @grant        GM_getResourceURL
 // @grant        GM_getValue
 // @grant        GM_setValue
 // @grant        GM_registerMenuCommand
 // @grant        GM_openInTab
+// @grant        GM_xmlhttpRequest
+// @connect      lohas.nicoseiga.jp
 // @require      https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js
 // @require      https://github.com/rafaelw/mutation-summary/raw/421110f84178aa9e4098b38df83f727e5aea3d97/src/mutation-summary.js
 // @require      https://github.com/sizzlemctwizzle/GM_config/raw/06f2015c04db3aaab9717298394ca4f025802873/gm_config.js
@@ -45,12 +48,12 @@ GM_registerMenuCommand('Settings', () => {
 
 const PROGRAM_CSS = `
 .ex-utb-upload-button {
-  display: inline-flex;
+  display: inline-flex !important;
   align-self: center;
   align-items: center;
   vertical-align: middle;
   margin: 5px;
-  padding: 5px;
+  padding: 5px !important;
   cursor: pointer;
   background: rgba(0,0,0,0.5);
   text-decoration: none !important;
@@ -117,6 +120,20 @@ function parseHtml(text, baseHref) {
   base.href = baseHref
   document.head.appendChild(base)
   return document
+}
+
+function GM_fetch(options) {
+  return new Promise((resolve, reject) => {
+    GM_xmlhttpRequest({
+      ...options,
+      onload(response) {
+        resolve(response)
+      },
+      onerror(error) {
+        reject(error)
+      },
+    })
+  })
 }
 
 function findAndAttach(options) {
@@ -342,7 +359,7 @@ function initializeNijie() {
 function initializeTwitter() {
   GM_addStyle(`
     .ex-utb-upload-button {
-      padding: unset;
+      padding: unset !important;
       margin: unset;
       margin-inline-start: 12px;
       background: none;
@@ -401,6 +418,21 @@ function initializeCien() {
   })
 }
 
+function initializeNicoSeiga() {
+  findAndAttach({
+    selector: 'a#illust_link',
+    classes: ['ex-utb-upload-button-absolute'],
+    asyncClick: true,
+    toUrl: async (el) => {
+      const response = await GM_fetch({
+        url: $(el).prop('href'),
+      })
+      return response.finalUrl.replace(/\/o\//, '/priv/')
+    },
+    callback: async ($el, $btn) => $btn.insertBefore($el),
+  })
+}
+
 function initialize() {
   GM_addStyle(PROGRAM_CSS)
 
@@ -423,6 +455,9 @@ function initialize() {
       break
     case 'ci-en.dlsite.com':
       initializeCien()
+      break
+    case 'seiga.nicovideo.jp':
+      initializeNicoSeiga()
       break
   }
 }

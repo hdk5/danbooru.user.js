@@ -1,0 +1,1 @@
+../dist/editform-dock.user.js
