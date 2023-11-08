@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Upload To Danbooru
 // @author       hdk5
-// @version      20231106130639
+// @version      20231108112143
 // @description  another userscript for uploading to danbooru
 // @namespace    https://github.com/hdk5/danbooru.user.js
 // @homepageURL  https://github.com/hdk5/danbooru.user.js
@@ -16,6 +16,8 @@
 // @match        *://x.com/*
 // @match        *://ci-en.dlsite.com/*
 // @match        *://seiga.nicovideo.jp/*
+// @match        *://pawoo.net/*
+// @match        *://baraag.net/*
 // @grant        GM_addStyle
 // @grant        GM_getResourceURL
 // @grant        GM_getValue
@@ -433,6 +435,36 @@ function initializeNicoSeiga() {
   })
 }
 
+function initializeMastodon() {
+  GM_addStyle(`
+    .ex-utb-upload-button {
+      padding: 2px !important;
+      margin: unset;
+      background: none;
+      border-radius: 4px;
+    }
+
+    .ex-utb-upload-button:hover {
+      background: rgba(174,137,102,0.15);
+    }
+
+    .ex-utb-upload-button-icon {
+      height: 18px;
+    }
+  `)
+
+  findAndAttach({
+    selector: 'div',
+    predicate: 'div.status__action-bar__dropdown, div.detailed-status__action-bar-dropdown',
+    asyncAttach: true,
+    toUrl: async el => $(el)
+      .closest('div.status__wrapper, div.detailed-status__wrapper')
+      .find('a.status__relative-time, a.detailed-status__datetime')
+      .prop('href'),
+    callback: async ($el, $btn) => $btn.insertBefore($el),
+  })
+}
+
 function initialize() {
   GM_addStyle(PROGRAM_CSS)
 
@@ -458,6 +490,10 @@ function initialize() {
       break
     case 'seiga.nicovideo.jp':
       initializeNicoSeiga()
+      break
+    case 'baraag.net':
+    case 'pawoo.net':
+      initializeMastodon()
       break
   }
 }
