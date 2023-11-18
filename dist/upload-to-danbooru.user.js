@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Upload To Danbooru
 // @author       hdk5
-// @version      20231108112143
+// @version      20231118222234
 // @description  another userscript for uploading to danbooru
 // @namespace    https://github.com/hdk5/danbooru.user.js
 // @homepageURL  https://github.com/hdk5/danbooru.user.js
@@ -101,6 +101,8 @@ function noIndents(strings, ...values) {
   return res.join('')
 }
 
+const locationToRef = async (_el) => window.location 
+
 function generateUploadUrl(url, ref) {
   const booru = GM_config.get('booru')
   const uploadUrl = new URL('uploads/new', booru)
@@ -146,7 +148,7 @@ function findAndAttach(options) {
     predicate: _el => true,
     classes: [],
     toUrl: async el => $(el).closest('a').prop('href'),
-    toRef: async _el => window.location,
+    toRef: async _el => null,
     callback: async (_el, _btn) => null,
     ...options,
   }
@@ -416,6 +418,7 @@ function initializeCien() {
     classes: ['ex-utb-upload-button-absolute'],
     asyncAttach: true,
     toUrl: async el => $(el).attr('data-raw'),
+    toRef: locationToRef,
     callback: async ($el, $btn) => $btn.insertBefore($el),
   })
 }
@@ -431,6 +434,7 @@ function initializeNicoSeiga() {
       })
       return response.finalUrl.replace(/\/o\//, '/priv/')
     },
+    toRef: locationToRef,
     callback: async ($el, $btn) => $btn.insertBefore($el),
   })
 }
