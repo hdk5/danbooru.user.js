@@ -96,3 +96,4 @@ Advanced blacklist rule grammar for Danbooru.
   - `vote:0`
   - `vote:-1`
   - ranges are also supported (see `score`)
+  - works only on post page and posts gallery, requires scores to be shown

@@ -50,9 +50,8 @@ export class Post {
   }
 
   get vote(): 1 | 0 | -1 | null {
-    const voteContainer = document.querySelector(
-      '#post-info-score, .post-preview-score',
-    )
+    const voteContainer = this.post.querySelector('.post-preview-score')
+      ?? document.querySelector('#post-info-score')
 
     if (voteContainer === null)
       return null

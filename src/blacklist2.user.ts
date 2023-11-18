@@ -3,9 +3,13 @@ import { Post } from './Post'
 import { QueryParser } from './QueryParser'
 
 function refreshBlacklist(): void {
-  if (Danbooru.Blacklist.apply() > 0)
+  if (Danbooru.Blacklist.apply() > 0) {
     Danbooru.Blacklist.update_sidebar()
-  else $('#blacklist-box').hide()
+  }
+  else {
+    $('#blacklist-list').empty()
+    $('#blacklist-box').hide()
+  }
 }
 
 $(() => {

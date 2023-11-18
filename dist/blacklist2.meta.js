@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name Danbooru - Blacklist2
-// @version 20231106011256
+// @version 20231118121336
 // @author hdk5
 // @supportURL https://github.com/hdk5/danbooru.user.js/issues
 // @match *://*.donmai.us/*
