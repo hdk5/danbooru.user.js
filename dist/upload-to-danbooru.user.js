@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Upload To Danbooru
 // @author       hdk5
-// @version      20231118222234
+// @version      20231121174431
 // @description  another userscript for uploading to danbooru
 // @namespace    https://github.com/hdk5/danbooru.user.js
 // @homepageURL  https://github.com/hdk5/danbooru.user.js
@@ -14,6 +14,7 @@
 // @match        *://nijie.info/*
 // @match        *://twitter.com/*
 // @match        *://x.com/*
+// @match        *://ci-en.net/*
 // @match        *://ci-en.dlsite.com/*
 // @match        *://seiga.nicovideo.jp/*
 // @match        *://pawoo.net/*
@@ -489,6 +490,7 @@ function initialize() {
     case 'x.com':
       initializeTwitter()
       break
+    case 'ci-en.net':
     case 'ci-en.dlsite.com':
       initializeCien()
       break
