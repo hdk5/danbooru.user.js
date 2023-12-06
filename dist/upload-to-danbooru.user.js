@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Upload To Danbooru
 // @author       hdk5
-// @version      20231121174431
+// @version      20231206160825
 // @description  another userscript for uploading to danbooru
 // @namespace    https://github.com/hdk5/danbooru.user.js
 // @homepageURL  https://github.com/hdk5/danbooru.user.js
@@ -353,11 +353,11 @@ function initializeNijie() {
 
   // Post thumbnails
   findAndAttach({
-    selector: '.nijiedao',
+    selector: '.nijie',
     classes: ['ex-utb-upload-button-absolute'],
     asyncAttach: true,
     toUrl: async el => $(el).find('a').prop('href'),
-    callback: async ($el, $btn) => $el.prepend($btn),
+    callback: async ($el, $btn) => $el.find('.mozamoza').parent().prepend($btn),
   })
 }
 
