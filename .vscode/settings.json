@@ -16,9 +16,11 @@
     "typescriptreact",
     "vue",
     "html",
+    "css",
     "markdown",
     "json",
     "jsonc",
-    "yaml"
+    "yaml",
+    "toml"
   ]
 }
