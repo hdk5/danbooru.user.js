@@ -1,0 +1,101 @@
+/* ==UserStyle==
+@name           Danbooru - AMOLED css
+@namespace      https://github.com/hdk5/danbooru.user.js
+@version        20231219092634
+@author         hdk5
+==/UserStyle== */
+
+@-moz-document domain("donmai.us") {
+  body {
+    --grey-0: #ffffff; /* hsluv(0, 0, 100.0) */
+    --grey-1: #dfdfdf; /* hsluv(0, 0, 88.88888888888889) */
+    --grey-2: #c0c0c0; /* hsluv(0, 0, 77.77777777777777) */
+    --grey-3: #a2a2a2; /* hsluv(0, 0, 66.66666666666666) */
+    --grey-4: #858585; /* hsluv(0, 0, 55.55555555555556) */
+    --grey-5: #696969; /* hsluv(0, 0, 44.44444444444444) */
+    --grey-6: #4e4e4e; /* hsluv(0, 0, 33.33333333333333) */
+    --grey-7: #353535; /* hsluv(0, 0, 22.22222222222222) */
+    --grey-8: #1e1e1e; /* hsluv(0, 0, 11.11111111111111) */
+    --grey-9: #000000; /* hsluv(0, 0, 0.0) */
+    --red-0: #fff4f4; /* hsluv(12, 100, 97.0) */
+    --red-1: #ffe1e1; /* hsluv(12, 100, 92.0) */
+    --red-2: #ffc3c3; /* hsluv(12, 100, 84.0) */
+    --red-3: #ff8a8b; /* hsluv(12, 100, 70.5) */
+    --red-4: #ff5a5b; /* hsluv(12, 100, 61.0) */
+    --red-5: #f50007; /* hsluv(12, 100, 51.2) */
+    --red-6: #c00004; /* hsluv(12, 100, 40.0) */
+    --red-7: #8a0002; /* hsluv(12, 100, 28.0) */
+    --red-8: #650001; /* hsluv(12, 100, 19.0) */
+    --red-9: #490001; /* hsluv(12, 100, 12.0) */
+    --orange-0: #fff4f0; /* hsluv(37, 100, 97.0) */
+    --orange-1: #ffe2d5; /* hsluv(37, 100, 92.0) */
+    --orange-2: #ffc5a5; /* hsluv(37, 100, 84.0) */
+    --orange-3: #fd9200; /* hsluv(37, 100, 70.5) */
+    --orange-4: #d97c00; /* hsluv(37, 100, 61.0) */
+    --orange-5: #b56700; /* hsluv(37, 100, 51.2) */
+    --orange-6: #8d4f00; /* hsluv(37, 100, 40.0) */
+    --orange-7: #653700; /* hsluv(37, 100, 28.0) */
+    --orange-8: #482500; /* hsluv(37, 100, 19.0) */
+    --orange-9: #331900; /* hsluv(37, 100, 12.0) */
+    --yellow-0: #fff6e1; /* hsluv(68, 100, 97.0) */
+    --yellow-1: #ffe6a6; /* hsluv(68, 100, 92.0) */
+    --yellow-2: #f7ce00; /* hsluv(68, 100, 84.0) */
+    --yellow-3: #ccaa00; /* hsluv(68, 100, 70.5) */
+    --yellow-4: #ae9100; /* hsluv(68, 100, 61.0) */
+    --yellow-5: #917800; /* hsluv(68, 100, 51.2) */
+    --yellow-6: #705d00; /* hsluv(68, 100, 40.0) */
+    --yellow-7: #504100; /* hsluv(68, 100, 28.0) */
+    --yellow-8: #382d00; /* hsluv(68, 100, 19.0) */
+    --yellow-9: #271f00; /* hsluv(68, 100, 12.0) */
+    --green-0: #deffe0; /* hsluv(130, 100, 97.0) */
+    --green-1: #97ffa0; /* hsluv(130, 100, 92.0) */
+    --green-2: #00f242; /* hsluv(130, 100, 84.0) */
+    --green-3: #00c835; /* hsluv(130, 100, 70.5) */
+    --green-4: #00ab2c; /* hsluv(130, 100, 61.0) */
+    --green-5: #008e23; /* hsluv(130, 100, 51.2) */
+    --green-6: #006e19; /* hsluv(130, 100, 40.0) */
+    --green-7: #004e0f; /* hsluv(130, 100, 28.0) */
+    --green-8: #003708; /* hsluv(130, 100, 19.0) */
+    --green-9: #002604; /* hsluv(130, 100, 12.0) */
+    --azure-0: #f1f7ff; /* hsluv(242, 100, 97.0) */
+    --azure-1: #d9eaff; /* hsluv(242, 100, 92.0) */
+    --azure-2: #afd5ff; /* hsluv(242, 100, 84.0) */
+    --azure-3: #4bb4ff; /* hsluv(242, 100, 70.5) */
+    --azure-4: #009be6; /* hsluv(242, 100, 61.0) */
+    --azure-5: #0081c0; /* hsluv(242, 100, 51.2) */
+    --azure-6: #006496; /* hsluv(242, 100, 40.0) */
+    --azure-7: #00466b; /* hsluv(242, 100, 28.0) */
+    --azure-8: #00314d; /* hsluv(242, 100, 19.0) */
+    --azure-9: #002237; /* hsluv(242, 100, 12.0) */
+    --blue-0: #f4f6ff; /* hsluv(257, 100, 97.0) */
+    --blue-1: #e1e8ff; /* hsluv(257, 100, 92.0) */
+    --blue-2: #c3d0ff; /* hsluv(257, 100, 84.0) */
+    --blue-3: #8caaff; /* hsluv(257, 100, 70.5) */
+    --blue-4: #5d8fff; /* hsluv(257, 100, 61.0) */
+    --blue-5: #0075f8; /* hsluv(257, 100, 51.2) */
+    --blue-6: #005ac3; /* hsluv(257, 100, 40.0) */
+    --blue-7: #003f8d; /* hsluv(257, 100, 28.0) */
+    --blue-8: #002c66; /* hsluv(257, 100, 19.0) */
+    --blue-9: #001e4a; /* hsluv(257, 100, 12.0) */
+    --purple-0: #f9f5ff; /* hsluv(282, 100, 97.0) */
+    --purple-1: #eee3ff; /* hsluv(282, 100, 92.0) */
+    --purple-2: #dfc8ff; /* hsluv(282, 100, 84.0) */
+    --purple-3: #c797ff; /* hsluv(282, 100, 70.5) */
+    --purple-4: #b871ff; /* hsluv(282, 100, 61.0) */
+    --purple-5: #ab3fff; /* hsluv(282, 100, 51.2) */
+    --purple-6: #9000df; /* hsluv(282, 100, 40.0) */
+    --purple-7: #6700a1; /* hsluv(282, 100, 28.0) */
+    --purple-8: #4a0076; /* hsluv(282, 100, 19.0) */
+    --purple-9: #340056; /* hsluv(282, 100, 12.0) */
+    --magenta-0: #fff3ff; /* hsluv(307, 100, 97.0) */
+    --magenta-1: #fedeff; /* hsluv(307, 100, 92.0) */
+    --magenta-2: #febcff; /* hsluv(307, 100, 84.0) */
+    --magenta-3: #fd78ff; /* hsluv(307, 100, 70.5) */
+    --magenta-4: #fd23ff; /* hsluv(307, 100, 61.0) */
+    --magenta-5: #d700d9; /* hsluv(307, 100, 51.2) */
+    --magenta-6: #a800aa; /* hsluv(307, 100, 40.0) */
+    --magenta-7: #79007a; /* hsluv(307, 100, 28.0) */
+    --magenta-8: #570058; /* hsluv(307, 100, 19.0) */
+    --magenta-9: #3f003f; /* hsluv(307, 100, 12.0) */
+  }
+}
