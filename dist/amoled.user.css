@@ -1,7 +1,7 @@
 /* ==UserStyle==
 @name           Danbooru - AMOLED css
 @namespace      https://github.com/hdk5/danbooru.user.js
-@version        20231219092634
+@version        20231226094958
 @author         hdk5
 ==/UserStyle== */
 
@@ -97,5 +97,7 @@
     --magenta-7: #79007a; /* hsluv(307, 100, 28.0) */
     --magenta-8: #570058; /* hsluv(307, 100, 19.0) */
     --magenta-9: #3f003f; /* hsluv(307, 100, 12.0) */
+
+    --dtext-spoiler-background-color: var(--grey-8);
   }
 }
