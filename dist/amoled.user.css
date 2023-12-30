@@ -98,6 +98,6 @@
     --magenta-8: #570058; /* hsluv(307, 100, 19.0) */
     --magenta-9: #3f003f; /* hsluv(307, 100, 12.0) */
 
-    --dtext-spoiler-background-color: var(--grey-8);
+    --dtext-spoiler-background-color: var(--grey-5);
   }
 }
