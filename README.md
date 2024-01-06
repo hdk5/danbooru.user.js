@@ -37,6 +37,12 @@ Works well with Mediaasset Panzoom.
 
 [Install](/dist/editform-dock.user.js?raw=1)
 
+### Plus-Minus
+
+Adds back the "+ -" links next to tags in tag lists.
+
+[Install](/dist/plus-minus.user.js?raw=1)
+
 ## Old scripts
 
 These scripts were not moved into this repository yet
