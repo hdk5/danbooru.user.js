@@ -37,10 +37,12 @@
     const $plusBtn = $('<a>', {
       text: '+',
       href: plusUrl,
+      class: 'search-inc-tag',
     })
     const $minusBtn = $('<a>', {
       text: '-',
       href: minusUrl,
+      class: 'search-exl-tag',
     })
 
     const $wikiLink = $el.closest('li').find('.wiki-link')
