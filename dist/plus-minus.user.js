@@ -8,8 +8,14 @@
 // @downloadURL  https://github.com/hdk5/danbooru.user.js/raw/master/dist/plus-minus.user.js
 // @updateURL    https://github.com/hdk5/danbooru.user.js/raw/master/dist/plus-minus.user.js
 // @match        *://*.donmai.us/*
-// @grant        none
+// @grant        GM_addStyle
 // ==/UserScript==
+
+GM_addStyle(`
+span:has(.wiki-link) {
+  white-space: nowrap;
+}
+`)
 
 (() => {
   let query
