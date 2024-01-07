@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Danbooru - PlusMinus
 // @author       hdk5
-// @version      20240107004102
+// @version      20240107004251
 // @namespace    https://github.com/hdk5/danbooru.user.js
 // @homepageURL  https://github.com/hdk5/danbooru.user.js
 // @supportURL   https://github.com/hdk5/danbooru.user.js/issues
@@ -11,13 +11,13 @@
 // @grant        GM_addStyle
 // ==/UserScript==
 
-GM_addStyle(`
+(() => {
+  GM_addStyle(`
 span:has(.wiki-link) {
   white-space: nowrap;
 }
 `)
 
-(() => {
   let query
   const params = (new URL(document.location)).searchParams
   if (params.has('q'))
