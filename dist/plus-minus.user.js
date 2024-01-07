@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Danbooru - PlusMinus
 // @author       hdk5
-// @version      20240106233054
+// @version      20240107004102
 // @namespace    https://github.com/hdk5/danbooru.user.js
 // @homepageURL  https://github.com/hdk5/danbooru.user.js
 // @supportURL   https://github.com/hdk5/danbooru.user.js/issues
