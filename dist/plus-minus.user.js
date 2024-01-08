@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Danbooru - PlusMinus
 // @author       hdk5
-// @version      20240107004251
+// @version      20240108122749
 // @namespace    https://github.com/hdk5/danbooru.user.js
 // @homepageURL  https://github.com/hdk5/danbooru.user.js
 // @supportURL   https://github.com/hdk5/danbooru.user.js/issues
@@ -15,6 +15,11 @@
   GM_addStyle(`
 span:has(.wiki-link) {
   white-space: nowrap;
+  margin-right: 0;
+}
+
+span:has(.wiki-link):after {
+  content: "\\FEFF";
 }
 `)
 
