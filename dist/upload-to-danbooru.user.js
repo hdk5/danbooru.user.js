@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Upload To Danbooru
 // @author       hdk5
-// @version      20231206160825
+// @version      20240121054642
 // @description  another userscript for uploading to danbooru
 // @namespace    https://github.com/hdk5/danbooru.user.js
 // @homepageURL  https://github.com/hdk5/danbooru.user.js
@@ -19,6 +19,7 @@
 // @match        *://seiga.nicovideo.jp/*
 // @match        *://pawoo.net/*
 // @match        *://baraag.net/*
+// @match        *://inkbunny.net/*
 // @grant        GM_addStyle
 // @grant        GM_getResourceURL
 // @grant        GM_getValue
@@ -102,7 +103,7 @@ function noIndents(strings, ...values) {
   return res.join('')
 }
 
-const locationToRef = async (_el) => window.location 
+const locationToRef = async _el => window.location
 
 function generateUploadUrl(url, ref) {
   const booru = GM_config.get('booru')
@@ -470,6 +471,26 @@ function initializeMastodon() {
   })
 }
 
+function initializeInkbunny() {
+  GM_addStyle(`
+    .ex-utb-upload-button {
+      padding: unset !important;
+      margin: unset;
+      vertical-align: unset;
+    }
+  `)
+
+  findAndAttach({
+    selector: 'div.widget_thumbnailFromSubmission_icons',
+    asyncAttach: true,
+    toUrl: async el => $(el)
+      .parent()
+      .find('div.widget_imageFromSubmission a')
+      .prop('href'),
+    callback: async ($el, $btn) => $el.append($btn),
+  })
+}
+
 function initialize() {
   GM_addStyle(PROGRAM_CSS)
 
@@ -500,6 +521,9 @@ function initialize() {
     case 'baraag.net':
     case 'pawoo.net':
       initializeMastodon()
+      break
+    case 'inkbunny.net':
+      initializeInkbunny()
       break
   }
 }
