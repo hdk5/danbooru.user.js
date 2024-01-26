@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Upload To Danbooru
 // @author       hdk5
-// @version      20240121054642
+// @version      20240126013547
 // @description  another userscript for uploading to danbooru
 // @namespace    https://github.com/hdk5/danbooru.user.js
 // @homepageURL  https://github.com/hdk5/danbooru.user.js
@@ -27,6 +27,8 @@
 // @grant        GM_registerMenuCommand
 // @grant        GM_openInTab
 // @grant        GM_xmlhttpRequest
+// @inject-into  content
+// @noframes
 // @connect      lohas.nicoseiga.jp
 // @require      https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js
 // @require      https://github.com/rafaelw/mutation-summary/raw/421110f84178aa9e4098b38df83f727e5aea3d97/src/mutation-summary.js
@@ -407,7 +409,7 @@ function initializeTwitter() {
     asyncAttach: true,
     toUrl: async el => $(el).find('time').closest('a').prop('href'),
     callback: async ($el, $btn) => {
-      $btn.append('<div class=\'ex-utb-upload-button-twitter-hover\'>')
+      $btn.append('<div class="ex-utb-upload-button-twitter-hover">')
       $el.find('div[role=group]').append($btn)
     },
   })
