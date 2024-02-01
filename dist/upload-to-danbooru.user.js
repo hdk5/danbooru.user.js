@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Upload To Danbooru
 // @author       hdk5
-// @version      20240201230406
+// @version      20240201234119
 // @description  another userscript for uploading to danbooru
 // @namespace    https://github.com/hdk5/danbooru.user.js
 // @homepageURL  https://github.com/hdk5/danbooru.user.js
@@ -212,6 +212,8 @@ function findAndAttach(options) {
         ready = true
       }
 
+      $btn.on('click', e => e.preventDefault())
+      $btn.on('auxclick', e => e.preventDefault())
       $btn.on('click', onclick)
       $btn.on('auxclick', onclick)
 
