@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Upload To Danbooru
 // @author       hdk5
-// @version      20240126013547
+// @version      20240201230406
 // @description  another userscript for uploading to danbooru
 // @namespace    https://github.com/hdk5/danbooru.user.js
 // @homepageURL  https://github.com/hdk5/danbooru.user.js
@@ -286,14 +286,22 @@ function initializeFantia() {
       callback: async ($el, $btn) => $btn.insertBefore($el.closest('.image-container')),
     })
 
-    // 2, 3
+    // 2
     findAndAttach({
       selector: 'a',
-      predicate: el =>
-        el.href
-        && [/^\/posts\/\d+\/download\/\d+$/, /^\/posts\/\d+\/album_image$/].some(
-          regex => regex.test(new URL(el.href).pathname),
-        ),
+      predicate: el => el.href && /^\/posts\/\d+\/album_image$/.test(new URL(el.href).pathname),
+      classes: ['ex-utb-upload-button-absolute'],
+      asyncAttach: true,
+      asyncClick: true,
+      toUrl: async el => (await fetch(el.href)).url,
+      toRef,
+      callback: async ($el, $btn) => $el.prepend($btn),
+    })
+
+    // 3
+    findAndAttach({
+      selector: 'a',
+      predicate: el => el.href && /^\/posts\/\d+\/download\/\d+$/.test(new URL(el.href).pathname),
       classes: ['ex-utb-upload-button-absolute'],
       asyncAttach: true,
       asyncClick: true,
