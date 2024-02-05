@@ -1,14 +1,23 @@
 # danbooru.user.js
 
-A collection of userscripts for Danbooru.
+A collection of userscripts and userstyles for Danbooru.
 
 ## Installation
 
-- Install [Tampermonkey](https://tampermonkey.net/) extension.
+### For userscripts:
+
+- Install [Violentmonkey](https://violentmonkey.github.io) _or_ [Tampermonkey](https://tampermonkey.net/) browser extension.
 - Download the script.
 - An installation prompt will appear. Accept the installation.
 
-_All userscripts are confirmed to work only on latest Firefox + latest Tampermonkey. Other browsers and userscript managers are not tested._
+_All userscripts are confirmed to work only on latest Firefox + latest Violentmonkey. Other browsers and userscript managers are not tested._
+
+### For userstyles:
+
+Either:
+
+- Use [Stylus](https://add0n.com/stylus.html) browser extension
+- Copy style contents (between `@-moz-document domain("donmai.us") {` and the final `}`) to your **Custom CSS style** in [settings](https://danbooru.donmai.us/settings)
 
 ## Scripts
 
@@ -43,10 +52,18 @@ Adds back the "+ -" links next to tags in tag lists.
 
 [Install](/dist/plus-minus.user.js?raw=1)
 
-## Old scripts
+### Old scripts
 
 These scripts were not moved into this repository yet
 
 - [Upload to Gelbooru](https://gist.github.com/hdk5/d5e896431de6253d67beeb7ef7f9f8fb/raw/danbooru_upload_to_gelbooru.user.js)
 - [Tag Preview](https://gist.github.com/hdk5/be69f7e9e57c643fec130a3f3a46f0a0/raw/danbooru_tag_preview.user.js)
 - [Frontpage](https://github.com/hdk5/danbooru-frontpage.user.js/raw/master/danbooru-frontpage.user.js)
+
+## Styles
+
+### AMOLED
+
+Black color scheme + more saturated other colors
+
+[Install](/dist/amoled.user.css?raw=1)
