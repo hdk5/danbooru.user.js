@@ -52,6 +52,13 @@ Adds back the "+ -" links next to tags in tag lists.
 
 [Install](/dist/plus-minus.user.js?raw=1)
 
+### Sticky Search
+
+Makes the search bar whole-page wide and sticked to the top of the page.<br>
+When used with [PostModeMenu+](https://danbooru.donmai.us/forum_topics/21812), also makes the post mode menu wide and sticky as well.
+
+[Install](/dist/sticky-search.user.js?raw=1)
+
 ### Old scripts
 
 These scripts were not moved into this repository yet
