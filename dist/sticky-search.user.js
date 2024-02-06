@@ -1,14 +1,14 @@
 // ==UserScript==
 // @name         Danbooru - Sticky Search
 // @author       hdk5
-// @version      20240205210841
+// @version      20240206005555
 // @namespace    https://github.com/hdk5/danbooru.user.js
 // @homepageURL  https://github.com/hdk5/danbooru.user.js
 // @supportURL   https://github.com/hdk5/danbooru.user.js/issues
 // @downloadURL  https://github.com/hdk5/danbooru.user.js/raw/master/dist/sticky-search.user.js
 // @updateURL    https://github.com/hdk5/danbooru.user.js/raw/master/dist/sticky-search.user.js
 // @match        *://*.donmai.us/*
-// @grant        none
+// @grant        GM_addStyle
 // ==/UserScript==
 
 (() => {
@@ -19,7 +19,7 @@
 
   const $sticky = $('<div>')
   $sticky.css('position', 'sticky')
-  $sticky.css('top', '-1.35em')
+  $sticky.css('top', '-20px')
   $sticky.css('z-index', '1')
   $aIndex.prepend($sticky)
 
@@ -33,33 +33,36 @@
   if ($pmmSelectControls.length === 0)
     return
 
-  $searchBox.css('padding-bottom', '0')
+  GM_addStyle(`
+    #pmm-selection-buttons {
+      display: flex;
+    }
+
+    button.pmm-select {
+      flex-grow: 1;
+      padding-left: 0;
+      padding-right: 0;
+    }
+  `)
 
   const $modeBox = $('#mode-box')
-  $sticky.append($modeBox)
+  $modeBox.css('position', 'sticky')
+  $modeBox.css('top', '25px')
 
-  $pmmSelectControls.prev().css('background', 'var(--body-background-color)')
-  $pmmSelectControls.prev().css('padding-bottom', '0.5em')
-  $pmmSelectControls.prev().css('padding-right', '0.5em')
-
-  $pmmSelectControls.css('background', 'var(--body-background-color)')
-  $pmmSelectControls.css('margin', '0')
-  $pmmSelectControls.css('padding', '0')
-  $pmmSelectControls.css('padding-bottom', '0.5em')
-
-  const $pmmApplyAll = $('#pmm-apply-all')
+  $modeBox.css('background', 'var(--body-background-color)')
+  $modeBox.css('margin-top', '-0.5em')
 
   const $tagScriptField = $('#tag-script-field')
+  $tagScriptField.css('margin', '0')
 
   const $tagScriptFieldWrap = $tagScriptField.wrap('<div>').parent()
-  $tagScriptFieldWrap.css('flex-grow', '1')
-  $tagScriptFieldWrap.css('height', '100%')
-  $tagScriptFieldWrap.css('padding-left', '0.5em')
-  $tagScriptFieldWrap.css('padding-bottom', '0.5em')
+  $tagScriptFieldWrap.css('position', 'sticky')
+  $tagScriptFieldWrap.css('top', '32px')
+  $tagScriptFieldWrap.css('z-index', '1')
   $tagScriptFieldWrap.css('background', 'var(--body-background-color)')
+  $tagScriptFieldWrap.css('margin-left', '-12px')
+  $tagScriptFieldWrap.css('padding-bottom', '0.5em')
 
-  $pmmSelectControls.append($pmmApplyAll)
-  $pmmSelectControls.after($tagScriptFieldWrap)
-
+  $('#post-sections').before($tagScriptFieldWrap)
   $('#pmm-select-only-input').css('border', 'none')
 })()
