@@ -2,11 +2,15 @@
   "extends": "@tsconfig/strictest/tsconfig.json",
   "compilerOptions": {
     "target": "ESNext",
+    "jsx": "preserve",
+    "jsxImportSource": "solid-js",
     "module": "ESNext",
     "moduleResolution": "Bundler",
     "resolveJsonModule": true,
+    "types": [],
     "allowJs": true,
     "checkJs": false,
+    "outDir": "out-tsc",
     "sourceMap": true
   }
 }

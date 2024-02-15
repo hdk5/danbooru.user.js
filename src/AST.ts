@@ -1,4 +1,6 @@
 import { Metatag } from './Metatag'
+
+// TODO: get rid of AST -> Blacklist2 dependencies
 import type { Post } from './Post'
 
 export abstract class AST {

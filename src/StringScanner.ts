@@ -35,7 +35,7 @@ export class StringScanner {
    * @param source The string to be scanned. If not a string,
    * it will be converted using `toString()`
    */
-  constructor(source: { toString(): string }) {
+  constructor(source: { toString: () => string }) {
     this.source = source.toString()
     this.reset()
   }
@@ -341,7 +341,7 @@ export class StringScanner {
    */
   private setState(
     matches: string[],
-    { head, last }: { head?: number; last?: number } = {},
+    { head, last }: { head?: number, last?: number } = {},
   ): string | null {
     if (head !== undefined) {
       if (head < 0)

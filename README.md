@@ -46,6 +46,15 @@ Works well with Mediaasset Panzoom.
 
 [Install](/dist/editform-dock.user.js?raw=1)
 
+### Tag Preview
+
+Adds preview pane near related tags to the post create/edit form, showing tags as a tree, with each tag's category, aliases, implications and deprecation status.<br>
+Adds buttons to compact/expand the tag string by removing/adding all aliased or implicated tags.<br>
+Shows a checkbox near each tag to allow a quick implication tree removal.<br>
+Works well with Editform Dock.<br>
+
+[Install](/dist/tag-preview.user.js?raw=1)
+
 ### Plus-Minus
 
 Adds back the "+ -" links next to tags in tag lists.

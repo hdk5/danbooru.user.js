@@ -1,4 +1,5 @@
-type AST = import('./AST').AST
+// TODO: remove everything userscript specific from here
+type AST = import('../AST').AST
 
 interface BlacklistEntry {
   tags: string
@@ -14,6 +15,14 @@ declare let Danbooru: {
     initialize_all: () => void
     apply: () => number
     update_sidebar: () => void
+  }
+  RelatedTag: {
+    current_tags: () => string[]
+    update_selected: () => void
+  }
+  Utility: {
+    regexp_escape: (string) => string
+    splitWords: (string) => string[]
   }
 }
 

@@ -3,7 +3,7 @@ type ValueType = number
 export abstract class Range {
   abstract includes(value: ValueType): boolean
 
-  private static get SUBCLASSES(): { parse(expr: string): Range | null }[] {
+  private static get SUBCLASSES(): { parse: (expr: string) => Range | null }[] {
     return [
       RangeUnion,
       RangeExclusive,

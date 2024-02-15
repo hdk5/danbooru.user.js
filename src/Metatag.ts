@@ -1,5 +1,7 @@
-import type { Post } from './Post'
 import { Range } from './Range'
+
+// TODO: get rid of AST -> Blacklist2 dependencies
+import type { Post } from './Post'
 
 export abstract class Metatag {
   abstract match(post: Post): boolean

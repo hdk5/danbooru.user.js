@@ -22,5 +22,9 @@
     "jsonc",
     "yaml",
     "toml"
+  ],
+  "cSpell.words": [
+    "clsx",
+    "danbooru"
   ]
 }

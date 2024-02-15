@@ -4,7 +4,7 @@ export class StringParser<StateType> {
   private scanner: StringScanner
   state: StateType
 
-  constructor(input: { toString(): string }, state: StateType) {
+  constructor(input: { toString: () => string }, state: StateType) {
     this.state = state
     this.scanner = new StringScanner(input)
   }

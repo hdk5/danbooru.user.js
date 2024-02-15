@@ -238,7 +238,7 @@ export class QueryParser {
       if (
         skipBalancedParens
         && (QueryParser.hasBalancedParens(str)
-          || QueryParser.PERMITTED_UNBALANCED_TAGS.includes(str))
+        || QueryParser.PERMITTED_UNBALANCED_TAGS.includes(str))
       )
         break
 

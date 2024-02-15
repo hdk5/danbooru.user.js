@@ -10,7 +10,7 @@ export class Post {
   }
 
   get score(): number {
-    return Number.parseInt(this.post.dataset.score)!
+    return Number.parseInt(this.post.dataset.score)
   }
 
   get rating(): string {
@@ -18,7 +18,7 @@ export class Post {
   }
 
   get uploaderId(): number {
-    return Number.parseInt(this.post.dataset.uploaderId)!
+    return Number.parseInt(this.post.dataset.uploaderId)
   }
 
   get isActive(): boolean {
