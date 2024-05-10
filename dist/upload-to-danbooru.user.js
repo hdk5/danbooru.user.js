@@ -413,11 +413,23 @@ function initializeTwitter() {
     }
   `)
 
+  const toRef = async el => $(el).find('time').closest('a').prop('href')
+
+  const toUrl = async (el) => {
+    const tweetPhoto = $(el).find('[data-testid="tweetPhoto"]')
+    if (tweetPhoto.length === 1)
+      return tweetPhoto.find('img, video').attr('src')
+    else
+      return toRef(el)
+  }
+
   findAndAttach({
     selector: 'article',
     predicate: 'article[data-testid=tweet]',
     asyncAttach: true,
-    toUrl: async el => $(el).find('time').closest('a').prop('href'),
+    asyncClick: true,
+    toUrl,
+    toRef,
     callback: async ($el, $btn) => {
       $btn.append('<div class="ex-utb-upload-button-twitter-hover">')
       $el.find('div[role=group]').append($btn)
