@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Upload To Danbooru
 // @author       hdk5
-// @version      20240510071730
+// @version      20240510082329
 // @description  another userscript for uploading to danbooru
 // @namespace    https://github.com/hdk5/danbooru.user.js
 // @homepageURL  https://github.com/hdk5/danbooru.user.js
@@ -416,11 +416,16 @@ function initializeTwitter() {
   const toRef = async el => $(el).find('time').closest('a').prop('href')
 
   const toUrl = async (el) => {
+    let url
+
     const tweetPhoto = $(el).find('[data-testid="tweetPhoto"]')
     if (tweetPhoto.length === 1)
-      return tweetPhoto.find('img, video').attr('src')
-    else
-      return toRef(el)
+      url = tweetPhoto.find('img, video').attr('src')
+
+    if (url === undefined)
+      url = toRef(el)
+
+    return url
   }
 
   findAndAttach({
