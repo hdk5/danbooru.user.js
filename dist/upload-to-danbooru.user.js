@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Upload To Danbooru
 // @author       hdk5
-// @version      20240510192029
+// @version      20240517161451
 // @description  another userscript for uploading to danbooru
 // @namespace    https://github.com/hdk5/danbooru.user.js
 // @homepageURL  https://github.com/hdk5/danbooru.user.js
@@ -20,6 +20,7 @@
 // @match        *://pawoo.net/*
 // @match        *://baraag.net/*
 // @match        *://inkbunny.net/*
+// @match        *://xfolio.jp/*
 // @grant        GM_addStyle
 // @grant        GM_getResourceURL
 // @grant        GM_getValue
@@ -520,6 +521,40 @@ function initializeInkbunny() {
   })
 }
 
+function initializeXfolio() {
+  GM_addStyle(`
+    .ex-utb-upload-button {
+      position: absolute;
+      right: 20px;
+      top: 20px;
+      width: 36px;
+    }
+
+    .ex-utb-upload-button-icon {
+      height: auto;
+    }
+  `)
+
+  const toUrl = async (el) => {
+    // TODO: doesn't work on the main danbooru instance
+    let url = $(el).find('img').attr('src')
+
+    const openIcon = $(el).find('.openIcon')
+    if (openIcon.length === 1)
+      url = openIcon.attr('href')
+
+    return url
+  }
+
+  findAndAttach({
+    selector: 'div.article__wrap_img',
+    asyncAttach: true,
+    toUrl,
+    toRef: locationToRef,
+    callback: async ($el, $btn) => $el.append($btn),
+  })
+}
+
 function initialize() {
   GM_addStyle(PROGRAM_CSS)
 
@@ -553,6 +588,9 @@ function initialize() {
       break
     case 'inkbunny.net':
       initializeInkbunny()
+      break
+    case 'xfolio.jp':
+      initializeXfolio()
       break
   }
 }
