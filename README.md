@@ -68,6 +68,12 @@ When used with [PostModeMenu+](https://danbooru.donmai.us/forum_topics/21812), a
 
 [Install](/dist/sticky-search.user.js?raw=1)
 
+### Frontpage
+
+Transforms the frontpage (`/`) into the imitation of the old `static-index` page with catgirls counter.
+
+[Install](/dist/frontpage.user.js?raw=1)
+
 ### Old scripts
 
 These scripts were not moved into this repository yet
