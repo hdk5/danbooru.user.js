@@ -2,7 +2,7 @@
 // @name         Danbooru - Frontpage
 // @description  Bring back the front page and catgirls post counter
 // @author       hdk5
-// @version      20240707121704
+// @version      20240708184901
 // @namespace    https://github.com/hdk5/danbooru.user.js
 // @homepageURL  https://github.com/hdk5/danbooru.user.js
 // @supportURL   https://github.com/hdk5/danbooru.user.js/issues
@@ -12,16 +12,16 @@
 // @match        *://*.donmai.us/
 // @grant        GM_getResourceURL
 // @grant        GM_addStyle
-// @resource     counter-0 https://raw.githubusercontent.com/hdk5/danbooru-frontpage.user.js/da419aeeb3c27015ba74c2819c0ea7f1ca32dd26/resource/0.gif
-// @resource     counter-1 https://raw.githubusercontent.com/hdk5/danbooru-frontpage.user.js/da419aeeb3c27015ba74c2819c0ea7f1ca32dd26/resource/1.gif
-// @resource     counter-2 https://raw.githubusercontent.com/hdk5/danbooru-frontpage.user.js/da419aeeb3c27015ba74c2819c0ea7f1ca32dd26/resource/2.gif
-// @resource     counter-3 https://raw.githubusercontent.com/hdk5/danbooru-frontpage.user.js/da419aeeb3c27015ba74c2819c0ea7f1ca32dd26/resource/3.gif
-// @resource     counter-4 https://raw.githubusercontent.com/hdk5/danbooru-frontpage.user.js/da419aeeb3c27015ba74c2819c0ea7f1ca32dd26/resource/4.gif
-// @resource     counter-5 https://raw.githubusercontent.com/hdk5/danbooru-frontpage.user.js/da419aeeb3c27015ba74c2819c0ea7f1ca32dd26/resource/5.gif
-// @resource     counter-6 https://raw.githubusercontent.com/hdk5/danbooru-frontpage.user.js/da419aeeb3c27015ba74c2819c0ea7f1ca32dd26/resource/6.gif
-// @resource     counter-7 https://raw.githubusercontent.com/hdk5/danbooru-frontpage.user.js/da419aeeb3c27015ba74c2819c0ea7f1ca32dd26/resource/7.gif
-// @resource     counter-8 https://raw.githubusercontent.com/hdk5/danbooru-frontpage.user.js/da419aeeb3c27015ba74c2819c0ea7f1ca32dd26/resource/8.gif
-// @resource     counter-9 https://raw.githubusercontent.com/hdk5/danbooru-frontpage.user.js/da419aeeb3c27015ba74c2819c0ea7f1ca32dd26/resource/9.gif
+// @resource     counter-0 https://raw.githubusercontent.com/hdk5/danbooru.user.js/0734b0c45952bd72dc7a8862776f91fe3142e71d/resource/counter/0.gif
+// @resource     counter-1 https://raw.githubusercontent.com/hdk5/danbooru.user.js/0734b0c45952bd72dc7a8862776f91fe3142e71d/resource/counter/1.gif
+// @resource     counter-2 https://raw.githubusercontent.com/hdk5/danbooru.user.js/0734b0c45952bd72dc7a8862776f91fe3142e71d/resource/counter/2.gif
+// @resource     counter-3 https://raw.githubusercontent.com/hdk5/danbooru.user.js/0734b0c45952bd72dc7a8862776f91fe3142e71d/resource/counter/3.gif
+// @resource     counter-4 https://raw.githubusercontent.com/hdk5/danbooru.user.js/0734b0c45952bd72dc7a8862776f91fe3142e71d/resource/counter/4.gif
+// @resource     counter-5 https://raw.githubusercontent.com/hdk5/danbooru.user.js/0734b0c45952bd72dc7a8862776f91fe3142e71d/resource/counter/5.gif
+// @resource     counter-6 https://raw.githubusercontent.com/hdk5/danbooru.user.js/0734b0c45952bd72dc7a8862776f91fe3142e71d/resource/counter/6.gif
+// @resource     counter-7 https://raw.githubusercontent.com/hdk5/danbooru.user.js/0734b0c45952bd72dc7a8862776f91fe3142e71d/resource/counter/7.gif
+// @resource     counter-8 https://raw.githubusercontent.com/hdk5/danbooru.user.js/0734b0c45952bd72dc7a8862776f91fe3142e71d/resource/counter/8.gif
+// @resource     counter-9 https://raw.githubusercontent.com/hdk5/danbooru.user.js/0734b0c45952bd72dc7a8862776f91fe3142e71d/resource/counter/9.gif
 // ==/UserScript==
 
 /* globals $ */
