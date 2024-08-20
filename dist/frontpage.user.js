@@ -2,7 +2,7 @@
 // @name         Danbooru - Frontpage
 // @description  Bring back the front page and catgirls post counter
 // @author       hdk5
-// @version      20240708184901
+// @version      20240820125452
 // @namespace    https://github.com/hdk5/danbooru.user.js
 // @homepageURL  https://github.com/hdk5/danbooru.user.js
 // @supportURL   https://github.com/hdk5/danbooru.user.js/issues
@@ -10,25 +10,59 @@
 // @updateURL    https://github.com/hdk5/danbooru.user.js/raw/master/dist/frontpage.user.js
 // @run-at       document-start
 // @match        *://*.donmai.us/
-// @grant        GM_getResourceURL
+// @grant        GM_registerMenuCommand
 // @grant        GM_addStyle
-// @resource     counter-0 https://raw.githubusercontent.com/hdk5/danbooru.user.js/0734b0c45952bd72dc7a8862776f91fe3142e71d/resource/counter/0.gif
-// @resource     counter-1 https://raw.githubusercontent.com/hdk5/danbooru.user.js/0734b0c45952bd72dc7a8862776f91fe3142e71d/resource/counter/1.gif
-// @resource     counter-2 https://raw.githubusercontent.com/hdk5/danbooru.user.js/0734b0c45952bd72dc7a8862776f91fe3142e71d/resource/counter/2.gif
-// @resource     counter-3 https://raw.githubusercontent.com/hdk5/danbooru.user.js/0734b0c45952bd72dc7a8862776f91fe3142e71d/resource/counter/3.gif
-// @resource     counter-4 https://raw.githubusercontent.com/hdk5/danbooru.user.js/0734b0c45952bd72dc7a8862776f91fe3142e71d/resource/counter/4.gif
-// @resource     counter-5 https://raw.githubusercontent.com/hdk5/danbooru.user.js/0734b0c45952bd72dc7a8862776f91fe3142e71d/resource/counter/5.gif
-// @resource     counter-6 https://raw.githubusercontent.com/hdk5/danbooru.user.js/0734b0c45952bd72dc7a8862776f91fe3142e71d/resource/counter/6.gif
-// @resource     counter-7 https://raw.githubusercontent.com/hdk5/danbooru.user.js/0734b0c45952bd72dc7a8862776f91fe3142e71d/resource/counter/7.gif
-// @resource     counter-8 https://raw.githubusercontent.com/hdk5/danbooru.user.js/0734b0c45952bd72dc7a8862776f91fe3142e71d/resource/counter/8.gif
-// @resource     counter-9 https://raw.githubusercontent.com/hdk5/danbooru.user.js/0734b0c45952bd72dc7a8862776f91fe3142e71d/resource/counter/9.gif
+// @require      https://github.com/sizzlemctwizzle/GM_config/raw/4aa57fee9bea0a5a8a1a50d826ad90c1d0ad3707/gm_config.js
 // ==/UserScript==
 
 /* globals $ */
 
 GM_addStyle(`body { visibility: hidden; }`)
 
+const RESOURCE_HASH = '202ec3a9b9af44912b6b553cfea94f9d51b55882'
+const THEMES = {
+  'Gelbooru': { slug: 'gelbooru', ext: 'gif', rendering: 'pixelated' },
+  'Gelbooru (NSFW)': { slug: 'gelbooru-h', ext: 'png', rendering: 'pixelated' },
+  'Danbooru': { slug: 'danbooru', ext: 'gif', rendering: 'pixelated' },
+  'Danbooru (NSFW)': { slug: 'danbooru-h', ext: 'png', rendering: 'pixelated' },
+  'Rule 34 (animated)': { slug: 'rule34', ext: 'gif', rendering: 'pixelated' },
+  'A-SOUL': { slug: 'asoul', ext: 'gif', rendering: 'pixelated' },
+  'Girls Band Cry': { slug: 'garukura', ext: 'png', rendering: 'smooth' },
+  'Lain Iwakura': { slug: 'lain', ext: 'png', rendering: 'smooth' },
+  'Urushi Yaotome': { slug: 'urushi', ext: 'gif', rendering: 'smooth' },
+}
+
+GM_config.init({
+  id: 'DanbooruFrontpageConfig',
+  title: 'Danbooru Frontpage Settings',
+  fields: {
+    theme: {
+      label: 'Theme',
+      type: 'select',
+      options: Object.keys(THEMES),
+    },
+  },
+  frameStyle: `
+    height: auto;
+    width: 400px;
+    position: fixed;
+    z-index: 9999;
+  `,
+})
+
+GM_registerMenuCommand('Settings', () => {
+  GM_config.open()
+})
+
+function getCounterUrl(n, theme) {
+  theme ??= GM_config.get('theme')
+  const { slug, ext } = THEMES[theme]
+  return `https://raw.githubusercontent.com/hdk5/danbooru.user.js/${RESOURCE_HASH}/resource/counter/${slug}/${n}.${ext}`
+}
+
 document.addEventListener('DOMContentLoaded', () => {
+  const theme = GM_config.get('theme')
+  const { rendering } = THEMES[theme]
   // https://gitlab.com/hdk5/danbooru/-/blob/c0e5fd445f81497e19391177b1fed6c831a6e391/app/javascript/src/styles/specific/static_index.scss
   GM_addStyle(`
 header#top, nav#nav {
@@ -89,7 +123,8 @@ div#counter-girls {
 }
 
 div.counter-girl img {
-  width: 100%;
+  height: 150px;
+  image-rendering: ${rendering};
 }
   `)
 
@@ -108,7 +143,7 @@ div.counter-girl img {
       $('<div>', {
         class: 'counter-girl',
         html: $('<img>', {
-          src: GM_getResourceURL(`counter-${n}`),
+          src: getCounterUrl(n),
           alt: n,
         }),
       }),
