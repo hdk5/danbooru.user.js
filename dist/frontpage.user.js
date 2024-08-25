@@ -2,7 +2,7 @@
 // @name         Danbooru - Frontpage
 // @description  Bring back the front page and catgirls post counter
 // @author       hdk5
-// @version      20240820125452
+// @version      20240825150013
 // @namespace    https://github.com/hdk5/danbooru.user.js
 // @homepageURL  https://github.com/hdk5/danbooru.user.js
 // @supportURL   https://github.com/hdk5/danbooru.user.js/issues
@@ -45,9 +45,15 @@ GM_config.init({
   frameStyle: `
     height: auto;
     width: 400px;
+    padding-bottom: 50vh;
     position: fixed;
     z-index: 9999;
   `,
+  events: {
+    save() {
+      updateCounterUrls()
+    },
+  },
 })
 
 GM_registerMenuCommand('Settings', () => {
@@ -58,6 +64,11 @@ function getCounterUrl(n, theme) {
   theme ??= GM_config.get('theme')
   const { slug, ext } = THEMES[theme]
   return `https://raw.githubusercontent.com/hdk5/danbooru.user.js/${RESOURCE_HASH}/resource/counter/${slug}/${n}.${ext}`
+}
+
+function updateCounterUrls() {
+  for (let n = 0; n <= 9; ++n)
+    $(`.counter-girl img[alt=${n}]`).attr('src', getCounterUrl(n))
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -143,7 +154,6 @@ div.counter-girl img {
       $('<div>', {
         class: 'counter-girl',
         html: $('<img>', {
-          src: getCounterUrl(n),
           alt: n,
         }),
       }),
@@ -155,6 +165,7 @@ div.counter-girl img {
   $('menu#subnav-menu').remove()
   $('#c-posts').remove()
   $('#page').append($cStatic)
+  updateCounterUrls()
 
   GM_addStyle(`body { visibility: unset; }`)
 })
