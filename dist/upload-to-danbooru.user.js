@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Upload To Danbooru
 // @author       hdk5
-// @version      20240525073911
+// @version      20240917060729
 // @description  another userscript for uploading to danbooru
 // @namespace    https://github.com/hdk5/danbooru.user.js
 // @homepageURL  https://github.com/hdk5/danbooru.user.js
@@ -347,7 +347,7 @@ function initializePixiv() {
   // Add the button on thumbnails
   findAndAttach({
     selector: 'a',
-    predicate: 'div[type=illust] a[data-gtm-value]',
+    predicate: 'a[data-gtm-value][href*="artworks"]',
     classes: [
       'ex-utb-upload-button-absolute',
       'ex-utb-upload-button-bottom-left',
