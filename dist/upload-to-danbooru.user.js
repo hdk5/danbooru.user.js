@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Upload To Danbooru
 // @author       hdk5
-// @version      20240917060729
+// @version      20241018112958
 // @description  another userscript for uploading to danbooru
 // @namespace    https://github.com/hdk5/danbooru.user.js
 // @homepageURL  https://github.com/hdk5/danbooru.user.js
@@ -21,6 +21,7 @@
 // @match        *://baraag.net/*
 // @match        *://inkbunny.net/*
 // @match        *://xfolio.jp/*
+// @match        *://bsky.app/*
 // @grant        GM_addStyle
 // @grant        GM_getResourceURL
 // @grant        GM_getValue
@@ -555,6 +556,16 @@ function initializeXfolio() {
   })
 }
 
+function initializeBluesky() {
+  findAndAttach({
+    selector: 'div',
+    predicate: 'div[data-testid^="feedItem-by-"]',
+    asyncAttach: true,
+    toUrl: el => $(el).find('a').filter((i, el) => /\/profile\/[\w.]+\/post\/\w+/.exec($(el).attr('href'))).prop('href'),
+    callback: async ($el, $btn) => $el.find('div[data-testid="postDropdownBtn"]').parent().parent().parent().append($btn),
+  })
+}
+
 function initialize() {
   GM_addStyle(PROGRAM_CSS)
 
@@ -591,6 +602,9 @@ function initialize() {
       break
     case 'xfolio.jp':
       initializeXfolio()
+      break
+    case 'bsky.app':
+      initializeBluesky()
       break
   }
 }
