@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Upload To Danbooru
 // @author       hdk5
-// @version      20241018112958
+// @version      20241021184521
 // @description  another userscript for uploading to danbooru
 // @namespace    https://github.com/hdk5/danbooru.user.js
 // @homepageURL  https://github.com/hdk5/danbooru.user.js
@@ -557,9 +557,22 @@ function initializeXfolio() {
 }
 
 function initializeBluesky() {
+  GM_addStyle(`
+    .ex-utb-upload-button {
+      padding: 5px !important;
+      margin: unset;
+      background: none;
+      border-radius: 9999px;
+    }
+
+    .ex-utb-upload-button:hover {
+      background: rgba(174,137,102,0.15);
+    }
+  `)
+
   findAndAttach({
     selector: 'div',
-    predicate: 'div[data-testid^="feedItem-by-"]',
+    predicate: 'div[data-testid^="feedItem-by-"], div[data-testid^="postThreadItem-by-"]',
     asyncAttach: true,
     toUrl: el => $(el).find('a').filter((i, el) => /\/profile\/[\w.]+\/post\/\w+/.exec($(el).attr('href'))).prop('href'),
     callback: async ($el, $btn) => $el.find('div[data-testid="postDropdownBtn"]').parent().parent().parent().append($btn),
