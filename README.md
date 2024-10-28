@@ -55,6 +55,17 @@ Works well with Editform Dock.<br>
 
 [Install](/dist/tag-preview.user.js?raw=1)
 
+### Input Tag Highlight
+
+Adds highlighting to the post create/edit tag input field.
+
+<details>
+   <summary>Preview</summary>
+   <img src="readme/input-tag-highlight.png">
+</details>
+
+[Install](/dist/input-tag-highlight.user.js?raw=1)
+
 ### Plus-Minus
 
 Adds back the "+ -" links next to tags in tag lists.

@@ -1,0 +1,1 @@
+../dist/input-tag-highlight.user.js
