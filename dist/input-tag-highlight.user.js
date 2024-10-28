@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Danbooru - Input Tag Highlight
 // @author       hdk5
-// @version      20241028081554
+// @version      20241028084637
 // @namespace    https://github.com/hdk5/danbooru.user.js
 // @homepageURL  https://github.com/hdk5/danbooru.user.js
 // @supportURL   https://github.com/hdk5/danbooru.user.js/issues
@@ -12,7 +12,7 @@
 // @grant        GM_addStyle
 // ==/UserScript==
 
-const SCRIPT_CSS = `
+const SCRIPT_CSS = /* CSS */`
   .tag-highlight-highlights {
     color: transparent;
     white-space: pre-wrap;
@@ -35,10 +35,10 @@ const SCRIPT_CSS = `
     text-decoration: line-through;
   }
   .tag-highlight-meta-name {
-    color: var(--grey-4);
+    color: var(--tag-highlight-meta-name-color);
   }
   .tag-highlight-meta-value {
-    color: var(--grey-2);
+    color: var(--tag-highlight-meta-value-color);
   }
 
   .tag-highlight-type-0 {
@@ -61,6 +61,23 @@ const SCRIPT_CSS = `
     overscroll-behavior: none;
     -webkit-text-fill-color: transparent;
     font-size: var(--text-sm);
+  }
+
+  html, body[data-current-user-theme="light"] {
+    --tag-highlight-meta-name-color: var(--grey-4);
+    --tag-highlight-meta-value-color: var(--grey-6);
+  }
+
+  body[data-current-user-theme="dark"] {
+    --tag-highlight-meta-name-color: var(--grey-4);
+    --tag-highlight-meta-value-color: var(--grey-2);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    body {
+      --tag-highlight-meta-name-color: var(--grey-4);
+      --tag-highlight-meta-value-color: var(--grey-2);
+    }
   }
 `
 
