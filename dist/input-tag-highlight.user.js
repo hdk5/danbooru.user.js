@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Danbooru - Input Tag Highlight
 // @author       hdk5
-// @version      20241028074117
+// @version      20241028081554
 // @namespace    https://github.com/hdk5/danbooru.user.js
 // @homepageURL  https://github.com/hdk5/danbooru.user.js
 // @supportURL   https://github.com/hdk5/danbooru.user.js/issues
@@ -172,14 +172,20 @@ if ($input_textarea.length) {
     scroll: handleScroll,
   })
 
+  let handleInputReq
   async function handleInput() {
-    // TODO: fix flickering
+    const currentReq = {}
+    handleInputReq = currentReq
+
     const text = $input_textarea.val()
     const tokens = tokenize(text)
 
     $input_highlights.html(applyHighlights(tokens))
 
     await fillTagCache(tokens)
+
+    if (handleInputReq !== currentReq)
+      return
 
     $input_highlights.html(applyHighlights(tokens))
     handleScroll()
