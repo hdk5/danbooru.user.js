@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Upload To Danbooru
 // @author       hdk5
-// @version      20241021184521
+// @version      20241031152412
 // @description  another userscript for uploading to danbooru
 // @namespace    https://github.com/hdk5/danbooru.user.js
 // @homepageURL  https://github.com/hdk5/danbooru.user.js
@@ -258,7 +258,7 @@ function initializeFantia() {
       selector: 'img',
       predicate: el =>
         el.src
-        && /^\/uploads\/post_content_photo\/file\/\d+\/(?!(?:main|thumb)_)/.test(
+        && /^\/uploads\/post_content_photo\/file\/\d+\//.test(
           new URL(el.src).pathname,
         ),
       classes: ['ex-utb-upload-button-absolute'],
@@ -272,7 +272,7 @@ function initializeFantia() {
       selector: 'img',
       predicate: el =>
         el.src
-        && /^\/uploads\/post_content_photo\/file\/\d+\/(?:(?:main|thumb)_)/.test(
+        && /^\/uploads\/post_content_photo\/file\/\d+\//.test(
           new URL(el.src).pathname,
         ),
       classes: ['ex-utb-upload-button-absolute'],
