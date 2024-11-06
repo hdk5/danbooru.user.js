@@ -1,10 +1,10 @@
-import { clsx } from 'clsx'
-import { splitProps } from 'solid-js'
-
 import type { JSX } from 'solid-js'
 import type { Merge } from 'type-fest'
 
-export const ICONS_PATH = '/packs/static/public/images/icons-f4ca0cd60cf43cc54f9a.svg'
+import { clsx } from 'clsx'
+import { splitProps } from 'solid-js'
+
+export const ICONS_PATH = '/packs/static/icons-c18cad4efd0bb958da81.svg'
 
 type SvgIconProps = Merge<JSX.SVGElementTags['svg'], {
   name: string

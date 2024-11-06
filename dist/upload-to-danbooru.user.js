@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Upload To Danbooru
 // @author       hdk5
-// @version      20241031152412
+// @version      20241106223343
 // @description  another userscript for uploading to danbooru
 // @namespace    https://github.com/hdk5/danbooru.user.js
 // @homepageURL  https://github.com/hdk5/danbooru.user.js
@@ -37,6 +37,17 @@
 // @require      https://github.com/sizzlemctwizzle/GM_config/raw/06f2015c04db3aaab9717298394ca4f025802873/gm_config.js
 // @resource     danbooru_icon https://github.com/danbooru/danbooru/raw/0fd95375fac5cc036ff0141c3987abb0a03991b7/public/images/danbooru-logo.png
 // ==/UserScript==
+
+/* globals
+  GM_addStyle
+  GM_getResourceURL
+  GM_registerMenuCommand
+  GM_openInTab
+  GM_xmlhttpRequest
+  GM_config
+  MutationSummary
+  $
+*/
 
 GM_config.init({
   id: 'UtdConfig',

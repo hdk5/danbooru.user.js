@@ -12,7 +12,6 @@ export default antfu(
       markdown: true,
     },
   },
-  // @ts-expect-error solid types are broken
   {
     files: ['**/*.{ts,tsx}'],
     ...solid,

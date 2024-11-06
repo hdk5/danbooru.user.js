@@ -2,11 +2,15 @@
  * @name UploadToDanbooru
  * @author hdk5
  * @authorId 219173750980083712
- * @version 20240823135202
+ * @version 20241106223343
  * @description Quickly upload media to danbooru
  * @source https://github.com/hdk5/danbooru.user.js
  * @updateUrl https://github.com/hdk5/danbooru.user.js/raw/master/dist/upload-to-danbooru.bd.plugin.js
  */
+
+/* globals
+  BdApi
+*/
 
 const DEFAULT_BOORU = 'https://danbooru.donmai.us/'
 

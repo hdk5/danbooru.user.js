@@ -44,8 +44,9 @@ $(() => {
         if (
           node instanceof HTMLElement
           && node.classList.contains('post-votes')
-        )
+        ) {
           refreshBlacklist()
+        }
       }
     }
   }).observe(document.body, {

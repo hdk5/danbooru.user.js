@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Danbooru - Dock Edit Form
 // @author       hdk5
-// @version      20240126015210
+// @version      20241106223343
 // @namespace    https://github.com/hdk5/danbooru.user.js
 // @homepageURL  https://github.com/hdk5/danbooru.user.js
 // @supportURL   https://github.com/hdk5/danbooru.user.js/issues
@@ -10,6 +10,11 @@
 // @match        *://*.donmai.us/*
 // @grant        none
 // ==/UserScript==
+
+/* globals
+  Danbooru
+  $
+*/
 
 if ($('#c-posts #a-show').length) {
   const uploadEditPanelDock = JSON.parse(Danbooru.Cookie.get('upload_edit_panel_dock') || JSON.stringify('auto'))

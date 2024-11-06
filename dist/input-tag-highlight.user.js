@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Danbooru - Input Tag Highlight
 // @author       hdk5
-// @version      20241028084637
+// @version      20241106223343
 // @namespace    https://github.com/hdk5/danbooru.user.js
 // @homepageURL  https://github.com/hdk5/danbooru.user.js
 // @supportURL   https://github.com/hdk5/danbooru.user.js/issues
@@ -11,6 +11,11 @@
 // @grant        none
 // @grant        GM_addStyle
 // ==/UserScript==
+
+/* globals
+  GM_addStyle
+  $
+*/
 
 const SCRIPT_CSS = /* CSS */`
   .tag-highlight-highlights {

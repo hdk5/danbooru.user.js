@@ -135,7 +135,7 @@ export class ASTWildcard extends AST {
       .replace(/[|\\{}()[\]^$+*?.]/g, '\\$&')
       .replace(/-/g, '\\x2d')
       .replace(/\\\*/g, '[\\s\\S]*')
-    this.regex = RegExp(`^${pattern}$`, 'i')
+    this.regex = new RegExp(`^${pattern}$`, 'i')
   }
 
   override match(post: Post): boolean {

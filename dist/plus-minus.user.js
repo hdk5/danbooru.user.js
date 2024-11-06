@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Danbooru - PlusMinus
 // @author       hdk5
-// @version      20240108122749
+// @version      20241106223343
 // @namespace    https://github.com/hdk5/danbooru.user.js
 // @homepageURL  https://github.com/hdk5/danbooru.user.js
 // @supportURL   https://github.com/hdk5/danbooru.user.js/issues
@@ -10,6 +10,11 @@
 // @match        *://*.donmai.us/*
 // @grant        GM_addStyle
 // ==/UserScript==
+
+/* globals
+  GM_addStyle
+  $
+*/
 
 (() => {
   GM_addStyle(`

@@ -1,10 +1,10 @@
-import * as path from 'node:path'
-import 'webpack-dev-server'
-import { merge } from 'webpack-merge'
-import { UserscriptPlugin } from 'webpack-userscript'
-
 import type { Configuration } from 'webpack'
 import type { UserscriptOptions } from 'webpack-userscript'
+import * as path from 'node:path'
+import { merge } from 'webpack-merge'
+
+import { UserscriptPlugin } from 'webpack-userscript'
+import 'webpack-dev-server'
 
 // TODO: replace webpack with rollup
 export default (env: Record<string, string>, args: Record<string, string>) => {
@@ -125,6 +125,8 @@ export default (env: Record<string, string>, args: Record<string, string>) => {
     case 'production':
       config = merge(config, productionConfig)
       break
+    case undefined:
+      // no-op
   }
 
   switch (env['target']) {
@@ -134,6 +136,8 @@ export default (env: Record<string, string>, args: Record<string, string>) => {
     case 'tag-preview':
       config = merge(config, tagPreviewConfig)
       break
+    case undefined:
+        // no-op
   }
 
   return config

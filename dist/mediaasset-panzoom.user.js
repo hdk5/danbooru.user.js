@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Danbooru - Panzoom
 // @author       hdk5
-// @version      20231106011256
+// @version      20241106223343
 // @namespace    https://github.com/hdk5/danbooru.user.js
 // @homepageURL  https://github.com/hdk5/danbooru.user.js
 // @supportURL   https://github.com/hdk5/danbooru.user.js/issues
@@ -11,6 +11,11 @@
 // @grant        none
 // @require      https://unpkg.com/panzoom@9.4.3/dist/panzoom.min.js
 // ==/UserScript==
+
+/* globals
+  $
+  panzoom
+*/
 
 class MediaAssetComponent {
   static initialize() {

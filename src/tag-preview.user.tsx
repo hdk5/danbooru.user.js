@@ -1,12 +1,12 @@
-import { For, Show, createEffect, createRoot, createSignal, on } from 'solid-js'
-import { clsx } from 'clsx'
-import _ from 'lodash'
-import $ from 'jquery'
-import type { ValueOf } from 'type-fest'
 import type { VoidComponent } from 'solid-js'
+import type { ValueOf } from 'type-fest'
+import { clsx } from 'clsx'
+import $ from 'jquery'
+import _ from 'lodash'
+import { createEffect, createRoot, createSignal, For, on, Show } from 'solid-js'
 
-import css from './tag-preview.user.scss'
 import { ChevronDownIcon, SpinnerIcon } from './icons'
+import css from './tag-preview.user.scss'
 import { createLazyResource } from './util'
 
 GM_addStyle(css)
@@ -334,6 +334,7 @@ const PreviewColumn: VoidComponent = () => {
   const toggleCollapsed = () => setCollapsed(collapsed => (!collapsed))
 
   const [tags, { refetch: refetchTags }] = createLazyResource(
+    // eslint-disable-next-line ts/promise-function-async
     () => fetchTags(),
     { initialValue: {} },
   )

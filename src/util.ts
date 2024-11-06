@@ -13,6 +13,7 @@ export function createLazyResource<T, R = unknown>(
 ): InitializedResourceReturn<T, R> {
   let initialized = false
   const [resource, { mutate, refetch }] = createResource(
+    // eslint-disable-next-line ts/promise-function-async
     (source, info) => initialized ? fetcher(source, info) : options.initialValue,
     options,
   ) satisfies InitializedResourceReturn<T, R>
@@ -21,6 +22,7 @@ export function createLazyResource<T, R = unknown>(
     resource,
     {
       mutate,
+      // eslint-disable-next-line ts/promise-function-async
       refetch: (info) => {
         initialized = true
         return refetch(info)

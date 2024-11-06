@@ -36,7 +36,7 @@ export class QueryParser {
 
   private constructor(input: string, metatags: string[]) {
     this.parser = new StringParser<number>(input, 0)
-    this.metatagRegex = RegExp(`(${metatags.join('|')}):`, 'i')
+    this.metatagRegex = new RegExp(`(${metatags.join('|')}):`, 'i')
   }
 
   static parse(input: string, metatags: string[] = []): AST {
@@ -150,7 +150,7 @@ export class QueryParser {
   private expr(): AST | null {
     this.space()
 
-    if (this.parser.accept(/\(/)) {
+    if (this.parser.accept(/\(/) !== null) {
       ++this.parser.state
       const a = this.orClause()
       if (a === null || this.parser.accept(/\)/) === null)
@@ -221,8 +221,9 @@ export class QueryParser {
       || ['and', 'or'].includes(t.toLowerCase())
       || t.includes('*')
       || this.metatagRegex.exec(t)?.index === 0
-    )
+    ) {
       return null
+    }
 
     this.space()
     return new ASTTag(t)
@@ -238,9 +239,10 @@ export class QueryParser {
       if (
         skipBalancedParens
         && (QueryParser.hasBalancedParens(str)
-        || QueryParser.PERMITTED_UNBALANCED_TAGS.includes(str))
-      )
+          || QueryParser.PERMITTED_UNBALANCED_TAGS.includes(str))
+      ) {
         break
+      }
 
       str = str.slice(0, -1)
       this.parser.rewind()

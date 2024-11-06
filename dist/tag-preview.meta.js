@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name Danbooru - Tag Preview
-// @version 20240218170120
+// @version 20241106223343
 // @author hdk5
 // @supportURL https://github.com/hdk5/danbooru.user.js/issues
 // @match *://*.donmai.us/*

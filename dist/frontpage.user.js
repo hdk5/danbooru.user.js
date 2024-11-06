@@ -2,7 +2,7 @@
 // @name         Danbooru - Frontpage
 // @description  Bring back the front page and catgirls post counter
 // @author       hdk5
-// @version      20240825150013
+// @version      20241106223343
 // @namespace    https://github.com/hdk5/danbooru.user.js
 // @homepageURL  https://github.com/hdk5/danbooru.user.js
 // @supportURL   https://github.com/hdk5/danbooru.user.js/issues
@@ -15,7 +15,12 @@
 // @require      https://github.com/sizzlemctwizzle/GM_config/raw/4aa57fee9bea0a5a8a1a50d826ad90c1d0ad3707/gm_config.js
 // ==/UserScript==
 
-/* globals $ */
+/* globals
+  GM_registerMenuCommand
+  GM_addStyle
+  GM_config
+  $
+*/
 
 GM_addStyle(`body { visibility: hidden; }`)
 
