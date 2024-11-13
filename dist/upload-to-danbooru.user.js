@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Upload To Danbooru
 // @author       hdk5
-// @version      20241311120704
+// @version      20241311190443
 // @description  another userscript for uploading to danbooru
 // @namespace    https://github.com/hdk5/danbooru.user.js
 // @homepageURL  https://github.com/hdk5/danbooru.user.js
@@ -507,13 +507,13 @@ function initializeMastodon() {
 
   findAndAttach({
     selector: 'div',
-    predicate: 'div.status__action-bar__dropdown, div.detailed-status__action-bar-dropdown',
+    predicate: 'div.status__action-bar, div.detailed-status__action-bar',
     asyncAttach: true,
     toUrl: async el => $(el)
       .closest('div.status__wrapper, div.detailed-status__wrapper')
       .find('a.status__relative-time, a.detailed-status__datetime')
       .prop('href'),
-    callback: async ($el, $btn) => $btn.insertBefore($el),
+    callback: async ($el, $btn) => $el.children().last().before($btn),
   })
 }
 
