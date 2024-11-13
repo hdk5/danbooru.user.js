@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Upload To Danbooru
 // @author       hdk5
-// @version      20241106223343
+// @version      20241311115801
 // @description  another userscript for uploading to danbooru
 // @namespace    https://github.com/hdk5/danbooru.user.js
 // @homepageURL  https://github.com/hdk5/danbooru.user.js
@@ -583,10 +583,18 @@ function initializeBluesky() {
 
   findAndAttach({
     selector: 'div',
-    predicate: 'div[data-testid^="feedItem-by-"], div[data-testid^="postThreadItem-by-"]',
+    predicate: 'div[data-testid^="feedItem-by-"]',
     asyncAttach: true,
-    toUrl: el => $(el).find('a').filter((i, el) => /\/profile\/[\w.]+\/post\/\w+/.exec($(el).attr('href'))).prop('href'),
-    callback: async ($el, $btn) => $el.find('div[data-testid="postDropdownBtn"]').parent().parent().parent().append($btn),
+    toUrl: el => $(el).find('a').filter((i, el) => /\/profile\/[\w.-]+\/post\/\w+/.exec($(el).attr('href'))).prop('href'),
+    callback: async ($el, $btn) => $el.find('[data-testid="postDropdownBtn"]').parent().parent().parent().append($btn),
+  })
+
+  findAndAttach({
+    selector: 'div',
+    predicate: 'div[data-testid^="postThreadItem-by-"]',
+    asyncAttach: true,
+    toUrl: locationToRef,
+    callback: async ($el, $btn) => $el.find('[data-testid="postDropdownBtn"]').parent().parent().parent().append($btn),
   })
 }
 
