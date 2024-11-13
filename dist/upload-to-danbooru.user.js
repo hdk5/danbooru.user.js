@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Upload To Danbooru
 // @author       hdk5
-// @version      20241311115801
+// @version      20241311120704
 // @description  another userscript for uploading to danbooru
 // @namespace    https://github.com/hdk5/danbooru.user.js
 // @homepageURL  https://github.com/hdk5/danbooru.user.js
@@ -236,6 +236,10 @@ function findAndAttach(options) {
     else {
       $btn.attr('href', await fetchUploadUrl())
       $btn.attr('target', '_blank')
+
+      $btn.on('click', e => e.stopPropagation())
+      $btn.on('auxclick', e => e.stopPropagation())
+      $btn.on('mousedown', e => e.stopPropagation())
     }
 
     await fullOptions.callback($el, $btn)
