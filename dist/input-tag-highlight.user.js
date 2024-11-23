@@ -198,6 +198,84 @@ function tokenize(input) {
   return tokens
 }
 
+async function fillTagCache(tokens) {
+  // TODO: fix post_count for aliases
+  // https://github.com/danbooru/danbooru/issues/5850
+  const missingTags = tokens
+    .filter(token => token.type === 'tag' && !(token.value in TAG_CACHE))
+    .map(token => token.value)
+
+  if (missingTags.length === 0)
+    return
+
+  const chunkSize = 1000
+  for (let i = 0; i < missingTags.length; i += chunkSize) {
+    const chunk = missingTags.slice(i, i + chunkSize)
+    const resp = await $.post('/tags.json', {
+      _method: 'get',
+      limit: chunkSize,
+      only: 'name,post_count,category,is_deprecated',
+      search: {
+        name_array: chunk,
+      },
+    })
+    const tagData = Object.fromEntries(resp.map(tag => [tag.name, tag]))
+    for (const tagName of chunk) {
+      const tag = tagData[tagName] ?? {
+        name: tagName,
+        post_count: 0,
+        category: 0,
+        is_deprecated: false,
+      }
+      TAG_CACHE[tagName] = tag
+    }
+  }
+}
+
+function applyHighlights(tokens) {
+  const nodes = []
+
+  for (const token of tokens) {
+    const htmlToken = $('<span></span')
+    if (token.type === 'metatag') {
+      const htmlName = $('<span></span')
+      htmlName.addClass('tag-highlight-meta-name')
+      htmlName.text(`${token.name}:`)
+
+      const htmlValue = $('<span></span')
+      const cat = RECLASS_METATAGS[token.name]
+      if (cat !== undefined)
+        htmlToken.addClass(`tag-highlight-type-${cat}`)
+      else
+        htmlValue.addClass('tag-highlight-meta-value')
+      htmlValue.text(token.value)
+
+      htmlToken.html([htmlName, htmlValue])
+    }
+    else if (token.type === 'tag') {
+      htmlToken.text(token.value)
+      const tagData = TAG_CACHE[token.value] ?? {
+        category: 0,
+        post_count: 0,
+        is_deprecated: false,
+      }
+      if (tagData.is_deprecated)
+        htmlToken.addClass('tag-highlight-deprecated')
+      else if (!tagData.post_count)
+        htmlToken.addClass('tag-highlight-empty')
+
+      htmlToken.addClass(`tag-highlight-type-${tagData.category}`)
+    }
+    else if (token.type === 'whitespace') {
+      htmlToken.text(token.value)
+    }
+
+    nodes.push(htmlToken)
+  }
+
+  return nodes
+}
+
 $('#post_tag_string').each((i, el) => {
   GM_addStyle(SCRIPT_CSS)
 
@@ -236,84 +314,6 @@ $('#post_tag_string').each((i, el) => {
 
     $input_highlights.html(applyHighlights(tokens))
     handleScroll()
-  }
-
-  async function fillTagCache(tokens) {
-    // TODO: fix post_count for aliases
-    // https://github.com/danbooru/danbooru/issues/5850
-    const missingTags = tokens
-      .filter(token => token.type === 'tag' && !(token.value in TAG_CACHE))
-      .map(token => token.value)
-
-    if (missingTags.length === 0)
-      return
-
-    const chunkSize = 1000
-    for (let i = 0; i < missingTags.length; i += chunkSize) {
-      const chunk = missingTags.slice(i, i + chunkSize)
-      const resp = await $.post('/tags.json', {
-        _method: 'get',
-        limit: chunkSize,
-        only: 'name,post_count,category,is_deprecated',
-        search: {
-          name_array: chunk,
-        },
-      })
-      const tagData = Object.fromEntries(resp.map(tag => [tag.name, tag]))
-      for (const tagName of chunk) {
-        const tag = tagData[tagName] ?? {
-          name: tagName,
-          post_count: 0,
-          category: 0,
-          is_deprecated: false,
-        }
-        TAG_CACHE[tagName] = tag
-      }
-    }
-  }
-
-  function applyHighlights(tokens) {
-    const nodes = []
-
-    for (const token of tokens) {
-      const htmlToken = $('<span></span')
-      if (token.type === 'metatag') {
-        const htmlName = $('<span></span')
-        htmlName.addClass('tag-highlight-meta-name')
-        htmlName.text(`${token.name}:`)
-
-        const htmlValue = $('<span></span')
-        const cat = RECLASS_METATAGS[token.name]
-        if (cat !== undefined)
-          htmlToken.addClass(`tag-highlight-type-${cat}`)
-        else
-          htmlValue.addClass('tag-highlight-meta-value')
-        htmlValue.text(token.value)
-
-        htmlToken.html([htmlName, htmlValue])
-      }
-      else if (token.type === 'tag') {
-        htmlToken.text(token.value)
-        const tagData = TAG_CACHE[token.value] ?? {
-          category: 0,
-          post_count: 0,
-          is_deprecated: false,
-        }
-        if (tagData.is_deprecated)
-          htmlToken.addClass('tag-highlight-deprecated')
-        else if (!tagData.post_count)
-          htmlToken.addClass('tag-highlight-empty')
-
-        htmlToken.addClass(`tag-highlight-type-${tagData.category}`)
-      }
-      else if (token.type === 'whitespace') {
-        htmlToken.text(token.value)
-      }
-
-      nodes.push(htmlToken)
-    }
-
-    return nodes
   }
 
   function handleScroll() {
