@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Danbooru - Input Tag Highlight
 // @author       hdk5
-// @version      20241123025454
+// @version      20241123163057
 // @namespace    https://github.com/hdk5/danbooru.user.js
 // @homepageURL  https://github.com/hdk5/danbooru.user.js
 // @supportURL   https://github.com/hdk5/danbooru.user.js/issues
