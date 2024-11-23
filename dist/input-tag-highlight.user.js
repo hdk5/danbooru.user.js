@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Danbooru - Input Tag Highlight
 // @author       hdk5
-// @version      20241122213328
+// @version      20241123011021
 // @namespace    https://github.com/hdk5/danbooru.user.js
 // @homepageURL  https://github.com/hdk5/danbooru.user.js
 // @supportURL   https://github.com/hdk5/danbooru.user.js/issues
@@ -17,19 +17,52 @@
 */
 
 const SCRIPT_CSS = /* CSS */`
+  *, *::before, *::after {
+    box-sizing: border-box;
+  }
+
+  .tag-highlight-container, .tag-highlight-backdrop, #post_tag_string {
+    width: 100%;
+    height: 10rem;
+  }
+
+  .tag-highlight-highlights, #post_tag_string {
+    padding: 0.25em;
+    font-size: var(--text-sm);
+    line-height: calc(var(--text-sm) * 35 / 24);
+  }
+
+  .tag-highlight-container {
+    display: block;
+    margin: 0 auto;
+    transform: translateZ(0);
+    -webkit-text-size-adjust: none;
+  }
+
+  .tag-highlight-backdrop {
+    position: absolute;
+    z-index: 1;
+    border: 1px solid transparent;
+    overflow: auto;
+    pointer-events: none;
+  }
+
   .tag-highlight-highlights {
     color: transparent;
     white-space: pre-wrap;
     word-wrap: break-word;
   }
 
-  .tag-highlight-backdrop {
+  #post_tag_string {
+    display: block;
+    resize: none;
     position: absolute;
-    overflow: hidden;
-    pointer-events: none;
-    margin: 3.55px;
-
-    font-size: var(--text-sm);
+    color: transparent;
+    caret-color: var(--form-input-text-color);
+    margin: 0;
+    border-radius: 0;
+    overflow: auto;
+    overscroll-behavior: none;
   }
 
   .tag-highlight-empty {
@@ -59,12 +92,6 @@ const SCRIPT_CSS = /* CSS */`
   }
   .tag-highlight-type-5 {
     color: var(--meta-tag-color);
-  }
-
-  #post_tag_string {
-    overscroll-behavior: none;
-    -webkit-text-fill-color: transparent;
-    font-size: var(--text-sm);
   }
 
   html, body[data-current-user-theme="light"] {
@@ -210,11 +237,11 @@ if ($input_textarea.length) {
 
     $input_highlights.html(applyHighlights(tokens))
     handleScroll()
-    fixSize()
   }
 
   async function fillTagCache(tokens) {
     // TODO: fix post_count for aliases
+    // https://github.com/danbooru/danbooru/issues/5850
     const missingTags = tokens
       .filter(token => token.type === 'tag' && !(token.value in TAG_CACHE))
       .map(token => token.value)
@@ -298,14 +325,7 @@ if ($input_textarea.length) {
     $input_backdrop.scrollLeft(scrollLeft)
   }
 
-  function fixSize() {
-    $input_backdrop.width($input_textarea.width())
-    $input_backdrop.height($input_textarea.height())
-  }
-
   $('.post_tag_string').append($input_container)
-
-  new ResizeObserver(fixSize).observe($input_textarea.get(0))
 
   handleInput()
 }
