@@ -205,9 +205,6 @@ async function fillTagCache(tokens) {
     .filter(token => token.type === 'tag' && !(token.value in TAG_CACHE))
     .map(token => token.value)
 
-  if (missingTags.length === 0)
-    return
-
   const chunkSize = 1000
   for (let i = 0; i < missingTags.length; i += chunkSize) {
     const chunk = missingTags.slice(i, i + chunkSize)
@@ -230,6 +227,8 @@ async function fillTagCache(tokens) {
       TAG_CACHE[tagName] = tag
     }
   }
+
+  return missingTags.length
 }
 
 function applyHighlights(tokens) {
@@ -307,14 +306,14 @@ $('#post_tag_string').each((i, el) => {
     const tokens = tokenize(text)
 
     $input_highlights.html(applyHighlights(tokens))
+    handleScroll()
 
-    await fillTagCache(tokens)
+    const tagsLoaded = await fillTagCache(tokens)
 
-    if (handleInputReq !== currentReq)
+    if (tagsLoaded === 0 || handleInputReq !== currentReq)
       return
 
     $input_highlights.html(applyHighlights(tokens))
-    handleScroll()
   }
 
   function handleScroll() {
