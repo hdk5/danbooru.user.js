@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Danbooru - Input Tag Highlight
 // @author       hdk5
-// @version      20241123163057
+// @version      20241123210737
 // @namespace    https://github.com/hdk5/danbooru.user.js
 // @homepageURL  https://github.com/hdk5/danbooru.user.js
 // @supportURL   https://github.com/hdk5/danbooru.user.js/issues
@@ -331,4 +331,7 @@ $('#post_tag_string').each((i, el) => {
 
   $input_textarea.after($input_container)
   $input_container.append($input_textarea.detach())
+
+  if ($input_textarea.is(':visible'))
+    handleInput()
 })
