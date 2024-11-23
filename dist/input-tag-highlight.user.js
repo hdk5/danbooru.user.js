@@ -198,12 +198,16 @@ function tokenize(input) {
   return tokens
 }
 
+function normalizeTag(tag) {
+  return tag.toLowerCase()
+}
+
 async function fillTagCache(tokens) {
   // TODO: fix post_count for aliases
   // https://github.com/danbooru/danbooru/issues/5850
   const missingTags = tokens
     .filter(token => token.type === 'tag' && !(token.value in TAG_CACHE))
-    .map(token => token.value)
+    .map(token => normalizeTag(token.value))
 
   const chunkSize = 1000
   for (let i = 0; i < missingTags.length; i += chunkSize) {
@@ -253,7 +257,7 @@ function applyHighlights(tokens) {
     }
     else if (token.type === 'tag') {
       htmlToken.text(token.value)
-      const tagData = TAG_CACHE[token.value] ?? {
+      const tagData = TAG_CACHE[normalizeTag(token.value)] ?? {
         category: 0,
         post_count: 0,
         is_deprecated: false,
