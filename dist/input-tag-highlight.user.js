@@ -24,6 +24,7 @@ const SCRIPT_CSS = /* CSS */`
 
   .tag-highlight-container, .tag-highlight-backdrop, #post_tag_string {
     width: 100%;
+    max-width: 60rem;
     height: 10rem;
   }
 
@@ -35,7 +36,7 @@ const SCRIPT_CSS = /* CSS */`
 
   .tag-highlight-container {
     display: block;
-    margin: 0 auto;
+    margin: 0;
     transform: translateZ(0);
     -webkit-text-size-adjust: none;
   }
