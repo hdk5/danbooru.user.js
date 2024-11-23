@@ -294,6 +294,7 @@ $('#post_tag_string').each((i, el) => {
 
   $input_textarea.on({
     input: handleInput,
+    focus: handleInput,
     scroll: handleScroll,
   })
 
@@ -326,6 +327,4 @@ $('#post_tag_string').each((i, el) => {
 
   $input_textarea.after($input_container)
   $input_container.append($input_textarea.detach())
-
-  handleInput()
 })
