@@ -1,12 +1,12 @@
 // ==UserScript==
 // @name         Danbooru - Input Tag Highlight
 // @author       hdk5
-// @version      20241123011021
+// @version      20241123025454
 // @namespace    https://github.com/hdk5/danbooru.user.js
 // @homepageURL  https://github.com/hdk5/danbooru.user.js
 // @supportURL   https://github.com/hdk5/danbooru.user.js/issues
-// @updateURL    https://github.com/hdk5/danbooru.user.js/raw/master/dist/upload-to-danbooru.user.js
-// @downloadURL  https://github.com/hdk5/danbooru.user.js/raw/master/dist/upload-to-danbooru.user.js
+// @updateURL    https://github.com/hdk5/danbooru.user.js/raw/master/dist/input-tag-highlight.user.js
+// @downloadURL  https://github.com/hdk5/danbooru.user.js/raw/master/dist/input-tag-highlight.user.js
 // @match        *://*.donmai.us/*
 // @grant        GM_addStyle
 // ==/UserScript==
@@ -16,6 +16,7 @@
   $
 */
 
+// https://codersblock.com/blog/highlight-text-inside-a-textarea/
 const SCRIPT_CSS = /* CSS */`
   *, *::before, *::after {
     box-sizing: border-box;
@@ -197,11 +198,10 @@ function tokenize(input) {
   return tokens
 }
 
-const $input_textarea = $('#post_tag_string').detach()
-
-if ($input_textarea.length) {
+$('#post_tag_string').each((i, el) => {
   GM_addStyle(SCRIPT_CSS)
 
+  const $input_textarea = $(el)
   const $input_container = $('<div></div>', {
     class: 'tag-highlight-container',
   })
@@ -213,7 +213,6 @@ if ($input_textarea.length) {
   })
   $input_container.append($input_backdrop)
   $input_backdrop.append($input_highlights)
-  $input_container.append($input_textarea)
 
   $input_textarea.on({
     input: handleInput,
@@ -325,7 +324,8 @@ if ($input_textarea.length) {
     $input_backdrop.scrollLeft(scrollLeft)
   }
 
-  $('.post_tag_string').append($input_container)
+  $input_textarea.after($input_container)
+  $input_container.append($input_textarea.detach())
 
   handleInput()
-}
+})
