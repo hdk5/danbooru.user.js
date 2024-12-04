@@ -1,0 +1,1 @@
+../dist/estimate-jpeg-quality.user.js

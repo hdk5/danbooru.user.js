@@ -79,6 +79,16 @@ When used with [PostModeMenu+](https://danbooru.donmai.us/forum_topics/21812), a
 
 [Install](/dist/sticky-search.user.js?raw=1)
 
+### Estimate JPEG Quality
+
+Shows JPEG quantization info on upload/media asset page:
+
+- quantization matrix digest;
+- chroma subsampling;
+- estimated quality (0-100).
+
+[Install](/dist/estimate-jpeg-quality.user.js?raw=1)
+
 ### Frontpage
 
 Transforms the frontpage (`/`) into the imitation of the old `static-index` page with catgirls counter.
