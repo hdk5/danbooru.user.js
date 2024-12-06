@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Danbooru - Estimate JPEG quality
 // @author       hdk5
-// @version      20241204181739
+// @version      20241206012823
 // @namespace    https://github.com/hdk5/danbooru.user.js
 // @homepageURL  https://github.com/hdk5/danbooru.user.js
 // @supportURL   https://github.com/hdk5/danbooru.user.js/issues
@@ -18,37 +18,69 @@
   CryptoJS
 */
 
+const markerLenBytes = {
+  /* eslint-disable antfu/consistent-list-newline */
+  0x00: 0, 0x01: 0,
+  0xD0: 0, 0xD1: 0, 0xD2: 0, 0xD3: 0, 0xD4: 0, 0xD5: 0, 0xD6: 0, 0xD7: 0,
+  0xD8: 0, 0xD9: 0, 0xDA: 0,
+  0x30: 0, 0x31: 0, 0x32: 0, 0x33: 0, 0x34: 0, 0x35: 0, 0x36: 0, 0x37: 0,
+  0x38: 0, 0x39: 0, 0x3A: 0, 0x3B: 0, 0x3C: 0, 0x3D: 0, 0x3E: 0, 0x3F: 0,
+  0x4F: 0,
+  0x92: 0, 0x93: 0,
+  0x74: 4, 0x75: 4, 0x77: 4,
+  /* eslint-enable antfu/consistent-list-newline */
+}
+
 function extractJPEGMetadata(data) {
   const dqtList = []
   let subsampling
 
   let offset = 0
-  while (offset < data.length - 1) {
-    if (data[offset] === 0xFF) {
-      const marker = data[offset + 1]
-      const length = (data[offset + 2] << 8) | data[offset + 3]
-      const segment = data.slice(offset + 2 + 2, offset + 2 + length)
 
-      // DQT
-      // https://github.com/exiftool/exiftool/blob/b6d6096376f940912506e2df7a11ce57ac144269/lib/Image/ExifTool.pm#L7422
-      if (marker === 0xDB) {
-        const num = segment[0] & 0x0F // table number
-        dqtList[num] = segment
-      }
+  for (; offset < data.length - 1; offset++) {
+    if (data[offset] === 0xFF && data[offset + 1] === 0xD8)
+      break
+  }
 
-      // SOF
-      // https://github.com/exiftool/exiftool/blob/b6d6096376f940912506e2df7a11ce57ac144269/lib/Image/ExifTool.pm#L7204
-      if ((marker & 0xF0) === 0xC0 && (marker === 0xC0 || (marker & 0x03)) && subsampling === undefined) {
-        subsampling = ''
-        for (let i = 0; i < segment[5]; ++i) {
-          const factor = segment[6 + 3 * i + 1]
-          subsampling += (factor >> 4)
-          subsampling += (factor & 0x0F)
-        }
-      }
+  offset += 2
+
+  for (; offset < data.length - 1; offset++) {
+    if (data[offset] !== 0xFF)
+      continue
+
+    const marker = data[offset + 1]
+
+    if (marker === 0xFF)
+      continue
+    if (marker === 0xD9 || marker === 0xDA || marker === 0x93)
+      break
+
+    let length = 0
+    for (let n = 0; n < (markerLenBytes[marker] ?? 2); n++) {
+      length <<= 8
+      length |= data[offset + 2 + n]
     }
 
-    offset++
+    const segment = data.slice(offset + 2 + 2, offset + 2 + length)
+    offset += length + 1
+
+    // DQT
+    // https://github.com/exiftool/exiftool/blob/b6d6096376f940912506e2df7a11ce57ac144269/lib/Image/ExifTool.pm#L7422
+    if (marker === 0xDB) {
+      const num = segment[0] & 0x0F // table number
+      dqtList[num] = segment
+    }
+
+    // SOF
+    // https://github.com/exiftool/exiftool/blob/b6d6096376f940912506e2df7a11ce57ac144269/lib/Image/ExifTool.pm#L7204
+    if ((marker & 0xF0) === 0xC0 && (marker === 0xC0 || (marker & 0x03)) && subsampling === undefined) {
+      subsampling = ''
+      for (let i = 0; i < segment[5]; ++i) {
+        const factor = segment[6 + 3 * i + 1]
+        subsampling += (factor >> 4)
+        subsampling += (factor & 0x0F)
+      }
+    }
   }
 
   return { dqtList, subsampling }
