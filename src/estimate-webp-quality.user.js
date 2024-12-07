@@ -1,0 +1,1 @@
+../dist/estimate-webp-quality.user.js

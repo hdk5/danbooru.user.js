@@ -89,6 +89,16 @@ Shows JPEG quantization info on upload/media asset page:
 
 [Install](/dist/estimate-jpeg-quality.user.js?raw=1)
 
+### Estimate WEBP Quality
+
+Shows webp compression info on upload/media asset page:
+
+- lossless or lossy;
+- frames count per type for animations;
+- estimated quality (0-100) for lossy.
+
+[Install](/dist/estimate-jpeg-quality.user.js?raw=1)
+
 ### Frontpage
 
 Transforms the frontpage (`/`) into the imitation of the old `static-index` page with catgirls counter.
