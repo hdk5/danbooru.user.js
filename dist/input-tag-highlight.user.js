@@ -72,6 +72,7 @@ const SCRIPT_CSS = /* CSS */`
   }
   .tag-highlight-deprecated {
     text-decoration: line-through;
+    color: var(--artist-tag-color)!important;
   }
   .tag-highlight-meta-name {
     color: var(--tag-highlight-meta-name-color);
