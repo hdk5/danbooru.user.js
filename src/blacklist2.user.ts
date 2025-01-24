@@ -3,13 +3,20 @@ import { Post } from './Post'
 import { QueryParser } from './QueryParser'
 
 function refreshBlacklist(): void {
+  const disabled = Danbooru.Blacklist.entries.filter(entry => entry.disabled)
+  Danbooru.Blacklist.entries.forEach(entry => entry.disabled = false)
+
+  $('#blacklist-list').empty()
   if (Danbooru.Blacklist.apply() > 0) {
     Danbooru.Blacklist.update_sidebar()
   }
   else {
-    $('#blacklist-list').empty()
     $('#blacklist-box').hide()
   }
+
+  disabled.forEach((entry) => {
+    $('#blacklist-list li a').filter((i, el) => $(el).text() === entry.tags).trigger('click')
+  })
 }
 
 $(() => {
