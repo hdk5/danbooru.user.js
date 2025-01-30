@@ -6,7 +6,8 @@ function refreshBlacklist(): void {
   const disabled = Danbooru.Blacklist.entries.filter(entry => entry.disabled)
   Danbooru.Blacklist.entries.forEach(entry => entry.disabled = false)
 
-  $('#blacklist-list').empty()
+  $('#blacklist-list li:not([id])').remove()
+
   if (Danbooru.Blacklist.apply() > 0) {
     Danbooru.Blacklist.update_sidebar()
   }
@@ -14,9 +15,12 @@ function refreshBlacklist(): void {
     $('#blacklist-box').hide()
   }
 
-  disabled.forEach((entry) => {
-    $('#blacklist-list li a').filter((i, el) => $(el).text() === entry.tags).trigger('click')
-  })
+  const disabledTags = disabled.map(entry => entry.tags)
+  $('#blacklist-list li:not([id]) a')
+    .filter((i, el) => disabledTags.includes($(el).text()))
+    .addClass('blacklisted-inactive')
+  disabled.forEach(entry => entry.disabled = true)
+  Danbooru.Blacklist.apply()
 }
 
 $(() => {
@@ -40,7 +44,7 @@ $(() => {
   }
 
   Danbooru.Blacklist.entries = []
-  $('#blacklist-list').empty()
+  $('#blacklist-list li:not([id])').remove()
   $('#blacklist-box').hide()
 
   Danbooru.Blacklist.initialize_all()
