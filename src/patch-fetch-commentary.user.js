@@ -1,0 +1,1 @@
+../dist/patch-fetch-commentary.user.js
