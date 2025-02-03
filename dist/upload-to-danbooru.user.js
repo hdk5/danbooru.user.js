@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Upload To Danbooru
 // @author       hdk5
-// @version      20241311190443
+// @version      20250203051724
 // @description  another userscript for uploading to danbooru
 // @namespace    https://github.com/hdk5/danbooru.user.js
 // @homepageURL  https://github.com/hdk5/danbooru.user.js
@@ -26,8 +26,8 @@
 // @grant        GM_getResourceURL
 // @grant        GM_getValue
 // @grant        GM_setValue
-// @grant        GM_registerMenuCommand
 // @grant        GM_openInTab
+// @grant        GM_registerMenuCommand
 // @grant        GM_xmlhttpRequest
 // @inject-into  content
 // @noframes
@@ -41,9 +41,10 @@
 /* globals
   GM_addStyle
   GM_getResourceURL
-  GM_registerMenuCommand
   GM_openInTab
+  GM_registerMenuCommand
   GM_xmlhttpRequest
+
   GM_config
   MutationSummary
   $
@@ -55,8 +56,20 @@ GM_config.init({
   fields: {
     booru: {
       label: 'Danbooru domain',
+      section: ['General'],
       type: 'text',
       default: 'https://danbooru.donmai.us',
+    },
+    container_enabled: {
+      label: 'Enabled',
+      section: ['Container', 'Firefox, Violentmonkey only'],
+      type: 'checkbox',
+      default: false,
+    },
+    container_id: {
+      label: 'Container ID',
+      type: 'int',
+      default: 0,
     },
   },
 })
@@ -215,6 +228,7 @@ function findAndAttach(options) {
           GM_openInTab(await fetchUploadUrl(), {
             active: ev.button === 0,
             setParent: true,
+            container: (GM_config.get('container_enabled') || null) && GM_config.get('container_id'),
           })
         }
         catch (err) {
