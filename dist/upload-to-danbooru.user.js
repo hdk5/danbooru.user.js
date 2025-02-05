@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Upload To Danbooru
 // @author       hdk5
-// @version      20250203051724
+// @version      20250205090111
 // @description  another userscript for uploading to danbooru
 // @namespace    https://github.com/hdk5/danbooru.user.js
 // @homepageURL  https://github.com/hdk5/danbooru.user.js
@@ -28,7 +28,7 @@
 // @grant        GM_setValue
 // @grant        GM_openInTab
 // @grant        GM_registerMenuCommand
-// @grant        GM_xmlhttpRequest
+// @grant        GM.xmlHttpRequest
 // @inject-into  content
 // @noframes
 // @connect      lohas.nicoseiga.jp
@@ -39,11 +39,11 @@
 // ==/UserScript==
 
 /* globals
+  GM
   GM_addStyle
   GM_getResourceURL
   GM_openInTab
   GM_registerMenuCommand
-  GM_xmlhttpRequest
 
   GM_config
   MutationSummary
@@ -154,20 +154,6 @@ function parseHtml(text, baseHref) {
   base.href = baseHref
   document.head.appendChild(base)
   return document
-}
-
-function GM_fetch(options) {
-  return new Promise((resolve, reject) => {
-    GM_xmlhttpRequest({
-      ...options,
-      onload(response) {
-        resolve(response)
-      },
-      onerror(error) {
-        reject(error)
-      },
-    })
-  })
 }
 
 function findAndAttach(options) {
@@ -491,7 +477,7 @@ function initializeNicoSeiga() {
     classes: ['ex-utb-upload-button-absolute'],
     asyncClick: true,
     toUrl: async (el) => {
-      const response = await GM_fetch({
+      const response = await GM.xmlHttpRequest({
         url: $(el).prop('href'),
       })
       return response.finalUrl.replace(/\/o\//, '/priv/')
