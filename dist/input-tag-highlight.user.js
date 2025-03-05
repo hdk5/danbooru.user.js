@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Danbooru - Input Tag Highlight
 // @author       hdk5
-// @version      20241123210737
+// @version      20250305111817
 // @namespace    https://github.com/hdk5/danbooru.user.js
 // @homepageURL  https://github.com/hdk5/danbooru.user.js
 // @supportURL   https://github.com/hdk5/danbooru.user.js/issues
@@ -53,6 +53,10 @@ const SCRIPT_CSS = /* CSS */`
     color: transparent;
     white-space: pre-wrap;
     word-wrap: break-word;
+  }
+
+  .tag-highlight-highlights:after {
+    content: "\\FEFF";
   }
 
   #post_tag_string {
@@ -240,13 +244,13 @@ function applyHighlights(tokens) {
   const nodes = []
 
   for (const token of tokens) {
-    const htmlToken = $('<span></span')
+    const htmlToken = $('<span></span>')
     if (token.type === 'metatag') {
-      const htmlName = $('<span></span')
+      const htmlName = $('<span></span>')
       htmlName.addClass('tag-highlight-meta-name')
       htmlName.text(`${token.name}:`)
 
-      const htmlValue = $('<span></span')
+      const htmlValue = $('<span></span>')
       const cat = RECLASS_METATAGS[token.name]
       if (cat !== undefined)
         htmlToken.addClass(`tag-highlight-type-${cat}`)
