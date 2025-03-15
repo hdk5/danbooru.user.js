@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Danbooru - Upload to Gelbooru
 // @author       hdk5
-// @version      20250315210419
+// @version      20250315211512
 // @namespace    https://github.com/hdk5/danbooru.user.js
 // @homepageURL  https://github.com/hdk5/danbooru.user.js
 // @supportURL   https://github.com/hdk5/danbooru.user.js/issues
@@ -242,7 +242,13 @@ function extractTags() {
     const error = $(responseHtml).find('.alert-warning')
 
     if (error.length === 0) {
-      newPostUrl = response.finalUrl
+      const ogUrl = $(responseHtml).find('meta[property=\'og:image\']').attr('content')
+      if (ogUrl) {
+        newPostUrl = ogUrl
+      }
+      else {
+        newPostUrl = response.finalUrl
+      }
     }
     else if (error.text().startsWith('That image already exists. You can find it here')) {
       newPostUrl = error.find('a').prop('href')
