@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Danbooru - Panzoom
 // @author       hdk5
-// @version      20241106223343
+// @version      20250316192617
 // @namespace    https://github.com/hdk5/danbooru.user.js
 // @homepageURL  https://github.com/hdk5/danbooru.user.js
 // @supportURL   https://github.com/hdk5/danbooru.user.js/issues
@@ -37,6 +37,7 @@ class MediaAssetComponent {
     this.$component.css('max-height', 'var(--height)')
     this.$component.css('min-height', 'var(--height)')
     this.$component.css('overflow', 'hidden')
+    this.$component.removeClass('media-asset-component-fit-height')
 
     this.$container = this.$component.find('.media-asset-container')
     this.$container.css('width', '100%')
