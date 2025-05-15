@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Upload To Danbooru
 // @author       hdk5
-// @version      20250205090111
+// @version      20250515042312
 // @description  another userscript for uploading to danbooru
 // @namespace    https://github.com/hdk5/danbooru.user.js
 // @homepageURL  https://github.com/hdk5/danbooru.user.js
@@ -22,6 +22,7 @@
 // @match        *://inkbunny.net/*
 // @match        *://xfolio.jp/*
 // @match        *://bsky.app/*
+// @match        *://gall.dcinside.com/*
 // @grant        GM_addStyle
 // @grant        GM_getResourceURL
 // @grant        GM_getValue
@@ -602,6 +603,29 @@ function initializeBluesky() {
   })
 }
 
+function initializeDcinside() {
+  findAndAttach({
+    selector: 'div.imgwrap',
+    asyncAttach: true,
+    classes: ['ex-utb-upload-button-absolute'],
+    toUrl: (el) => {
+      const mediaElement = $(el).find('img, video')
+      let src = mediaElement.attr('data-src') || mediaElement.attr('src')
+      if (mediaElement.attr('onclick')) {
+        const onclick = mediaElement.attr('onclick')
+        const match = /^javascript:imgPop\('([^']*)'/.exec(onclick)
+        if (match) {
+          src = match[1]
+        }
+      }
+      src = src.replace('viewimagePop.php', 'viewimage.php')
+      return src
+    },
+    toRef: locationToRef,
+    callback: async ($el, $btn) => $el.prepend($btn),
+  })
+}
+
 function initialize() {
   GM_addStyle(PROGRAM_CSS)
 
@@ -641,6 +665,9 @@ function initialize() {
       break
     case 'bsky.app':
       initializeBluesky()
+      break
+    case 'gall.dcinside.com':
+      initializeDcinside()
       break
   }
 }
