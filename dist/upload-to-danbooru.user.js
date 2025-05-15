@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Upload To Danbooru
 // @author       hdk5
-// @version      20250515042312
+// @version      20250515050403
 // @description  another userscript for uploading to danbooru
 // @namespace    https://github.com/hdk5/danbooru.user.js
 // @homepageURL  https://github.com/hdk5/danbooru.user.js
@@ -672,4 +672,4 @@ function initialize() {
   }
 }
 
-initialize()
+setTimeout(initialize, 0)
