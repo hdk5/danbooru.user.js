@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Danbooru - Panzoom
 // @author       hdk5
-// @version      20250316192617
+// @version      20250520155842
 // @namespace    https://github.com/hdk5/danbooru.user.js
 // @homepageURL  https://github.com/hdk5/danbooru.user.js
 // @supportURL   https://github.com/hdk5/danbooru.user.js/issues
@@ -90,7 +90,7 @@ class MediaAssetComponent {
   }
 
   get zoomLevel() {
-    return (this.$image.width() * this.panzoom.getTransform().scale) / Number(this.$image.attr('width'))
+    return (this.$image.width() * this.panzoom.getTransform().scale) / Number(this.$component.css('--media-asset-width'))
   }
 }
 
