@@ -1,28 +1,25 @@
-// TODO: remove everything userscript specific from here
-type AST = import('../AST').AST
+declare class Blacklist {
+  static Rule = class {
+    constructor(blacklist: Blacklist, string: string)
+    match(post: BlacklistPost): boolean
+  }
 
-interface BlacklistEntry {
-  tags: string
-  disabled: boolean
-  ast: AST
+  static Post = class {
+    constructor(post: PostHTMLElement, blacklist: Blacklist)
+  }
+
+  rules: BlacklistRule[]
+  posts: BlacklistPost[]
+  initialize(rules: string[]): void
+  apply(): void
+  cleanupStorage(): void
 }
 
 declare let Danbooru: {
-  Blacklist: {
-    entries: BlacklistEntry[]
-    parse_entry: (str: string) => BlacklistEntry
-    post_match: (post: PostHTMLElement, entry: BlacklistEntry) => boolean
-    initialize_all: () => void
-    apply: () => number
-    update_sidebar: () => void
-  }
+  Blacklist: typeof Blacklist
   RelatedTag: {
     current_tags: () => string[]
     update_selected: () => void
-  }
-  Utility: {
-    regexp_escape: (string) => string
-    splitWords: (string) => string[]
   }
 }
 

@@ -1,67 +1,39 @@
+import type { AST } from './AST'
 import { Metatag } from './Metatag'
-import { Post } from './Post'
+import { Post as PostWrapper } from './Post'
 import { QueryParser } from './QueryParser'
 
-function refreshBlacklist(): void {
-  const disabled = Danbooru.Blacklist.entries.filter(entry => entry.disabled)
-  Danbooru.Blacklist.entries.forEach(entry => entry.disabled = false)
-
-  $('#blacklist-list li:not([id])').remove()
-
-  if (Danbooru.Blacklist.apply() > 0) {
-    Danbooru.Blacklist.update_sidebar()
+class Blacklist extends Danbooru.Blacklist {
+  override initialize(rules: string[]) {
+    this.rules = rules.map(rule => new Rule(this, rule))
+    this.posts = $<PostHTMLElement>('.post-preview, .image-container, #c-comments .post, .mod-queue-preview.post-preview')
+      .toArray()
+      .map(post => new Post(post, this))
+    this.apply()
+    this.cleanupStorage()
   }
-  else {
-    $('#blacklist-box').hide()
-  }
-
-  const disabledTags = disabled.map(entry => entry.tags)
-  $('#blacklist-list li:not([id]) a')
-    .filter((i, el) => disabledTags.includes($(el).text()))
-    .addClass('blacklisted-inactive')
-  disabled.forEach(entry => entry.disabled = true)
-  Danbooru.Blacklist.apply()
 }
 
-$(() => {
-  if ($('#blacklist-box').length === 0)
-    return
+class Rule extends Danbooru.Blacklist.Rule {
+  ast: AST
 
-  Danbooru.Blacklist.post_match = (post, entry): boolean => {
-    if (entry.disabled)
-      return false
-
-    return entry.ast.match(new Post(post))
+  constructor(blacklist: Blacklist, string: string) {
+    super(blacklist, string)
+    this.ast = QueryParser.parse(string, Metatag.NAMES)
   }
 
-  const super_parse_entry = Danbooru.Blacklist.parse_entry
-  Danbooru.Blacklist.parse_entry = (str): BlacklistEntry => {
-    const entry = super_parse_entry(str)
-
-    entry.ast = QueryParser.parse(str, Metatag.NAMES)
-
-    return entry
+  override match(post: Post) {
+    return this.ast.match(post.x_post)
   }
+}
 
-  Danbooru.Blacklist.entries = []
-  $('#blacklist-list li:not([id])').remove()
-  $('#blacklist-box').hide()
+class Post extends Danbooru.Blacklist.Post {
+  x_post: PostWrapper
 
-  Danbooru.Blacklist.initialize_all()
+  constructor(post: PostHTMLElement, blacklist: Blacklist) {
+    super(post, blacklist)
+    this.x_post = new PostWrapper(post)
+  }
+}
 
-  new MutationObserver((mutations, _observer) => {
-    for (const mutation of mutations) {
-      for (const node of mutation.addedNodes) {
-        if (
-          node instanceof HTMLElement
-          && node.classList.contains('post-votes')
-        ) {
-          refreshBlacklist()
-        }
-      }
-    }
-  }).observe(document.body, {
-    childList: true,
-    subtree: true,
-  })
-})
+Danbooru.Blacklist = Blacklist
