@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Danbooru - Input Tag Highlight
 // @author       hdk5
-// @version      20250305111817
+// @version      20250623034007
 // @namespace    https://github.com/hdk5/danbooru.user.js
 // @homepageURL  https://github.com/hdk5/danbooru.user.js
 // @supportURL   https://github.com/hdk5/danbooru.user.js/issues
@@ -301,9 +301,10 @@ $('#post_tag_string').each((i, el) => {
   $input_backdrop.append($input_highlights)
 
   $input_textarea.on({
-    input: handleInput,
-    focus: handleInput,
-    scroll: handleScroll,
+    'input': handleInput,
+    'focus': handleInput,
+    'danbooru:update-tag-counter': handleInput,
+    'scroll': handleScroll,
   })
 
   let handleInputReq
