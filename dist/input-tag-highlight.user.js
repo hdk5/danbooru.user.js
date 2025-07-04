@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Danbooru - Input Tag Highlight
 // @author       hdk5
-// @version      20250623034007
+// @version      20250704035522
 // @namespace    https://github.com/hdk5/danbooru.user.js
 // @homepageURL  https://github.com/hdk5/danbooru.user.js
 // @supportURL   https://github.com/hdk5/danbooru.user.js/issues
@@ -64,7 +64,7 @@ const SCRIPT_CSS = /* CSS */`
     resize: none;
     position: absolute;
     color: transparent;
-    caret-color: var(--form-input-text-color);
+    caret-color: var(--text-color);
     margin: 0;
     border-radius: 0;
     overflow: auto;
