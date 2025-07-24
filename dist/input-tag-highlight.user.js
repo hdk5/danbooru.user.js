@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Danbooru - Input Tag Highlight
 // @author       hdk5
-// @version      20250704035522
+// @version      20250724163121
 // @namespace    https://github.com/hdk5/danbooru.user.js
 // @homepageURL  https://github.com/hdk5/danbooru.user.js
 // @supportURL   https://github.com/hdk5/danbooru.user.js/issues
@@ -47,6 +47,7 @@ const SCRIPT_CSS = /* CSS */`
     border: 1px solid transparent;
     overflow: auto;
     pointer-events: none;
+    opacity: unset;
   }
 
   .tag-highlight-highlights {
@@ -293,6 +294,7 @@ $('#post_tag_string').each((i, el) => {
   })
   const $input_backdrop = $('<div></div>', {
     class: 'tag-highlight-backdrop',
+    inert: '',
   })
   const $input_highlights = $('<div></div>', {
     class: 'tag-highlight-highlights',
