@@ -1,0 +1,3 @@
+[submodule "src/private"]
+	path = src/private
+	url = git@github.com:hdk5/danbooru.user.js-private.git
