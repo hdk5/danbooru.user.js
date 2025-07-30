@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Upload To Danbooru
 // @author       hdk5
-// @version      20250515050403
+// @version      20250730192743
 // @description  another userscript for uploading to danbooru
 // @namespace    https://github.com/hdk5/danbooru.user.js
 // @homepageURL  https://github.com/hdk5/danbooru.user.js
@@ -219,7 +219,7 @@ function findAndAttach(options) {
 
         try {
           GM_openInTab(await fetchUploadUrl(), {
-            active: ev.button === 0,
+            active: ev.button === 0 && !ev.ctrlKey,
             setParent: true,
             container: (GM_config.get('container_enabled') || null) && GM_config.get('container_id'),
           });
