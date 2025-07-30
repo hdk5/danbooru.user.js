@@ -3,6 +3,7 @@ import solid from 'eslint-plugin-solid/configs/typescript';
 
 export default antfu(
   {
+    lessOpinionated: true,
     stylistic: {
       semi: true,
     },

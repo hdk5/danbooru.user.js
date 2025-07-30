@@ -73,11 +73,11 @@ GM_config.init({
       default: 0,
     },
   },
-})
+});
 
 GM_registerMenuCommand('Settings', () => {
-  GM_config.open()
-})
+  GM_config.open();
+});
 
 const PROGRAM_CSS = `
 .ex-utb-upload-button {
@@ -112,49 +112,51 @@ const PROGRAM_CSS = `
   height: 1.2em;
   vertical-align: middle;
 }
-`
+`;
 
 // Tag function for template literals to remove newlines and leading spaces
 function noIndents(strings, ...values) {
   // Remove all spaces before/after a tag and leave one in other cases
   const compactStrings = strings.map(str =>
     str.replace(/(>)?\n *(<)?/g, (s, lt, gt) => lt && gt ? lt + gt : lt || gt ? lt || gt : ' '),
-  )
+  );
 
-  const res = Array.from({ length: values.length * 2 + 1 })
+  const res = Array.from({ length: values.length * 2 + 1 });
 
   for (let i = 0; i < values.length; i++) {
-    res[i * 2] = compactStrings[i]
-    res[i * 2 + 1] = values[i]
+    res[i * 2] = compactStrings[i];
+    res[i * 2 + 1] = values[i];
   }
-  res[res.length - 1] = compactStrings[compactStrings.length - 1]
+  res[res.length - 1] = compactStrings[compactStrings.length - 1];
 
-  return res.join('')
+  return res.join('');
 }
 
-const locationToRef = async _el => window.location
+const locationToRef = async _el => window.location;
 
 function generateUploadUrl(url, ref) {
-  const booru = GM_config.get('booru')
-  const uploadUrl = new URL('uploads/new', booru)
+  const booru = GM_config.get('booru');
+  const uploadUrl = new URL('uploads/new', booru);
 
-  uploadUrl.searchParams.set('url', url)
+  uploadUrl.searchParams.set('url', url);
 
-  if (ref)
-    uploadUrl.searchParams.set('ref', ref)
+  if (ref) {
+    uploadUrl.searchParams.set('ref', ref);
+  }
 
-  return uploadUrl.href
+  return uploadUrl.href;
 }
 
 function parseHtml(text, baseHref) {
-  if (baseHref === undefined)
-    baseHref = new URL('/', window.location).href
+  if (baseHref === undefined) {
+    baseHref = new URL('/', window.location).href;
+  }
 
-  const document = new DOMParser().parseFromString(text, 'text/html')
-  const base = document.createElement('base')
-  base.href = baseHref
-  document.head.appendChild(base)
-  return document
+  const document = new DOMParser().parseFromString(text, 'text/html');
+  const base = document.createElement('base');
+  base.href = baseHref;
+  document.head.appendChild(base);
+  return document;
 }
 
 function findAndAttach(options) {
@@ -168,21 +170,23 @@ function findAndAttach(options) {
     toRef: async _el => null,
     callback: async (_el, _btn) => null,
     ...options,
-  }
+  };
 
   if (typeof fullOptions.predicate === 'string') {
-    const predicateSelector = fullOptions.predicate
-    fullOptions.predicate = el => $(el).is(predicateSelector)
+    const predicateSelector = fullOptions.predicate;
+    fullOptions.predicate = el => $(el).is(predicateSelector);
   }
 
   const attach = async (el) => {
-    if (!fullOptions.predicate(el))
-      return
-    if (el.hasAttribute('ex-utb'))
-      return
-    el.setAttribute('ex-utb', '')
+    if (!fullOptions.predicate(el)) {
+      return;
+    }
+    if (el.hasAttribute('ex-utb')) {
+      return;
+    }
+    el.setAttribute('ex-utb', '');
 
-    const $el = $(el)
+    const $el = $(el);
     const $btn = $(noIndents`
       <a class="ex-utb-upload-button">
         <img
@@ -190,73 +194,76 @@ function findAndAttach(options) {
           title="Upload to Danbooru"
           src="${GM_getResourceURL('danbooru_icon')}">
       </a>
-    `)
+    `);
 
-    fullOptions.classes.forEach(clazz => $btn.addClass(clazz))
+    fullOptions.classes.forEach(clazz => $btn.addClass(clazz));
 
     const fetchUploadUrl = async () => {
-      const url = await fullOptions.toUrl(el)
-      const ref = await fullOptions.toRef(el)
-      return generateUploadUrl(url, ref)
-    }
+      const url = await fullOptions.toUrl(el);
+      const ref = await fullOptions.toRef(el);
+      return generateUploadUrl(url, ref);
+    };
 
     if (fullOptions.asyncClick) {
-      let ready = true
+      let ready = true;
       const onclick = async (ev) => {
-        if (!ready)
-          return
-        if (![0, 1].includes(ev.button))
-          return
+        if (!ready) {
+          return;
+        }
+        if (![0, 1].includes(ev.button)) {
+          return;
+        }
 
-        ready = false
-        $btn.css('cursor', 'wait')
+        ready = false;
+        $btn.css('cursor', 'wait');
 
         try {
           GM_openInTab(await fetchUploadUrl(), {
             active: ev.button === 0,
             setParent: true,
             container: (GM_config.get('container_enabled') || null) && GM_config.get('container_id'),
-          })
+          });
         }
         catch (err) {
-          console.error(err)
+          console.error(err);
         }
 
-        $btn.css('cursor', '')
-        ready = true
-      }
+        $btn.css('cursor', '');
+        ready = true;
+      };
 
-      $btn.on('click', e => e.preventDefault())
-      $btn.on('auxclick', e => e.preventDefault())
-      $btn.on('click', onclick)
-      $btn.on('auxclick', onclick)
+      $btn.on('click', e => e.preventDefault());
+      $btn.on('auxclick', e => e.preventDefault());
+      $btn.on('click', onclick);
+      $btn.on('auxclick', onclick);
 
       // Prevent middle-click autoscroll
-      $btn.on('mousedown', e => e.preventDefault())
+      $btn.on('mousedown', e => e.preventDefault());
     }
     else {
-      $btn.attr('href', await fetchUploadUrl())
-      $btn.attr('target', '_blank')
+      $btn.attr('href', await fetchUploadUrl());
+      $btn.attr('target', '_blank');
 
-      $btn.on('click', e => e.stopPropagation())
-      $btn.on('auxclick', e => e.stopPropagation())
-      $btn.on('mousedown', e => e.stopPropagation())
+      $btn.on('click', e => e.stopPropagation());
+      $btn.on('auxclick', e => e.stopPropagation());
+      $btn.on('mousedown', e => e.stopPropagation());
     }
 
-    await fullOptions.callback($el, $btn)
+    await fullOptions.callback($el, $btn);
+  };
+
+  $(fullOptions.selector).each((i, el) => attach(el));
+
+  if (!fullOptions.asyncAttach) {
+    return;
   }
-
-  $(fullOptions.selector).each((i, el) => attach(el))
-
-  if (!fullOptions.asyncAttach)
-    return
 
   // eslint-disable-next-line no-new
   new MutationSummary({
     rootNode: document.body,
     queries: [{ element: fullOptions.selector }],
     callback: ([summary]) => summary.added.forEach(attach),
-  })
+  });
 }
 
 function initializeFantia() {
@@ -264,10 +271,10 @@ function initializeFantia() {
   // 2. album_image (e.g. https://fantia.jp/posts/2293136)
   // 3. download  (e.g. https://fantia.jp/posts/61560)
 
-  const postUrlMatch = /^\/posts\/\d+/.exec(new URL(window.location).pathname)
+  const postUrlMatch = /^\/posts\/\d+/.exec(new URL(window.location).pathname);
   if (postUrlMatch) {
-    const ref = new URL(postUrlMatch[0], window.location).href
-    const toRef = async () => ref
+    const ref = new URL(postUrlMatch[0], window.location).href;
+    const toRef = async () => ref;
 
     // 1 - original image
     findAndAttach({
@@ -281,7 +288,7 @@ function initializeFantia() {
       toUrl: async el => el.src,
       toRef,
       callback: async ($el, $btn) => $btn.insertBefore($el),
-    })
+    });
 
     // 1 - thumbnail
     findAndAttach({
@@ -295,16 +302,16 @@ function initializeFantia() {
       asyncAttach: true,
       asyncClick: true,
       toUrl: async (el) => {
-        const fileId = /\/(\d+)\//.exec(new URL(el.src).pathname)[1]
-        const imagePageUrl = `${ref}/post_content_photo/${fileId}`
-        const imagePageResponse = await fetch(imagePageUrl)
-        const imagePageHtml = await imagePageResponse.text()
-        const imagePageDom = parseHtml(imagePageHtml)
-        return $(imagePageDom).find('img').prop('src')
+        const fileId = /\/(\d+)\//.exec(new URL(el.src).pathname)[1];
+        const imagePageUrl = `${ref}/post_content_photo/${fileId}`;
+        const imagePageResponse = await fetch(imagePageUrl);
+        const imagePageHtml = await imagePageResponse.text();
+        const imagePageDom = parseHtml(imagePageHtml);
+        return $(imagePageDom).find('img').prop('src');
       },
       toRef,
       callback: async ($el, $btn) => $btn.insertBefore($el.closest('.image-container')),
-    })
+    });
 
     // 2
     findAndAttach({
@@ -316,7 +323,7 @@ function initializeFantia() {
       toUrl: async el => (await fetch(el.href)).url,
       toRef,
       callback: async ($el, $btn) => $el.prepend($btn),
-    })
+    });
 
     // 3
     findAndAttach({
@@ -328,7 +335,7 @@ function initializeFantia() {
       toUrl: async el => (await fetch(el.href)).url,
       toRef,
       callback: async ($el, $btn) => $btn.insertBefore($el),
-    })
+    });
   }
 }
 
@@ -338,7 +345,7 @@ function initializeMisskey() {
     .ex-utb-upload-button-icon {
       height: 1.5em;
     }
-  `)
+  `);
 
   // Timeline
   // User notes
@@ -348,7 +355,7 @@ function initializeMisskey() {
     asyncAttach: true,
     toUrl: async el => $(el).find('.xAtlm a').prop('href'),
     callback: async ($el, $btn) => $el.find('.xlT1y').prepend($btn),
-  })
+  });
 
   // Note
   findAndAttach({
@@ -357,7 +364,7 @@ function initializeMisskey() {
     asyncAttach: true,
     toUrl: async el => $(el).find('.xi1ty a').prop('href'),
     callback: async ($el, $btn) => $el.find('.xlT1y').prepend($btn),
-  })
+  });
 }
 
 function initializePixiv() {
@@ -371,7 +378,7 @@ function initializePixiv() {
     ],
     asyncAttach: true,
     callback: async ($el, $btn) => $btn.insertBefore($el),
-  })
+  });
 }
 
 function initializeNijie() {
@@ -380,7 +387,7 @@ function initializeNijie() {
       border: unset !important;
       padding: unset !important;
     }
-  `)
+  `);
 
   // Post thumbnails
   findAndAttach({
@@ -389,7 +396,7 @@ function initializeNijie() {
     asyncAttach: true,
     toUrl: async el => $(el).find('a').prop('href'),
     callback: async ($el, $btn) => $el.find('.mozamoza').parent().prepend($btn),
-  })
+  });
 }
 
 function initializeTwitter() {
@@ -429,22 +436,23 @@ function initializeTwitter() {
     .ex-utb-upload-button-twitter-hover:hover {
       background: rgba(174,137,102,0.15);
     }
-  `)
+  `);
 
-  const toRef = async el => $(el).find('time').closest('a').prop('href')
+  const toRef = async el => $(el).find('time').closest('a').prop('href');
 
   const toUrl = async (el) => {
-    let url
+    let url;
 
-    const tweetPhoto = $(el).find('[data-testid="tweetPhoto"]').not('div[role="link"] *')
-    if (tweetPhoto.length === 1)
-      url = tweetPhoto.find('img, video').not('div[data-testid="previewInterstitial"] *').attr('src')
+    const tweetPhoto = $(el).find('[data-testid="tweetPhoto"]').not('div[role="link"] *');
+    if (tweetPhoto.length === 1) {
+      url = tweetPhoto.find('img, video').not('div[data-testid="previewInterstitial"] *').attr('src');
+    }
+    if (url === undefined) {
+      url = await toRef(el);
+    };
 
-    if (url === undefined)
-      url = await toRef(el)
-
-    return url
-  }
+    return url;
+  };
 
   findAndAttach({
     selector: 'article',
@@ -454,10 +462,10 @@ function initializeTwitter() {
     toUrl,
     toRef,
     callback: async ($el, $btn) => {
-      $btn.append('<div class="ex-utb-upload-button-twitter-hover">')
-      $el.find('div[role=group]').append($btn)
+      $btn.append('<div class="ex-utb-upload-button-twitter-hover">');
+      $el.find('div[role=group]').append($btn);
     },
-  })
+  });
 }
 
 function initializeCien() {
@@ -469,7 +477,7 @@ function initializeCien() {
     toUrl: async el => $(el).attr('data-raw'),
     toRef: locationToRef,
     callback: async ($el, $btn) => $btn.insertBefore($el),
-  })
+  });
 }
 
 function initializeNicoSeiga() {
@@ -480,12 +488,12 @@ function initializeNicoSeiga() {
     toUrl: async (el) => {
       const response = await GM.xmlHttpRequest({
         url: $(el).prop('href'),
-      })
-      return response.finalUrl.replace(/\/o\//, '/priv/')
+      });
+      return response.finalUrl.replace(/\/o\//, '/priv/');
     },
     toRef: locationToRef,
     callback: async ($el, $btn) => $btn.insertBefore($el),
-  })
+  });
 }
 
 function initializeMastodon() {
@@ -504,7 +512,7 @@ function initializeMastodon() {
     .ex-utb-upload-button-icon {
       height: 18px;
     }
-  `)
+  `);
 
   findAndAttach({
     selector: 'div',
@@ -515,7 +523,7 @@ function initializeMastodon() {
       .find('a.status__relative-time, a.detailed-status__datetime')
       .prop('href'),
     callback: async ($el, $btn) => $el.children().last().before($btn),
-  })
+  });
 }
 
 function initializeInkbunny() {
@@ -525,7 +533,7 @@ function initializeInkbunny() {
       margin: unset;
       vertical-align: unset;
     }
-  `)
+  `);
 
   findAndAttach({
     selector: 'div.widget_thumbnailFromSubmission_icons',
@@ -535,7 +543,7 @@ function initializeInkbunny() {
       .find('div.widget_imageFromSubmission a')
       .prop('href'),
     callback: async ($el, $btn) => $el.append($btn),
-  })
+  });
 }
 
 function initializeXfolio() {
@@ -550,18 +558,19 @@ function initializeXfolio() {
     .ex-utb-upload-button-icon {
       height: auto;
     }
-  `)
+  `);
 
   const toUrl = async (el) => {
     // TODO: doesn't work on the main danbooru instance
-    let url = $(el).find('img').attr('src')
+    let url = $(el).find('img').attr('src');
 
-    const openIcon = $(el).find('.openIcon')
-    if (openIcon.length === 1)
-      url = openIcon.attr('href')
+    const openIcon = $(el).find('.openIcon');
+    if (openIcon.length === 1) {
+      url = openIcon.attr('href');
+    }
 
-    return url
-  }
+    return url;
+  };
 
   findAndAttach({
     selector: 'div.article__wrap_img',
@@ -569,7 +578,7 @@ function initializeXfolio() {
     toUrl,
     toRef: locationToRef,
     callback: async ($el, $btn) => $el.append($btn),
-  })
+  });
 }
 
 function initializeBluesky() {
@@ -584,7 +593,7 @@ function initializeBluesky() {
     .ex-utb-upload-button:hover {
       background: rgba(174,137,102,0.15);
     }
-  `)
+  `);
 
   findAndAttach({
     selector: 'div',
@@ -592,7 +601,7 @@ function initializeBluesky() {
     asyncAttach: true,
     toUrl: el => $(el).find('a').filter((i, el) => /\/profile\/[\w.-]+\/post\/\w+/.exec($(el).attr('href'))).prop('href'),
     callback: async ($el, $btn) => $el.find('[data-testid="postDropdownBtn"]').parent().parent().parent().append($btn),
-  })
+  });
 
   findAndAttach({
     selector: 'div',
@@ -600,7 +609,7 @@ function initializeBluesky() {
     asyncAttach: true,
     toUrl: locationToRef,
     callback: async ($el, $btn) => $el.find('[data-testid="postDropdownBtn"]').parent().parent().parent().append($btn),
-  })
+  });
 }
 
 function initializeDcinside() {
@@ -609,67 +618,67 @@ function initializeDcinside() {
     asyncAttach: true,
     classes: ['ex-utb-upload-button-absolute'],
     toUrl: (el) => {
-      const mediaElement = $(el).find('img, video')
-      let src = mediaElement.attr('data-src') || mediaElement.attr('src')
+      const mediaElement = $(el).find('img, video');
+      let src = mediaElement.attr('data-src') || mediaElement.attr('src');
       if (mediaElement.attr('onclick')) {
-        const onclick = mediaElement.attr('onclick')
-        const match = /^javascript:imgPop\('([^']*)'/.exec(onclick)
+        const onclick = mediaElement.attr('onclick');
+        const match = /^javascript:imgPop\('([^']*)'/.exec(onclick);
         if (match) {
-          src = match[1]
+          src = match[1];
         }
       }
-      src = src.replace('viewimagePop.php', 'viewimage.php')
-      return src
+      src = src.replace('viewimagePop.php', 'viewimage.php');
+      return src;
     },
     toRef: locationToRef,
     callback: async ($el, $btn) => $el.prepend($btn),
-  })
+  });
 }
 
 function initialize() {
-  GM_addStyle(PROGRAM_CSS)
+  GM_addStyle(PROGRAM_CSS);
 
   switch (window.location.host) {
     case 'fantia.jp':
-      initializeFantia()
-      break
+      initializeFantia();
+      break;
     case 'misskey.io':
-      initializeMisskey()
-      break
+      initializeMisskey();
+      break;
     case 'www.pixiv.net':
-      initializePixiv()
-      break
+      initializePixiv();
+      break;
     case 'nijie.info':
-      initializeNijie()
-      break
+      initializeNijie();
+      break;
     case 'twitter.com':
     case 'x.com':
-      initializeTwitter()
-      break
+      initializeTwitter();
+      break;
     case 'ci-en.net':
     case 'ci-en.dlsite.com':
-      initializeCien()
-      break
+      initializeCien();
+      break;
     case 'seiga.nicovideo.jp':
-      initializeNicoSeiga()
-      break
+      initializeNicoSeiga();
+      break;
     case 'baraag.net':
     case 'pawoo.net':
-      initializeMastodon()
-      break
+      initializeMastodon();
+      break;
     case 'inkbunny.net':
-      initializeInkbunny()
-      break
+      initializeInkbunny();
+      break;
     case 'xfolio.jp':
-      initializeXfolio()
-      break
+      initializeXfolio();
+      break;
     case 'bsky.app':
-      initializeBluesky()
-      break
+      initializeBluesky();
+      break;
     case 'gall.dcinside.com':
-      initializeDcinside()
-      break
+      initializeDcinside();
+      break;
   }
 }
 
-setTimeout(initialize, 0)
+setTimeout(initialize, 0);
