@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         XHS - Copy DText
 // @author       hdk5
-// @version      1
+// @version      20250812131415
 // @namespace    https://github.com/hdk5/danbooru.user.js
 // @homepageURL  https://github.com/hdk5/danbooru.user.js
 // @supportURL   https://github.com/hdk5/danbooru.user.js/issues
@@ -9,68 +9,105 @@
 // @downloadURL  https://github.com/hdk5/danbooru.user.js/raw/master/dist/upload-to-gelbooru.user.js
 // @match        https://www.xiaohongshu.com/*
 // @grant        none
+// @require      https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js
+// @require      https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.14.1/jquery-ui.min.js
 // ==/UserScript==
 
+/* globals
+  $
+*/
+
+$('head').append($('<link>', {
+  rel: 'stylesheet',
+  type: 'text/css',
+  href: '//cdnjs.cloudflare.com/ajax/libs/jqueryui/1.14.1/themes/base/jquery-ui.min.css',
+}));
+
 function convertHtml(el) {
-  let output = '';
+  return $(el).contents().filter(function () {
+    return this.nodeType === Node.ELEMENT_NODE || this.nodeType === Node.TEXT_NODE;
+  }).map(function () {
+    const $node = $(this);
 
-  el.childNodes.forEach((node) => {
-    if (node.nodeType !== Node.ELEMENT_NODE && node.nodeType !== Node.TEXT_NODE) {
-      return;
+    if ($node.hasClass('tag')) {
+      // TPT fucks up the layout a bit - can't use just .text()
+      const tag = $node.contents().filter(function () {
+        return this.nodeType === Node.TEXT_NODE;
+      }).text();
+      return `"${tag}":[https://www.xiaohongshu.com/search_result?keyword=${encodeURIComponent(tag.slice(1))}]`;
     }
 
-    if (node.id === 'hash-tag') {
-      // TPT fucks up the layout a bit - can't use .innerText
-      let tag = '';
-      node.childNodes.forEach((cn) => {
-        if (cn.nodeType === Node.TEXT_NODE) {
-          tag += cn.textContent.trim();
-        }
-      });
-      output += `"${tag}":[https://www.xiaohongshu.com/search_result?keyword=${encodeURIComponent(tag.slice(1))}]`;
-      return;
+    if ($node.hasClass('note-content-user')) {
+      const user = $node.text().trim();
+      const userId = $node.attr('data-user-id');
+      return `"${user}":[https://www.xiaohongshu.com/user/profile/${userId}]`;
     }
 
-    if (node.className === 'note-content-user') {
-      const user = node.textContent.trim();
-      const userId = node.getAttribute('data-user-id');
-      output += `"${user}":[https://www.xiaohongshu.com/user/profile/${userId}]`;
-      return;
+    if ($node.hasClass('note-content-emoji')) {
+      const emojiUrl = $node.attr('src');
+      return `"[emoji]":[${emojiUrl}]`;
     }
 
-    if (node.className === 'note-content-emoji') {
-      const emojiUrl = node.getAttribute('src');
-      output += `"[emoji]":[${emojiUrl}]`;
-      return;
+    if (this.nodeType === Node.ELEMENT_NODE) {
+      console.warn('Unsupported element:', this);
     }
 
-    if (node.nodeType === Node.ELEMENT_NODE) {
-      console.warn('Unsupported element:', node);
-    }
-
-    output += node.textContent;
-  });
-
-  return output;
+    return $node.text();
+  }).get().join('');
 }
 
 function addButtons() {
-  document.querySelectorAll('.note-text:not(:has(+ .ex-copy-dtext))').forEach((note) => {
-    const btn = document.createElement('a');
-    btn.className = 'ex-copy-dtext';
-    btn.textContent = 'Copy DText';
-    btn.style.display = 'block';
-    btn.style.cursor = 'pointer';
+  $('.note-text:not(:has(+ .ex-copy-dtext))').each(function () {
+    const note = this;
+    const $note = $(note);
 
-    btn.addEventListener('click', (ev) => {
-      ev.preventDefault();
-      const output = convertHtml(note);
-      if (confirm(output)) {
-        navigator.clipboard.writeText(output);
-      };
+    const $btn = $('<a>', {
+      class: 'ex-copy-dtext',
+      text: 'Copy DText',
+      css: {
+        display: 'block',
+        cursor: 'pointer',
+      },
     });
 
-    note.insertAdjacentElement('afterend', btn);
+    $btn.on('click', (ev) => {
+      ev.preventDefault();
+      const output = convertHtml(note);
+      $('<div>', {
+        title: 'Copy DText',
+        html: [
+          $('<textarea>', {
+            readonly: true,
+            css: {
+              width: '100%',
+              height: '200px',
+              boxSizing: 'border-box',
+            },
+            val: output,
+          }),
+        ],
+      }).dialog({
+        modal: true,
+        width: 600,
+        buttons: [
+          {
+            text: 'Copy',
+            click() {
+              navigator.clipboard.writeText(output);
+              $(this).dialog('close');
+            },
+          },
+          {
+            text: 'Close',
+            click() {
+              $(this).dialog('close');
+            },
+          },
+        ],
+      });
+    });
+
+    $note.after($btn);
   });
 }
 
