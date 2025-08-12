@@ -1,0 +1,1 @@
+../dist/xhs-copy-dtext.user.js
