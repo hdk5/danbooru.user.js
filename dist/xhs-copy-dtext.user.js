@@ -23,8 +23,16 @@ $('head').append($('<link>', {
   href: '//cdnjs.cloudflare.com/ajax/libs/jqueryui/1.14.1/themes/base/jquery-ui.min.css',
 }));
 
+function reprNode(node) {
+  const tag = node.tagName.toLowerCase();
+  const id = node.id ? `#${node.id}` : '';
+  const cls = node.className.split(' ').map(c => `.${c}`).join('');
+  return `${tag}${id}${cls}`;
+}
+
 function convertHtml(el) {
-  return $(el).contents().filter(function () {
+  const errors = [];
+  const text = $(el).contents().filter(function () {
     return this.nodeType === Node.ELEMENT_NODE || this.nodeType === Node.TEXT_NODE;
   }).map(function () {
     const $node = $(this);
@@ -49,11 +57,14 @@ function convertHtml(el) {
     }
 
     if (this.nodeType === Node.ELEMENT_NODE) {
+      errors.push(`Unsupported element: ${reprNode(this)}`);
       console.warn('Unsupported element:', this);
     }
 
     return $node.text();
   }).get().join('');
+
+  return { text, errors };
 }
 
 function addButtons() {
@@ -72,28 +83,54 @@ function addButtons() {
 
     $btn.on('click', (ev) => {
       ev.preventDefault();
-      const output = convertHtml(note);
-      $('<div>', {
+      const { text, errors } = convertHtml(note);
+      const $dialog = $('<div>', {
         title: 'Copy DText',
-        html: [
-          $('<textarea>', {
-            readonly: true,
-            css: {
-              width: '100%',
-              height: '200px',
-              boxSizing: 'border-box',
-            },
-            val: output,
-          }),
-        ],
-      }).dialog({
+      });
+
+      if (errors.length) {
+        $('<div>', {
+          text: 'Errors:',
+          css: {
+            fontWeight: 'bold',
+          },
+        }).appendTo($dialog);
+        $('<textarea>', {
+          readonly: true,
+          css: {
+            width: '100%',
+            height: '50px',
+            boxSizing: 'border-box',
+            marginBottom: '0.5em',
+          },
+          val: errors.join('\n'),
+        }).appendTo($dialog);
+      }
+
+      $('<div>', {
+        text: 'DText:',
+        css: {
+          fontWeight: 'bold',
+        },
+      }).appendTo($dialog);
+      $('<textarea>', {
+        readonly: true,
+        css: {
+          width: '100%',
+          height: '200px',
+          boxSizing: 'border-box',
+        },
+        val: text,
+      }).appendTo($dialog);
+
+      $dialog.dialog({
         modal: true,
         width: 600,
         buttons: [
           {
             text: 'Copy',
             click() {
-              navigator.clipboard.writeText(output);
+              navigator.clipboard.writeText(text);
               $(this).dialog('close');
             },
           },
