@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         XHS - Copy DText
 // @author       hdk5
-// @version      20250812131415
+// @version      20250812222222
 // @namespace    https://github.com/hdk5/danbooru.user.js
 // @homepageURL  https://github.com/hdk5/danbooru.user.js
 // @supportURL   https://github.com/hdk5/danbooru.user.js/issues
@@ -33,7 +33,7 @@ function reprNode(node) {
 function convertHtml(el) {
   const errors = [];
   const text = $(el).contents().filter(function () {
-    return this.nodeType === Node.ELEMENT_NODE || this.nodeType === Node.TEXT_NODE;
+    return this.nodeType === Node.ELEMENT_NODE;
   }).map(function () {
     const $node = $(this);
 
@@ -56,7 +56,11 @@ function convertHtml(el) {
       return `"[emoji]":[${emojiUrl}]`;
     }
 
-    if (this.nodeType === Node.ELEMENT_NODE) {
+    if (
+      this.tagName !== 'SPAN'
+      || this.id !== ''
+      || this.className !== ''
+    ) {
       errors.push(`Unsupported element: ${reprNode(this)}`);
       console.warn('Unsupported element:', this);
     }
