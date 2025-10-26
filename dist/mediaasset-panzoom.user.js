@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Danbooru - Panzoom
 // @author       hdk5
-// @version      20250520155842
+// @version      20251026222905
 // @namespace    https://github.com/hdk5/danbooru.user.js
 // @homepageURL  https://github.com/hdk5/danbooru.user.js
 // @supportURL   https://github.com/hdk5/danbooru.user.js/issues
