@@ -23,7 +23,7 @@ class MediaAssetComponent {
       if (el.exPanzoom === undefined) {
         el.exPanzoom = new MediaAssetComponent(el);
       }
-          });
+    });
   }
 
   constructor(element) {
@@ -63,7 +63,9 @@ class MediaAssetComponent {
       this.$image.css('max-height', '100%');
       this.$image.css('max-width', '100%');
 
-      this.panzoom = panzoom(this.$panzoom.get(0));
+      this.panzoom = panzoom(this.$panzoom.get(0), {
+        beforeWheel: (event) => this.handleWheel(event),
+      });
 
       this.fit();
       this.$zoomLevel.on('click', () => this.fit());
@@ -77,6 +79,7 @@ class MediaAssetComponent {
   fit() {
     this.panzoom.zoomAbs(0, 0, 1);
     this.panzoom.moveTo(0, 0);
+    this.setRotation(0);
   }
 
   updateZoom() {
@@ -84,6 +87,22 @@ class MediaAssetComponent {
 
     // Rendering without smoothing makes checking for artifacts easier
     this.$container.css('image-rendering', this.zoomLevel > 1 ? 'pixelated' : 'auto');
+  }
+
+  handleWheel(event) {
+    if (!event.altKey) {
+      return false;
+    }
+
+    const degrees = Math.sign(event.deltaY) * 15;
+    this.setRotation(this.rotation + degrees);
+
+    return true;
+  }
+
+  setRotation(angle) {
+    this.rotation = angle;
+    this.$image.css('transform', `rotate(${this.rotation}deg)`);
   }
 
   get zoomLevel() {
