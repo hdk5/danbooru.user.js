@@ -20,14 +20,10 @@
 class MediaAssetComponent {
   static initialize() {
     $('.media-asset-component').each((i, el) => {
-      if (el.hasAttribute('ex-panzoom')) {
-        return;
+      if (el.exPanzoom === undefined) {
+        el.exPanzoom = new MediaAssetComponent(el);
       }
-      el.setAttribute('ex-panzoom', '');
-
-      // eslint-disable-next-line no-new
-      new MediaAssetComponent(el);
-    });
+          });
   }
 
   constructor(element) {
