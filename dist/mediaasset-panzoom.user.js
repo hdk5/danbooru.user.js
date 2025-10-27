@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Danbooru - Panzoom
 // @author       hdk5
-// @version      20251026222905
+// @version      20251027162911
 // @namespace    https://github.com/hdk5/danbooru.user.js
 // @homepageURL  https://github.com/hdk5/danbooru.user.js
 // @supportURL   https://github.com/hdk5/danbooru.user.js/issues
@@ -11,6 +11,11 @@
 // @grant        none
 // @require      https://unpkg.com/panzoom@9.4.3/dist/panzoom.min.js
 // ==/UserScript==
+
+// Scroll zooms
+// Dragging pans
+// Alt+scroll rotates
+// Click on zoom level resets
 
 /* globals
   $
@@ -93,6 +98,8 @@ class MediaAssetComponent {
     if (!event.altKey) {
       return false;
     }
+
+    event.preventDefault();
 
     const degrees = Math.sign(event.deltaY) * 15;
     this.setRotation(this.rotation + degrees);
