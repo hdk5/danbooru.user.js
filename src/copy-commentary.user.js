@@ -1,0 +1,1 @@
+../dist/copy-commentary.user.js
