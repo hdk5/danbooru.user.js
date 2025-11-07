@@ -383,10 +383,13 @@ function initializePixiv() {
 }
 
 function initializeFanbox() {
-  const postUrlMatch = /^\/posts\/\d+/.exec(new URL(window.location).pathname);
+  const postUrlMatch
+= /https?:\/\/www\.fanbox\.cc\/@(?<username>[^/]+)\/posts\/(?<post_id>\d+)/.exec(window.location.href)
+      || /https?:\/\/(?<username>[^.]+)\.fanbox\.cc\/posts\/(?<post_id>\d+)/.exec(window.location.href);
 
   if (postUrlMatch) {
-    const ref = new URL(postUrlMatch[0], window.location).href;
+    const { username, post_id } = postUrlMatch.groups;
+    const ref = `https://${username}.fanbox.cc/posts/${post_id}`;
     const toRef = async () => ref;
     findAndAttach({
       selector: 'a',
@@ -699,10 +702,11 @@ function initialize() {
     case 'gall.dcinside.com':
       initializeDcinside();
       break;
+default:
+      if (window.location.host.endsWith('.fanbox.cc')) {
+        initializeFanbox();
   }
-  if (window.location.host.endsWith(".fanbox.cc")) {
-    initializeFanbox();
-  }
+    }
 }
 
 setTimeout(initialize, 0);
