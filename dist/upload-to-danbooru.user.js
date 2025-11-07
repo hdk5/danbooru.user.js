@@ -11,6 +11,7 @@
 // @match        *://fantia.jp/*
 // @match        *://misskey.io/*
 // @match        *://www.pixiv.net/*
+// @match        *://*.fanbox.cc/*
 // @match        *://nijie.info/*
 // @match        *://twitter.com/*
 // @match        *://x.com/*
@@ -381,6 +382,26 @@ function initializePixiv() {
   });
 }
 
+function initializeFanbox() {
+  const postUrlMatch = /^\/posts\/\d+/.exec(new URL(window.location).pathname);
+
+  if (postUrlMatch) {
+    const ref = new URL(postUrlMatch[0], window.location).href;
+    const toRef = async () => ref;
+    findAndAttach({
+      selector: 'a',
+      predicate: 'a[class|="PostImage__Anchor-sc"]',
+      classes: [
+        'ex-utb-upload-button-absolute',
+      ],
+      asyncAttach: true,
+      toUrl: async el => el.href,
+      toRef,
+      callback: async ($el, $btn) => $btn.insertBefore($el),
+    });
+  }
+}
+
 function initializeNijie() {
   GM_addStyle(`
     .ex-utb-upload-button-icon {
@@ -678,6 +699,9 @@ function initialize() {
     case 'gall.dcinside.com':
       initializeDcinside();
       break;
+  }
+  if (window.location.host.endsWith(".fanbox.cc")) {
+    initializeFanbox();
   }
 }
 
