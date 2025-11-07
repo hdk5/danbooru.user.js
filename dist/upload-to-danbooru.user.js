@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Upload To Danbooru
 // @author       hdk5
-// @version      20251107122204
+// @version      20251107141516
 // @description  another userscript for uploading to danbooru
 // @namespace    https://github.com/hdk5/danbooru.user.js
 // @homepageURL  https://github.com/hdk5/danbooru.user.js
@@ -383,38 +383,28 @@ function initializePixiv() {
 }
 
 function initializeFanbox() {
-  const postUrlMatch
-    = /https?:\/\/www\.fanbox\.cc\/@(?<username>[^/]+)\/posts\/(?<post_id>\d+)/.exec(window.location.href)
-      || /https?:\/\/(?<username>[^.]+)\.fanbox\.cc\/posts\/(?<post_id>\d+)/.exec(window.location.href);
+  // Post images
+  findAndAttach({
+    selector: 'a',
+    predicate: 'a[class|="PostImage__Anchor"]',
+    classes: [
+      'ex-utb-upload-button-absolute',
+    ],
+    asyncAttach: true,
+    toUrl: async el => el.href,
+    toRef: locationToRef,
+    callback: async ($el, $btn) => $btn.insertBefore($el),
+  });
 
-  if (postUrlMatch) {
-    const { username, post_id } = postUrlMatch.groups;
-    const ref = `https://${username}.fanbox.cc/posts/${post_id}`;
-    const toRef = async () => ref;
-
-    // Post images
-    findAndAttach({
-      selector: 'a',
-      predicate: 'a[class|="PostImage__Anchor"]',
-      classes: [
-        'ex-utb-upload-button-absolute',
-      ],
-      asyncAttach: true,
-      toUrl: async el => el.href,
-      toRef,
-      callback: async ($el, $btn) => $btn.insertBefore($el),
-    });
-
-    // Downloadable attachments
-    findAndAttach({
-      selector: 'a',
-      predicate: 'a[class|="FileContent__DownloadLink"]',
-      asyncAttach: true,
-      toUrl: async el => el.href,
-      toRef,
-      callback: async ($el, $btn) => $el.find('button div').prepend($btn),
-    });
-  }
+  // Downloadable attachments
+  findAndAttach({
+    selector: 'a',
+    predicate: 'a[class|="FileContent__DownloadLink"]',
+    asyncAttach: true,
+    toUrl: async el => el.href,
+    toRef: locationToRef,
+    callback: async ($el, $btn) => $el.find('button div').prepend($btn),
+  });
 }
 
 function initializeNijie() {
