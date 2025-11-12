@@ -68,15 +68,29 @@ class MediaAssetComponent {
       this.$image.css('max-height', '100%');
       this.$image.css('max-width', '100%');
 
+      this.minZoom = 0.2;
+      this.maxZoom = 15;
+
       this.panzoom = panzoom(this.$panzoom.get(0), {
         beforeWheel: (event) => this.handleWheel(event),
+        maxZoom: this.maxZoom,
+        minZoom: this.minZoom
       });
 
       this.fit();
       this.$zoomLevel.on('click', () => this.fit());
 
       this.updateZoom();
-      this.panzoom.on('zoom', () => this.updateZoom());
+      this.panzoom.on('zoom', () => {
+        const t = this.panzoom.getTransform();
+        if (t.scale < this.minZoom) {
+          this.panzoom.zoomAbs(t.x, t.y, this.minZoom);
+        } else if (t.scale > this.maxZoom) {
+          this.panzoom.zoomAbs(t.x, t.y, this.maxZoom);
+        }
+        this.updateZoom();
+      });
+
       new ResizeObserver(() => this.updateZoom()).observe(this.$image.get(0));
     }
   }
