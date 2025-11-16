@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Danbooru - Dock Edit Form
 // @author       hdk5
-// @version      20241106223343
+// @version      20251116013409
 // @namespace    https://github.com/hdk5/danbooru.user.js
 // @homepageURL  https://github.com/hdk5/danbooru.user.js
 // @supportURL   https://github.com/hdk5/danbooru.user.js/issues
@@ -17,6 +17,8 @@
 */
 
 if ($('#c-posts #a-show').length) {
+  const ICONS_URL = $('svg.icon use').attr('href')?.split('#')[0] || '/packs/static/icons-9fcf22a5166a2c24e889.svg';
+
   const uploadEditPanelDock = JSON.parse(Danbooru.Cookie.get('upload_edit_panel_dock') || JSON.stringify('auto'));
   const uploadEditContainerWidth = Danbooru.Cookie.get('upload_edit_container_width');
 
@@ -98,39 +100,39 @@ if ($('#c-posts #a-show').length) {
             <div class="upload-edit-container">
               <div class="inline-block float-right mx-1">
                 <a class="inactive-link" href="javascript:void(0)" aria-expanded="false">
-                  <svg class="icon svg-icon close-icon" viewBox="0 0 320 512"><use fill="currentColor" href="/packs/static/images/icons-f4ca0cd60cf43cc54f9a.svg#xmark"></use></svg>
+                  <svg class="icon svg-icon close-icon" viewBox="0 0 320 512"><use fill="currentColor" href="${ICONS_URL}#xmark"></use></svg>
                 </a>
               </div>
               <div class="popup-menu inline-block float-right mx-1" data-hide-on-click="true">
                 <a class="popup-menu-button inactive-link" href="javascript:void(0)" aria-expanded="false">
-                  <svg class="icon svg-icon ellipsis-icon" viewBox="0 0 448 512"><use fill="currentColor" href="/packs/static/images/icons-f4ca0cd60cf43cc54f9a.svg#ellipsis"></use></svg>
+                  <svg class="icon svg-icon ellipsis-icon" viewBox="0 0 448 512"><use fill="currentColor" href="${ICONS_URL}#ellipsis"></use></svg>
                 </a>
                 <ul class="popup-menu-content">
                   <li>
                     <a x-on:click="dock = 'auto'" id="dock-auto-link" title="Rotate your screen to change layout" href="javascript:void(0)">
                       <svg class="icon svg-icon rotate-icon" viewBox="0 0 512 512">
-                        <use fill="currentColor" href="/packs/static/images/icons-f4ca0cd60cf43cc54f9a.svg#rotate"></use>
+                        <use fill="currentColor" href="${ICONS_URL}#rotate"></use>
                       </svg> Automatic
                     </a>
                   </li>
                   <li>
                     <a x-on:click="dock = 'right'" id="dock-right-link" data-shortcut="shift+r" href="javascript:void(0)" title="Shortcut is shift+r">
                       <svg class="icon svg-icon dock-right-icon" viewBox="0 0 1024 1024">
-                        <use fill="currentColor" href="/packs/static/images/icons-f4ca0cd60cf43cc54f9a.svg#dock-right"></use>
+                        <use fill="currentColor" href="${ICONS_URL}#dock-right"></use>
                       </svg> Dock to Right
                     </a>
                   </li>
                   <li>
                     <a x-on:click="dock = 'bottom'" id="dock-bottom-link" data-shortcut="shift+b" href="javascript:void(0)" title="Shortcut is shift+b">
                       <svg class="icon svg-icon dock-bottom-icon" viewBox="0 0 1024 1024">
-                        <use fill="currentColor" href="/packs/static/images/icons-f4ca0cd60cf43cc54f9a.svg#dock-bottom"></use>
+                        <use fill="currentColor" href="${ICONS_URL}#dock-bottom"></use>
                       </svg> Dock to Bottom
                     </a>
                   </li>
                   <li>
                     <a x-on:click="dock = 'left'" id="dock-left-link" data-shortcut="shift+l" href="javascript:void(0)" title="Shortcut is shift+l">
                       <svg class="icon svg-icon dock-left-icon" viewBox="0 0 1024 1024">
-                        <use fill="currentColor" href="/packs/static/images/icons-f4ca0cd60cf43cc54f9a.svg#dock-left"></use>
+                        <use fill="currentColor" href="${ICONS_URL}#dock-left"></use>
                       </svg> Dock to Left
                     </a>
                   </li>
