@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Danbooru - Dock Edit Form
 // @author       hdk5
-// @version      20251116013409
+// @version      20251116024444
 // @namespace    https://github.com/hdk5/danbooru.user.js
 // @homepageURL  https://github.com/hdk5/danbooru.user.js
 // @supportURL   https://github.com/hdk5/danbooru.user.js/issues
@@ -175,6 +175,7 @@ if ($('#c-posts #a-show').length) {
     $('#page').append(cUploads);
 
     Danbooru.RelatedTag.show();
+    Danbooru.Upload.initialize_draggable_divider();
     mediaAssetComponent.updateHeight();
     mediaAssetComponent.updateZoom();
 
