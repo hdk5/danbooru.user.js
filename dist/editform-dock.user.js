@@ -17,19 +17,19 @@
 */
 
 if ($('#c-posts #a-show').length) {
-  const uploadEditPanelDock = JSON.parse(Danbooru.Cookie.get('upload_edit_panel_dock') || JSON.stringify('auto'))
-  const uploadEditContainerWidth = Danbooru.Cookie.get('upload_edit_container_width')
+  const uploadEditPanelDock = JSON.parse(Danbooru.Cookie.get('upload_edit_panel_dock') || JSON.stringify('auto'));
+  const uploadEditContainerWidth = Danbooru.Cookie.get('upload_edit_container_width');
 
-  const assetWidth = $('body').attr('data-post-image-width')
-  const assetHeight = $('body').attr('data-post-image-height')
+  const assetWidth = $('body').attr('data-post-image-width');
+  const assetHeight = $('body').attr('data-post-image-height');
   const { assetUrl, assetImage } = (() => {
-    let assetUrl, assetImage
+    let assetUrl, assetImage;
 
-    const videoUrl = $('meta[property=\'og:video\']').attr('content')
-    const imageUrl = $('meta[property=\'og:image\']').attr('content')
+    const videoUrl = $('meta[property=\'og:video\']').attr('content');
+    const imageUrl = $('meta[property=\'og:image\']').attr('content');
 
     if (videoUrl) {
-      assetUrl = videoUrl
+      assetUrl = videoUrl;
       assetImage = $(`
         <video
           width="${assetWidth}"
@@ -39,10 +39,10 @@ if ($('#c-posts #a-show').length) {
           controls="controls"
           class="media-asset-image"
         >
-      `)
+      `);
     }
     else {
-      assetUrl = imageUrl
+      assetUrl = imageUrl;
       assetImage = $(`
         <img
           width="${assetWidth}"
@@ -50,21 +50,21 @@ if ($('#c-posts #a-show').length) {
           draggable="false"
           class="media-asset-image"
         >
-      `)
+      `);
     }
 
-    return { assetUrl, assetImage }
-  })()
+    return { assetUrl, assetImage };
+  })();
 
   const assetDesc = (() => {
-    const postInfoSize = $('#post-info-size').text()
-    const size = /Size: (.*)/.exec(postInfoSize)[1]
-    const dims = /\((.*)\)/.exec(postInfoSize)[1]
-    return `${size}, ${dims}`
-  })()
-  const assetPageUrl = $('#post-info-size a:last-of-type').attr('href')
+    const postInfoSize = $('#post-info-size').text();
+    const size = /Size: (.*)/.exec(postInfoSize)[1];
+    const dims = /\((.*)\)/.exec(postInfoSize)[1];
+    return `${size}, ${dims}`;
+  })();
+  const assetPageUrl = $('#post-info-size a:last-of-type').attr('href');
 
-  const cPosts = $('#c-posts')
+  const cPosts = $('#c-posts');
 
   const cUploads = $(`
     <div id="c-uploads">
@@ -141,49 +141,50 @@ if ($('#c-posts #a-show').length) {
         </div>
       </div>
     </div>
-  `)
+  `);
 
-  if (uploadEditContainerWidth !== null)
-    cUploads.find('.upload-container').css('--edit-container-width', uploadEditContainerWidth)
+  if (uploadEditContainerWidth !== null) {
+    cUploads.find('.upload-container').css('--edit-container-width', uploadEditContainerWidth);
+  }
 
-  cUploads.find('.media-asset-container').append(assetImage)
+  cUploads.find('.media-asset-container').append(assetImage);
   cUploads
     .find('.close-icon')
     .closest('div')
     .on('click.danbooru', (e) => {
-      Danbooru.Post.close_edit_dialog()
-      e.preventDefault()
-    })
+      Danbooru.Post.close_edit_dialog();
+      e.preventDefault();
+    });
 
-  const mediaAssetComponent = new Danbooru.MediaAssetComponent(cUploads.find('.media-asset-component'))
+  const mediaAssetComponent = new Danbooru.MediaAssetComponent(cUploads.find('.media-asset-component'));
 
-  const editSection = cPosts.find('#edit')
+  const editSection = cPosts.find('#edit');
 
   Danbooru.Post.open_edit_dialog = function () {
-    cPosts.detach()
+    cPosts.detach();
 
     // Don't load right away in case of shit internet
-    assetImage.attr('src', assetUrl)
+    assetImage.attr('src', assetUrl);
 
-    editSection.css('display', '')
-    editSection.detach()
-    cUploads.find('.upload-edit-container').append(editSection)
+    editSection.css('display', '');
+    editSection.detach();
+    cUploads.find('.upload-edit-container').append(editSection);
 
-    $('#page').append(cUploads)
+    $('#page').append(cUploads);
 
-    Danbooru.RelatedTag.show()
-    mediaAssetComponent.updateHeight()
-    mediaAssetComponent.updateZoom()
+    Danbooru.RelatedTag.show();
+    mediaAssetComponent.updateHeight();
+    mediaAssetComponent.updateZoom();
 
-    $('#post_tag_string').selectEnd()
-  }
+    $('#post_tag_string').selectEnd();
+  };
 
   Danbooru.Post.close_edit_dialog = function () {
-    cUploads.detach()
+    cUploads.detach();
 
-    editSection.detach()
-    cPosts.find('#content').append(editSection)
+    editSection.detach();
+    cPosts.find('#content').append(editSection);
 
-    $('#page').append(cPosts)
-  }
+    $('#page').append(cPosts);
+  };
 }
