@@ -11,7 +11,16 @@
 // @grant        none
 // @require      https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/core.min.js
 // @require      https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/md5.min.js
+// @license      GPL-3.0-or-later
 // ==/UserScript==
+
+/*
+This script includes code adapted from ExifTool (https://exiftool.org), which is licensed under GPL v3.
+The original ExifTool code is copyright © 1998-2025 Phil Harvey.
+
+This script is distributed under the same terms of the GPLv3:
+https://www.gnu.org/licenses/gpl-3.0.html
+*/
 
 /* globals
   $
