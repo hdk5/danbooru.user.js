@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Upload To Danbooru
 // @author       hdk5
-// @version      20251107141516
+// @version      20251123035353
 // @description  another userscript for uploading to danbooru
 // @namespace    https://github.com/hdk5/danbooru.user.js
 // @homepageURL  https://github.com/hdk5/danbooru.user.js
@@ -346,25 +346,30 @@ function initializeMisskey() {
     .ex-utb-upload-button-icon {
       height: 1.5em;
     }
+    .ex-utb-upload-button {
+      margin: unset;
+      margin-bottom: 3px;
+      margin-right: 10px;
+    }
   `);
 
   // Timeline
   // User notes
   findAndAttach({
-    selector: 'article.x5yeR',
-    predicate: '.xvu6Q article.x5yeR',
+    selector: 'article',
+    // predicate: '.xvu6Q article.x5yeR',
     asyncAttach: true,
     toUrl: async el => $(el).find('.xAtlm a').prop('href'),
-    callback: async ($el, $btn) => $el.find('.xlT1y').prepend($btn),
+    callback: async ($el, $btn) => $el.find('footer').append($btn),
   });
 
   // Note
   findAndAttach({
-    selector: 'article.xexC6',
-    predicate: '.xvu6Q article.xexC6',
+    selector: 'article',
+    // predicate: '.xvu6Q article.xexC6',
     asyncAttach: true,
     toUrl: async el => $(el).find('.xi1ty a').prop('href'),
-    callback: async ($el, $btn) => $el.find('.xlT1y').prepend($btn),
+    callback: async ($el, $btn) => $el.find('footer').append($btn),
   });
 }
 
