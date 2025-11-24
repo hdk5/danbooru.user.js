@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         XHS - Copy DText
 // @author       hdk5
-// @version      20250812222222
+// @version      20251124011001
 // @namespace    https://github.com/hdk5/danbooru.user.js
 // @homepageURL  https://github.com/hdk5/danbooru.user.js
 // @supportURL   https://github.com/hdk5/danbooru.user.js/issues
@@ -37,6 +37,11 @@ function convertHtml(el) {
   }).map(function () {
     const $node = $(this);
 
+    const redmojiMap = window.__INITIAL_STATE__?.redMoji?.mojiData?._rawValue?.redmojiMap || {};
+    const redmojiMapInvert = Object.fromEntries(
+      Object.entries(redmojiMap).map(([key, value]) => [value, key]),
+    );
+
     if ($node.hasClass('tag')) {
       // TPT fucks up the layout a bit - can't use just .text()
       const tag = $node.contents().filter(function () {
@@ -53,7 +58,8 @@ function convertHtml(el) {
 
     if ($node.hasClass('note-content-emoji')) {
       const emojiUrl = $node.attr('src');
-      return `"[emoji]":[${emojiUrl}]`;
+      const emojiTag = redmojiMapInvert[emojiUrl] || '[emoji]';
+      return `"${emojiTag}":[${emojiUrl}]`;
     }
 
     if (
