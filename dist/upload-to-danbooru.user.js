@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Upload To Danbooru
 // @author       hdk5
-// @version      20251125044600
+// @version      20251124065045
 // @description  another userscript for uploading to danbooru
 // @namespace    https://github.com/hdk5/danbooru.user.js
 // @homepageURL  https://github.com/hdk5/danbooru.user.js
@@ -360,7 +360,7 @@ function initializeMisskey() {
     // predicate: '.xvu6Q article.x5yeR',
     asyncAttach: true,
     toUrl: async el => $(el).find('.xAtlm a').prop('href'),
-    callback: async ($el, $btn) => $el.find('> footer').append($btn),
+    callback: async ($el, $btn) => $el.find('footer.xhAPG').append($btn),
   });
 
   // Note
