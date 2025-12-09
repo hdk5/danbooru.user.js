@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Danbooru - Copy Commentary
 // @author       hdk5
-// @version      20251104123049
+// @version      20251209215808
 // @namespace    https://github.com/hdk5/danbooru.user.js
 // @homepageURL  https://github.com/hdk5/danbooru.user.js
 // @supportURL   https://github.com/hdk5/danbooru.user.js/issues
@@ -24,8 +24,16 @@ const CSS = `
   }
 
   .copy-commentary-query {
-    display: flex;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    column-gap: 0.5rem;
     align-items: center;
+  }
+
+  .copy-commentary-shortcuts {
+    grid-column: 2 / 3;
+    display: flex;
+    flex-wrap: wrap;
     gap: 0.5rem;
   }
 
@@ -90,6 +98,58 @@ setTimeout(() => {
 
   GM_addStyle(CSS);
 
+  const postId = $('body').data('post-id');
+
+  const $shortcutsWrapper = $('<div>', { class: 'copy-commentary-shortcuts' });
+  let defaultQuery = `id:${postId}`;
+
+  const hasChildren = $('body').data('post-has-children') === 'true';
+  if (hasChildren) {
+    const childrenQuery = `parent:${postId}`;
+    defaultQuery = childrenQuery;
+    const $childrenShortcut = $('<a>', {
+      href: '#',
+      text: 'Children',
+      class: 'text-xs mr-2',
+      click: ev => onClickShortcut(ev, childrenQuery),
+    });
+    $shortcutsWrapper.append($childrenShortcut);
+  }
+
+  const parentId = $('body').data('post-parent-id');
+  if (parentId) {
+    const parentQuery = `id:${parentId}`;
+    const $parentShortcut = $('<a>', {
+      href: '#',
+      text: 'Siblings',
+      class: 'text-xs mr-2',
+      click: ev => onClickShortcut(ev, parentQuery),
+    });
+    $shortcutsWrapper.append($parentShortcut);
+  }
+
+  const pixivId = $('body').data('post-pixiv-id');
+  if (pixivId) {
+    const pixivQuery = `pixiv_id:${pixivId}`;
+    const $pixivShortcut = $('<a>', {
+      href: '#',
+      text: 'Pixiv',
+      class: 'text-xs mr-2',
+      click: ev => onClickShortcut(ev, pixivQuery),
+    });
+    $shortcutsWrapper.append($pixivShortcut);
+  }
+
+  const source = $('#post-info-source a:last').attr('href');
+  const sourceQuery = `source:"${source}"`;
+  const $sourceShortcut = $('<a>', {
+    href: '#',
+    text: 'Source',
+    class: 'text-xs mr-2',
+    click: ev => onClickShortcut(ev, sourceQuery),
+  });
+  $shortcutsWrapper.append($sourceShortcut);
+
   const $copyCommentaryDetails = $('<details>', { class: 'copy-commentary' });
 
   const $queryWrapper = $('<div>', { class: 'copy-commentary-query' });
@@ -100,14 +160,14 @@ setTimeout(() => {
   const $queryInput = $('<input>', {
     type: 'text',
     id: 'copy-commentary-query-input',
-    value: `parent:${$('body').attr('data-post-id')}`,
+    value: defaultQuery,
   });
   const $fetchButton = $('<button>', {
     type: 'button',
     text: 'Fetch',
     click: () => fetchPosts(),
   });
-  $queryWrapper.append($queryLabel, $queryInput, $fetchButton);
+  $queryWrapper.append($queryLabel, $queryInput, $fetchButton, $shortcutsWrapper);
 
   const $resultsTable = $('<table>', { class: 'copy-commentary-results-table' });
   const $resultsThead = $('<thead>');
@@ -250,5 +310,11 @@ setTimeout(() => {
       )
       .addClass(`copy-commentary-status-${status}`)
       .text(status);
+  };
+
+  const onClickShortcut = (ev, tag) => {
+    ev.preventDefault();
+    $queryInput.val(tag);
+    fetchPosts();
   };
 }, 0);
