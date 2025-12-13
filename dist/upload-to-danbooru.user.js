@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Upload To Danbooru
 // @author       hdk5
-// @version      20251124065045
+// @version      20251213184813
 // @description  another userscript for uploading to danbooru
 // @namespace    https://github.com/hdk5/danbooru.user.js
 // @homepageURL  https://github.com/hdk5/danbooru.user.js
@@ -272,8 +272,72 @@ function initializeFantia() {
   // 2. album_image (e.g. https://fantia.jp/posts/2293136)
   // 3. download  (e.g. https://fantia.jp/posts/61560)
 
-  const postUrlMatch = /^\/posts\/\d+/.exec(new URL(window.location).pathname);
+  const postUrlMatch = /^\/posts\/(\d+)/.exec(new URL(window.location).pathname);
   if (postUrlMatch) {
+    const postId = postUrlMatch[1];
+
+    let _post;
+    const _fetchPost = async () => {
+      const csrfToken = $('meta[name="csrf-token"]').attr('content');
+      const url = `https://fantia.jp/api/v1/posts/${postId}`;
+      const response = await fetch(url, {
+        headers: {
+          'X-CSRF-Token': csrfToken,
+          'X-Requested-With': 'XMLHttpRequest',
+        },
+      });
+      const post = await response.json();
+      return post.post;
+    };
+    const fetchPost = () => {
+      if (_post === undefined) {
+        _post = _fetchPost();
+      }
+      return _post;
+    };
+
+    let _images;
+    const _fetchImages = async () => {
+      const post = await fetchPost();
+
+      const images = {
+        photo: {},
+        file: {},
+        blog: {},
+      };
+
+      for (const content of post.post_contents) {
+        if (content.visible_status !== 'visible') {
+          continue;
+        }
+
+        if (content.category === 'photo_gallery') {
+          for (const photo of content.post_content_photos) {
+            images.photo[photo.id] = photo.url.original;
+          }
+        }
+        else if (content.category === 'file') {
+          images.file[content.id] = new URL(content.download_uri, 'https://fantia.jp').href;
+        }
+        else if (content.category === 'blog' && content.comment) {
+          const comment = JSON.parse(content.comment);
+          for (const node of comment.ops) {
+            const fantiaImage = node.insert?.fantiaImage;
+            if (fantiaImage) {
+              images.blog[fantiaImage.id] = new URL(fantiaImage.original_url, 'https://fantia.jp').href;
+            }
+          }
+        }
+      }
+      return images;
+    };
+    const fetchImages = () => {
+      if (_images === undefined) {
+        _images = _fetchImages();
+      }
+      return _images;
+    };
+
     const ref = new URL(postUrlMatch[0], window.location).href;
     const toRef = async () => ref;
 
@@ -303,8 +367,16 @@ function initializeFantia() {
       asyncAttach: true,
       asyncClick: true,
       toUrl: async (el) => {
-        const fileId = /\/(\d+)\//.exec(new URL(el.src).pathname)[1];
-        const imagePageUrl = `${ref}/post_content_photo/${fileId}`;
+        const match = /\/file\/(\d+)\//.exec(new URL(el.src).pathname);
+        const id = Number.parseInt(match[1], 10);
+        const images = await fetchImages();
+        const url = images.photo[id];
+        if (url) {
+          return url;
+        }
+
+        // Fallback
+        const imagePageUrl = `${ref}/post_content_photo/${id}`;
         const imagePageResponse = await fetch(imagePageUrl);
         const imagePageHtml = await imagePageResponse.text();
         const imagePageDom = parseHtml(imagePageHtml);
@@ -321,7 +393,18 @@ function initializeFantia() {
       classes: ['ex-utb-upload-button-absolute'],
       asyncAttach: true,
       asyncClick: true,
-      toUrl: async el => (await fetch(el.href)).url,
+      toUrl: async (el) => {
+        // TODO: url here redirects to the image, but danbooru extractor doesn't handle it
+        // const id = $(el).data('id');
+        // const images = await fetchImages();
+        // const url = images.blog[id];
+        // if (url) {
+        //   return url;
+        // }
+
+        // Fallback
+        return (await fetch(el.href)).url;
+      },
       toRef,
       callback: async ($el, $btn) => $el.prepend($btn),
     });
@@ -333,7 +416,19 @@ function initializeFantia() {
       classes: ['ex-utb-upload-button-absolute'],
       asyncAttach: true,
       asyncClick: true,
-      toUrl: async el => (await fetch(el.href)).url,
+      toUrl: async (el) => {
+        // TODO: same case as (2)
+        // const match = /\/download\/(\d+)$/.exec(new URL(el.href).pathname);
+        // const id = Number.parseInt(match[1], 10);
+        // const images = await fetchImages();
+        // const url = images.file[id];
+        // if (url) {
+        //   return url;
+        // }
+
+        // Fallback
+        return (await fetch(el.href)).url;
+      },
       toRef,
       callback: async ($el, $btn) => $btn.insertBefore($el),
     });
