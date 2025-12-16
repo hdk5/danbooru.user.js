@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Danbooru - Copy Commentary
 // @author       hdk5
-// @version      20251209215808
+// @version      20251216152642
 // @namespace    https://github.com/hdk5/danbooru.user.js
 // @homepageURL  https://github.com/hdk5/danbooru.user.js
 // @supportURL   https://github.com/hdk5/danbooru.user.js/issues
@@ -103,7 +103,7 @@ setTimeout(() => {
   const $shortcutsWrapper = $('<div>', { class: 'copy-commentary-shortcuts' });
   let defaultQuery = `id:${postId}`;
 
-  const hasChildren = $('body').data('post-has-children') === 'true';
+  const hasChildren = $('body').data('post-has-children');
   if (hasChildren) {
     const childrenQuery = `parent:${postId}`;
     defaultQuery = childrenQuery;
@@ -118,7 +118,10 @@ setTimeout(() => {
 
   const parentId = $('body').data('post-parent-id');
   if (parentId) {
-    const parentQuery = `id:${parentId}`;
+    const parentQuery = `parent:${parentId}`;
+    if (!hasChildren) {
+      defaultQuery = parentQuery;
+    }
     const $parentShortcut = $('<a>', {
       href: '#',
       text: 'Siblings',
