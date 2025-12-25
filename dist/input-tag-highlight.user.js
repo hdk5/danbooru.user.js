@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Danbooru - Input Tag Highlight
 // @author       hdk5
-// @version      20251225031747
+// @version      20251225035656
 // @namespace    https://github.com/hdk5/danbooru.user.js
 // @homepageURL  https://github.com/hdk5/danbooru.user.js
 // @supportURL   https://github.com/hdk5/danbooru.user.js/issues
@@ -293,10 +293,10 @@ function applyHighlights(tokens) {
   return nodes;
 }
 
-$('#post_tag_string').each((i, el) => {
+$('#post_tag_string').each((_, input_textarea) => {
   GM_addStyle(SCRIPT_CSS);
 
-  const $input_textarea = $(el);
+  const $input_textarea = $(input_textarea);
   const $input_container = $('<div></div>', {
     class: 'tag-highlight-container',
   });
@@ -311,9 +311,9 @@ $('#post_tag_string').each((i, el) => {
   $input_backdrop.append($input_highlights);
 
   $input_textarea.on({
-    'input': handleInput,
-    'focus': handleInput,
-    'scroll': handleScroll,
+    input: handleInput,
+    focus: handleInput,
+    scroll: handleScroll,
   });
 
   let handleInputReq;
@@ -344,8 +344,9 @@ $('#post_tag_string').each((i, el) => {
     $input_backdrop.scrollLeft(scrollLeft);
   }
 
-  const descriptor = Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype, 'value');
-  Object.defineProperty($input_textarea.get(0), 'value', {
+  const descriptor = Object.getOwnPropertyDescriptor(input_textarea, 'value')
+    || Object.getOwnPropertyDescriptor(Object.getPrototypeOf(input_textarea), 'value');
+  Object.defineProperty(input_textarea, 'value', {
     get: descriptor.get,
     set(val) {
       descriptor.set.call(this, val);
