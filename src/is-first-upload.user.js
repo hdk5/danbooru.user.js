@@ -1,0 +1,1 @@
+../dist/is-first-upload.user.js
