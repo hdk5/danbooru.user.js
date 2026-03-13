@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Danbooru - Panzoom
 // @author       hdk5
-// @version      20251027162911
+// @version      20260313132501
 // @namespace    https://github.com/hdk5/danbooru.user.js
 // @homepageURL  https://github.com/hdk5/danbooru.user.js
 // @supportURL   https://github.com/hdk5/danbooru.user.js/issues
@@ -69,7 +69,7 @@ class MediaAssetComponent {
       this.$image.css('max-width', '100%');
 
       this.panzoom = panzoom(this.$panzoom.get(0), {
-        beforeWheel: (event) => this.handleWheel(event),
+        beforeWheel: event => this.handleWheel(event),
       });
 
       this.fit();
@@ -101,8 +101,19 @@ class MediaAssetComponent {
 
     event.preventDefault();
 
-    const degrees = Math.sign(event.deltaY) * 15;
+    const degrees = Math.abs(event.deltaY) > 15 ? Math.sign(event.deltaY) * 15 : event.deltaY;
+    const radians = (degrees * Math.PI) / 180;
+
+    const rect = this.$image.get(0).getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+    const offsetX = event.clientX - centerX;
+    const offsetY = event.clientY - centerY;
+    const rotatedX = offsetX * Math.cos(radians) - offsetY * Math.sin(radians);
+    const rotatedY = offsetX * Math.sin(radians) + offsetY * Math.cos(radians);
+
     this.setRotation(this.rotation + degrees);
+    this.panzoom.moveBy(offsetX - rotatedX, offsetY - rotatedY);
 
     return true;
   }
