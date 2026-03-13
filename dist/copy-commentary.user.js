@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Danbooru - Copy Commentary
 // @author       hdk5
-// @version      20251216152642
+// @version      20260313132501
 // @namespace    https://github.com/hdk5/danbooru.user.js
 // @homepageURL  https://github.com/hdk5/danbooru.user.js
 // @supportURL   https://github.com/hdk5/danbooru.user.js/issues
@@ -18,23 +18,32 @@
 
 /* eslint-disable no-use-before-define */
 
+const TAG_SCRIPT_SHORTCUTS = [
+  'paid_reward_available',
+  'english_commentary',
+  'korean_commentary',
+  'chinese_commentary',
+  'mixed-language_commentary',
+  'bilingual_commentary',
+];
+
 const CSS = `
   .copy-commentary summary {
     font-weight: bold;
   }
 
-  .copy-commentary-query {
+  .copy-commentary-query, .copy-commentary-tag-script {
     display: grid;
     grid-template-columns: auto 1fr auto;
     column-gap: 0.5rem;
     align-items: center;
   }
 
-  .copy-commentary-shortcuts {
+  .copy-commentary-shortcuts, .copy-commentary-tag-script-shortcuts {
     grid-column: 2 / 3;
     display: flex;
     flex-wrap: wrap;
-    gap: 0.5rem;
+    column-gap: 0.5rem;
   }
 
   .copy-commentary-status-pending,
@@ -72,20 +81,23 @@ const CSS = `
   }
 
   .copy-commentary-col-status,
-  .copy-commentary-cell-status {
+  .copy-commentary-cell-status,
+  .copy-commentary-col-tag-script-status,
+  .copy-commentary-cell-tag-script-status {
     min-width: 1rem;
     white-space: nowrap;
+    text-align: center;
   }
 
   .copy-commentary-results-table:has(tbody:empty) {
     display: none;
   }
 
-  .copy-commentary-results-table:has(tbody:empty) + .copy-commentary-submit-button {
+  .copy-commentary-results-table:has(tbody:empty) + .copy-commentary-actions {
     display: none;
   }
 
-  .copy-commentary-submit-button {
+  .copy-commentary-actions {
     display: block;
   }
 `;
@@ -182,7 +194,8 @@ setTimeout(() => {
   $headerRow.append(
     $('<th>', { class: 'copy-commentary-col-select' }).append($selectAllCheckbox),
     $('<th>', { class: 'copy-commentary-col-id', text: 'ID' }),
-    $('<th>', { class: 'copy-commentary-col-status', text: 'Status' }),
+    $('<th>', { class: 'copy-commentary-col-status', text: 'Commentary' }),
+    $('<th>', { class: 'copy-commentary-col-tag-script-status', text: 'Tag Script' }),
   );
 
   $selectAllCheckbox.on('change', () => {
@@ -194,14 +207,54 @@ setTimeout(() => {
   });
 
   const $submitButton = $('<button>', {
-    text: 'Apply',
+    text: 'Apply Commentary',
     class: 'copy-commentary-submit-button',
     click: () => submitCommentary(),
   });
 
+  const $tagScriptWrapper = $('<div>', { class: 'copy-commentary-tag-script' });
+  const $tagScriptLabel = $('<label>', {
+    for: 'copy-commentary-tag-script-input',
+    text: 'Tag Script:',
+  });
+  const $tagScriptInput = $('<input>', {
+    type: 'text',
+    id: 'copy-commentary-tag-script-input',
+  });
+  const $tagScriptSubmitButton = $('<button>', {
+    text: 'Apply Tags',
+    class: 'copy-commentary-tag-script-submit-button',
+    click: () => submitTagScript(),
+  });
+  const $tagScriptShortcutsWrapper = $('<div>', { class: 'copy-commentary-tag-script-shortcuts' });
+
+  for (const tag of TAG_SCRIPT_SHORTCUTS) {
+    const $shortcut = $('<a>', {
+      href: '#',
+      text: tag,
+      class: 'text-xs mr-2',
+      click: ev => onClickTagScriptShortcut(ev, tag),
+    });
+    $tagScriptShortcutsWrapper.append($shortcut);
+  }
+
+  $tagScriptWrapper.append(
+    $tagScriptLabel,
+    $tagScriptInput,
+    $tagScriptSubmitButton,
+    $tagScriptShortcutsWrapper,
+  );
+
+  const $actionsWrapper = $('<div>', { class: 'copy-commentary-actions' });
+  $actionsWrapper.append($submitButton, $tagScriptWrapper);
+
   $addCommentaryDialog.append($copyCommentaryDetails);
   $copyCommentaryDetails.append($('<summary>', { text: 'Copy Commentary' }));
-  $copyCommentaryDetails.append($queryWrapper, $resultsTable, $submitButton);
+  $copyCommentaryDetails.append(
+    $queryWrapper,
+    $resultsTable,
+    $actionsWrapper,
+  );
 
   const fetchPosts = async () => {
     try {
@@ -239,7 +292,9 @@ setTimeout(() => {
 
       const $row = $('<tr>');
       const $statusCell = $('<td>', { class: 'copy-commentary-cell-status' });
+      const $tagScriptStatusCell = $('<td>', { class: 'copy-commentary-cell-tag-script-status' });
       setStatus($statusCell, 'pending');
+      setStatus($tagScriptStatusCell, 'pending');
       $row.append(
         $('<td>', { class: 'copy-commentary-cell-select' }).append($checkbox),
         $('<td>', { class: 'copy-commentary-cell-id' }).append(
@@ -250,6 +305,7 @@ setTimeout(() => {
           }),
         ),
         $statusCell,
+        $tagScriptStatusCell,
       );
       $resultsTbody.append($row);
     }
@@ -272,8 +328,8 @@ setTimeout(() => {
       try {
         await $.post(`/posts/${postId}/artist_commentary/create_or_update.json`, payload);
 
-        $checkbox.prop('checked', false).trigger('change');
         setStatus($statusCell, 'success');
+        uncheckRow($row, $checkbox);
       }
       catch (error) {
         console.error('Failed to submit commentary', postId, error);
@@ -282,6 +338,50 @@ setTimeout(() => {
     }
     updateSelectAllState();
     $submitButton.prop('disabled', false);
+  };
+
+  const submitTagScript = async () => {
+    const tagString = $tagScriptInput.val()?.trim();
+    if (!tagString) {
+      return;
+    }
+
+    $tagScriptSubmitButton.prop('disabled', true);
+    const $checkedRows = $resultsTbody.find('input[type="checkbox"]:checked');
+
+    try {
+      for (const checkbox of $checkedRows) {
+        const $checkbox = $(checkbox);
+        const $row = $checkbox.closest('tr');
+        const postId = $checkbox.data('post-id');
+        const $statusCell = $row.find('.copy-commentary-cell-tag-script-status');
+        setStatus($statusCell, 'processing');
+
+        try {
+          await $.ajax({
+            type: 'PUT',
+            url: `/posts/${postId}.json`,
+            data: {
+              post: {
+                old_tag_string: '',
+                tag_string: tagString,
+              },
+            },
+          });
+
+          setStatus($statusCell, 'success');
+          uncheckRow($row, $checkbox);
+        }
+        catch (error) {
+          console.error('Failed to submit tag script', postId, error);
+          setStatus($statusCell, 'error');
+        }
+      }
+    }
+    finally {
+      updateSelectAllState();
+      $tagScriptSubmitButton.prop('disabled', false);
+    }
   };
 
   const updateSelectAllState = () => {
@@ -315,9 +415,32 @@ setTimeout(() => {
       .text(status);
   };
 
+  const uncheckRow = ($row, $checkbox) => {
+    const commentaryStatus = $row.find('.copy-commentary-cell-status').text().trim().toLowerCase();
+    const tagScriptStatus = $row.find('.copy-commentary-cell-tag-script-status').text().trim().toLowerCase();
+
+    if (commentaryStatus === 'success' && tagScriptStatus === 'success') {
+      $checkbox.prop('checked', false).trigger('change');
+    }
+  };
+
   const onClickShortcut = (ev, tag) => {
     ev.preventDefault();
     $queryInput.val(tag);
     fetchPosts();
+  };
+
+  const onClickTagScriptShortcut = (ev, tag) => {
+    ev.preventDefault();
+
+    const tokens = $tagScriptInput.val().match(/\S+/g) || [];
+    const hasTag = tokens.some(token => token.toLowerCase() === tag.toLowerCase());
+
+    if (hasTag) {
+      $tagScriptInput.val($tagScriptInput.val().replace(new RegExp(`(?<=^|\\s)${RegExp.escape(tag)}(?=$|\\s)`, 'gi'), ''));
+    }
+    else {
+      $tagScriptInput.val(`${$tagScriptInput.val().trim()} ${tag}`.trim());
+    }
   };
 }, 0);
