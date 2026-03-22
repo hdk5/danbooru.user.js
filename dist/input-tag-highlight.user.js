@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Danbooru - Input Tag Highlight
 // @author       hdk5
-// @version      20251225035656
+// @version      20260322143403
 // @namespace    https://github.com/hdk5/danbooru.user.js
 // @homepageURL  https://github.com/hdk5/danbooru.user.js
 // @supportURL   https://github.com/hdk5/danbooru.user.js/issues
@@ -153,6 +153,8 @@ const METATAGS = [
   'status',
   '-status',
 ];
+const METATAG_NAME_REGEX = new RegExp(`^(${METATAGS.join('|')}):`, 'i');
+
 const TAG_CACHE = {};
 
 // cba to set up the bundler to use my proper parser tbh
@@ -164,44 +166,63 @@ function tokenize(input) {
     const char = input[i];
 
     if (/\s/.test(char)) {
-      tokens.push({ type: 'whitespace', value: char });
-      i++;
+      const start = i;
+      while (i < input.length && /\s/.test(input[i])) {
+        i++;
+      }
+      tokens.push({ type: 'whitespace', value: input.slice(start, i) });
       continue;
     }
 
-    const metaName = METATAGS.find(name => input.startsWith(`${name}:`, i));
-    if (metaName !== undefined) {
+    const metaMatch = input.slice(i).match(METATAG_NAME_REGEX);
+    if (metaMatch !== null) {
+      const metaName = metaMatch[1];
       i += metaName.length + 1;
 
-      let value = '';
+      let value;
 
       if (input[i] === '"' || input[i] === '\'') {
-        value += input[i++];
+        const valueStart = i;
+        const quoteChar = input[i++];
 
         while (i < input.length) {
-          value += input[i++];
-          if (input[i - 1] === value[0] && input[i - 2] !== '\\') {
+          i++;
+          if (input[i - 1] === quoteChar && input[i - 2] !== '\\') {
             break;
           }
         }
+
+        value = input.slice(valueStart, i);
       }
       else {
-        while (i < input.length && !/\s/.test(input[i])) {
-          value += input[i++];
+        const valueStart = i;
+        while (i < input.length) {
+          if (/\s/.test(input[i])) {
+            break;
+          }
+
+          if (input[i] === '\\' && i + 1 < input.length && /\s/.test(input[i + 1])) {
+            i += 2;
+            continue;
+          }
+
+          i++;
         }
+
+        value = input.slice(valueStart, i);
       }
 
       tokens.push({ type: 'metatag', name: metaName, value });
       continue;
     }
 
-    let tag = '';
+    const tagStart = i;
     while (i < input.length && !/\s/.test(input[i])) {
-      tag += input[i++];
+      i++;
     }
 
-    if (tag) {
-      tokens.push({ type: 'tag', value: tag });
+    if (tagStart !== i) {
+      tokens.push({ type: 'tag', value: input.slice(tagStart, i) });
     }
   }
 
@@ -256,7 +277,7 @@ function applyHighlights(tokens) {
       htmlName.text(`${token.name}:`);
 
       const htmlValue = $('<span></span>');
-      const cat = RECLASS_METATAGS[token.name];
+      const cat = RECLASS_METATAGS[token.name.toLowerCase()];
       if (cat !== undefined) {
         htmlToken.addClass(`tag-highlight-type-${cat}`);
       }
