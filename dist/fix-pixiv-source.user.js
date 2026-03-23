@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Danbooru - Fix Pixiv Source
 // @author       hdk5
-// @version      20250727111143
+// @version      20260323110428
 // @namespace    https://github.com/hdk5/danbooru.user.js
 // @homepageURL  https://github.com/hdk5/danbooru.user.js
 // @supportURL   https://github.com/hdk5/danbooru.user.js/issues
@@ -16,12 +16,16 @@
   $
 */
 
+const PIXIV_SOURCE_REGEX = /^https:\/\/i\.pximg\.net\/img-original\/img\/\d{4}\/\d{2}\/\d{2}\/\d{2}\/\d{2}\/\d{2}\/\d+(?:-[a-f0-9]{32})?_p\d+\.\w+$/;
+
 async function fix_pixiv_source() {
   const location_match = window.location.pathname.match(/^\/uploads\/(\d+)(\/|$)/);
 
   const upload_id = location_match && location_match[1];
-  if (!upload_id)
-    return Danbooru.Notice.error('not on upload page');
+  if (!upload_id) {
+    Danbooru.Notice.error('not on upload page');
+    return;
+  }
 
   const data = await $.get(`/uploads/${upload_id}.json`, {
     only: 'media_assets[id,post[id]],upload_media_assets[id,media_asset_id,source_url]',
@@ -36,12 +40,12 @@ async function fix_pixiv_source() {
     upload_media_asset.media_asset = media_assets[upload_media_asset.media_asset_id];
 
     const post_id = upload_media_asset.media_asset.post?.id;
-    if (!post_id)
+    if (!post_id) {
       continue;
+    }
 
     const source_url = upload_media_asset.source_url;
-    const source_url_match = source_url.match(/^https:\/\/i\.pximg\.net\/img-original\/img\/\d{4}\/\d{2}\/\d{2}\/\d{2}\/\d{2}\/\d{2}\/\d+_p\d+\.\w+$/);
-    if (!source_url_match) {
+    if (!PIXIV_SOURCE_REGEX.test(source_url)) {
       Danbooru.Notice.error(`not a pixiv url: ${source_url}`);
       continue;
     }
