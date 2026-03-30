@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Danbooru - Dock Edit Form
 // @author       hdk5
-// @version      20260330201827
+// @version      20260330220619
 // @namespace    https://github.com/hdk5/danbooru.user.js
 // @homepageURL  https://github.com/hdk5/danbooru.user.js
 // @supportURL   https://github.com/hdk5/danbooru.user.js/issues
@@ -108,28 +108,28 @@ if ($('#c-posts #a-show').length) {
                 </a>
                 <ul class="popup-menu-content">
                   <li>
-                    <a x-on:click="dock = 'auto'" id="dock-auto-link" title="Rotate your screen to change layout" href="javascript:void(0)">
+                    <a x-on:click="upload.dock = 'auto'" id="dock-auto-link" title="Rotate your screen to change layout" x-bind:class="{ 'font-bold': upload.dock === 'auto' }" href="javascript:void(0)">
                       <svg class="icon svg-icon rotate-icon" viewBox="0 0 512 512">
                         <use fill="currentColor" href="${ICONS_URL}#rotate"></use>
                       </svg> Automatic
                     </a>
                   </li>
                   <li>
-                    <a x-on:click="dock = 'right'" id="dock-right-link" data-shortcut="shift+r" href="javascript:void(0)" title="Shortcut is shift+r">
+                    <a x-on:click="upload.dock = 'right'" id="dock-right-link" data-shortcut="shift+r" x-bind:class="{ 'font-bold': upload.dock === 'right' }" href="javascript:void(0)" title="Shortcut is shift+r">
                       <svg class="icon svg-icon dock-right-icon" viewBox="0 0 1024 1024">
                         <use fill="currentColor" href="${ICONS_URL}#dock-right"></use>
                       </svg> Dock to Right
                     </a>
                   </li>
                   <li>
-                    <a x-on:click="dock = 'bottom'" id="dock-bottom-link" data-shortcut="shift+b" href="javascript:void(0)" title="Shortcut is shift+b">
+                    <a x-on:click="upload.dock = 'bottom'" id="dock-bottom-link" data-shortcut="shift+b" x-bind:class="{ 'font-bold': upload.dock === 'bottom' }" href="javascript:void(0)" title="Shortcut is shift+b">
                       <svg class="icon svg-icon dock-bottom-icon" viewBox="0 0 1024 1024">
                         <use fill="currentColor" href="${ICONS_URL}#dock-bottom"></use>
                       </svg> Dock to Bottom
                     </a>
                   </li>
                   <li>
-                    <a x-on:click="dock = 'left'" id="dock-left-link" data-shortcut="shift+l" href="javascript:void(0)" title="Shortcut is shift+l">
+                    <a x-on:click="upload.dock = 'left'" id="dock-left-link" data-shortcut="shift+l" x-bind:class="{ 'font-bold': upload.dock === 'left' }" href="javascript:void(0)" title="Shortcut is shift+l">
                       <svg class="icon svg-icon dock-left-icon" viewBox="0 0 1024 1024">
                         <use fill="currentColor" href="${ICONS_URL}#dock-left"></use>
                       </svg> Dock to Left
