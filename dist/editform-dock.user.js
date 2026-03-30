@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Danbooru - Dock Edit Form
 // @author       hdk5
-// @version      20251116024444
+// @version      20260330201827
 // @namespace    https://github.com/hdk5/danbooru.user.js
 // @homepageURL  https://github.com/hdk5/danbooru.user.js
 // @supportURL   https://github.com/hdk5/danbooru.user.js/issues
@@ -18,9 +18,6 @@
 
 if ($('#c-posts #a-show').length) {
   const ICONS_URL = $('svg.icon use').attr('href')?.split('#')[0] || '/packs/static/icons-9fcf22a5166a2c24e889.svg';
-
-  const uploadEditPanelDock = JSON.parse(Danbooru.Cookie.get('upload_edit_panel_dock') || JSON.stringify('auto'));
-  const uploadEditContainerWidth = Danbooru.Cookie.get('upload_edit_container_width');
 
   const assetWidth = $('body').attr('data-post-image-width');
   const assetHeight = $('body').attr('data-post-image-height');
@@ -72,12 +69,14 @@ if ($('#c-posts #a-show').length) {
     <div id="c-uploads">
       <div id="a-show">
         <div id="p-single-asset-upload" class="h-full">
-          <div class="upload-container h-full"
-              x-data="{ dock: $persist('${uploadEditPanelDock}').as('upload_edit_panel_dock').using(Danbooru.Cookie) }"
-              x-bind:data-dock="dock"
-              data-dock="${uploadEditPanelDock}"
+          <div class="upload-container grid gap-2 h-full"
+              x-data="{ upload: new Danbooru.UploadPostComponent($el) }"
+              x-init="upload.initialize()"
+              x-bind:data-dock="upload.dock"
+              x-bind:data-edit-container-width="upload.editContainerWidth"
+              x-bind:style='{ "--edit-container-width": upload.editContainerWidth }'
           >
-            <div class="upload-image-container">
+            <div class="upload-image-container z-10">
               <div
                 class="media-asset-component media-asset-component-fit-height media-asset-component-fit-width flex flex-col h-full top-0"
                 data-dynamic-height="false"
@@ -100,7 +99,7 @@ if ($('#c-posts #a-show').length) {
             <div class="upload-edit-container">
               <div class="inline-block float-right mx-1">
                 <a class="inactive-link" href="javascript:void(0)" aria-expanded="false">
-                  <svg class="icon svg-icon close-icon" viewBox="0 0 320 512"><use fill="currentColor" href="${ICONS_URL}#xmark"></use></svg>
+                  <svg class="icon svg-icon close-icon" viewBox="0 0 320 512"><use fill="currentColor" href="${ICONS_URL}#close"></use></svg>
                 </a>
               </div>
               <div class="popup-menu inline-block float-right mx-1" data-hide-on-click="true">
@@ -145,10 +144,6 @@ if ($('#c-posts #a-show').length) {
     </div>
   `);
 
-  if (uploadEditContainerWidth !== null) {
-    cUploads.find('.upload-container').css('--edit-container-width', uploadEditContainerWidth);
-  }
-
   cUploads.find('.media-asset-container').append(assetImage);
   cUploads
     .find('.close-icon')
@@ -175,7 +170,6 @@ if ($('#c-posts #a-show').length) {
     $('#page').append(cUploads);
 
     Danbooru.RelatedTag.show();
-    Danbooru.Upload.initialize_draggable_divider();
     mediaAssetComponent.updateHeight();
     mediaAssetComponent.updateZoom();
 
